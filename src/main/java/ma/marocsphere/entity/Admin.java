@@ -14,5 +14,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class Admin extends Utilisateur {
 
-    // méthodes métier : gererUtilisateurs(), voirStatistiques(), gererReservations()
+    @Override
+    protected Role assignerRole() {
+        return Role.ADMIN;
+    }
 }
