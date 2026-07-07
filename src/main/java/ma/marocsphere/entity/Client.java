@@ -2,29 +2,31 @@ package ma.marocsphere.entity;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(name = "client")
+@Table(name = "clients")
+@PrimaryKeyJoinColumn(name = "id")
 @Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-
-public  class Client {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // Must be "id"
-
+@SuperBuilder
+public class Client extends Utilisateur {
 
     private String tierAbonnement;
 
+    // Un client possède plusieurs itinéraires
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private List<Itineraire> itineraires = new ArrayList<>();
 
-
+    // Un client effectue plusieurs réservations
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private List<Reservation> reservations = new ArrayList<>();
 }

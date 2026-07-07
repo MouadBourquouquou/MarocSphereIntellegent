@@ -1,31 +1,25 @@
 package ma.marocsphere.entity;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
 
 @Entity
 @Table(name = "utilisateurs")
+@Inheritance(strategy = InheritanceType.JOINED)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-
-public  class Utilisateur {
+@SuperBuilder
+public abstract class Utilisateur {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // Must be "id"
+    private Long id;
 
     @Column(unique = true, nullable = false)
     private String email;
@@ -36,11 +30,14 @@ public  class Utilisateur {
     private String nom;
     private String prenom;
     private String telephone;
+    private String nationalite;
+    private String languePreferee;
 
-    private String laguePreferee;
+    @Column(updatable = false)
     private LocalDateTime dateCreation;
 
-
-
-
+    @PrePersist
+    protected void onCreate() {
+        this.dateCreation = LocalDateTime.now();
+    }
 }
