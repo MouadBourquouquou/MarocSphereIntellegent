@@ -18,9 +18,8 @@ public class Itineraire {
     private Boolean genereParIA;
 
     @Column(columnDefinition = "TEXT")
-    private String jours; // stocké en JSON string (simple)
+    private String jours; // JSON stocké en string
 
-    // Relation *..1 avec Client
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id", nullable = false)
     @ToString.Exclude
