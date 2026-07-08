@@ -10,7 +10,6 @@ import lombok.experimental.SuperBuilder;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-@AllArgsConstructor
 @SuperBuilder
 public class Admin extends Utilisateur {
 
