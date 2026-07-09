@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/api/dmcs")
@@ -20,7 +20,7 @@ public class DMCController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DMCResponseDTO> getById(@PathVariable UUID id) {
+    public ResponseEntity<DMCResponseDTO> getById(@PathVariable Long id) {
         DMCResponseDTO response = dmcService.getById(id);
         return ResponseEntity.ok(response);
     }

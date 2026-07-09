@@ -10,10 +10,8 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
 @Service
-@Primary // remplace GuideServiceFake comme implémentation par défaut
+@Primary
 @RequiredArgsConstructor
 public class GuideServiceImpl implements GuideService {
 
@@ -21,8 +19,8 @@ public class GuideServiceImpl implements GuideService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public GuideResponseDTO getById(UUID id) {
-        Guide guide = guideRepo.findById(id.getMostSignificantBits() & Long.MAX_VALUE)
+    public GuideResponseDTO getById(Long id) {
+        Guide guide = guideRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Guide non trouvé avec l'id : " + id));
         return toResponseDTO(guide);
     }
@@ -32,7 +30,6 @@ public class GuideServiceImpl implements GuideService {
         if (guideRepo.existsByEmail(dto.getEmail())) {
             throw new RuntimeException("Un guide avec cet email existe déjà : " + dto.getEmail());
         }
-
         Guide guide = Guide.builder()
                 .email(dto.getEmail())
                 .password(passwordEncoder.encode(dto.getPassword()))
@@ -42,20 +39,18 @@ public class GuideServiceImpl implements GuideService {
                 .nationalite(dto.getNationalite())
                 .languePreferee(dto.getLanguePreferee())
                 .numeroLicence(dto.getNumeroLicence())
-                .statutCertification("PENDING") // statut initial
+                .statutCertification("PENDING")
                 .scoreCertification(0.0f)
                 .disponible(true)
                 .role(Role.GUIDE)
                 .build();
-
         Guide saved = guideRepo.save(guide);
         return toResponseDTO(saved);
     }
 
-    // ---- Méthode de mapping entité → DTO ----
     private GuideResponseDTO toResponseDTO(Guide guide) {
         return GuideResponseDTO.builder()
-                .id(UUID.nameUUIDFromBytes(("guide-" + guide.getId()).getBytes()))
+                .id(guide.getId())
                 .email(guide.getEmail())
                 .nom(guide.getNom())
                 .prenom(guide.getPrenom())

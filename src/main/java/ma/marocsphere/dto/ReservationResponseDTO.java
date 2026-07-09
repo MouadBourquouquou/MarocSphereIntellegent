@@ -6,16 +6,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class ReservationResponseDTO {
-    private UUID id;
-    private UUID clientId;
-    private UUID guideId;
+    private Long id;
+    private Long clientId;
+    private Long guideId;
     private String statut;
     private LocalDateTime date;
 }

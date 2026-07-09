@@ -12,10 +12,8 @@ import ma.marocsphere.repository.ReservationRepo;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
 @Service
-@Primary // remplace ReservationServiceFake comme implémentation par défaut
+@Primary
 @RequiredArgsConstructor
 public class ReservationServiceImpl implements ReservationService {
 
@@ -24,48 +22,37 @@ public class ReservationServiceImpl implements ReservationService {
     private final GuideRepo guideRepo;
 
     @Override
-    public ReservationResponseDTO getById(UUID id) {
-        Reservation reservation = reservationRepo.findById(id.getMostSignificantBits() & Long.MAX_VALUE)
+    public ReservationResponseDTO getById(Long id) {
+        Reservation reservation = reservationRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Réservation non trouvée avec l'id : " + id));
         return toResponseDTO(reservation);
     }
 
     @Override
     public ReservationResponseDTO create(ReservationCreationDTO dto) {
-        // Récupérer le client
-        Long clientId = dto.getClientId().getMostSignificantBits() & Long.MAX_VALUE;
-        Client client = clientRepo.findById(clientId)
-                .orElseThrow(() -> new RuntimeException("Client non trouvé avec l'id : " + dto.getClientId()));
-
-        // Récupérer le guide (optionnel)
+        Client client = clientRepo.findById(dto.getClientId())
+                .orElseThrow(() -> new RuntimeException("Client non trouvé : " + dto.getClientId()));
         Guide guide = null;
         if (dto.getGuideId() != null) {
-            Long guideId = dto.getGuideId().getMostSignificantBits() & Long.MAX_VALUE;
-            guide = guideRepo.findById(guideId)
-                    .orElseThrow(() -> new RuntimeException("Guide non trouvé avec l'id : " + dto.getGuideId()));
+            guide = guideRepo.findById(dto.getGuideId())
+                    .orElseThrow(() -> new RuntimeException("Guide non trouvé : " + dto.getGuideId()));
         }
-
         Reservation reservation = Reservation.builder()
                 .client(client)
                 .guide(guide)
                 .date(dto.getDate())
-                .statut("PENDING") // statut initial
+                .statut("PENDING")
                 .build();
-
         Reservation saved = reservationRepo.save(reservation);
         return toResponseDTO(saved);
     }
 
-    // ---- Méthode de mapping entité → DTO ----
     private ReservationResponseDTO toResponseDTO(Reservation reservation) {
-        UUID guideUUID = reservation.getGuide() != null
-                ? UUID.nameUUIDFromBytes(("guide-" + reservation.getGuide().getId()).getBytes())
-                : null;
-
+        Long guideId = reservation.getGuide() != null ? reservation.getGuide().getId() : null;
         return ReservationResponseDTO.builder()
-                .id(UUID.nameUUIDFromBytes(("reservation-" + reservation.getId()).getBytes()))
-                .clientId(UUID.nameUUIDFromBytes(("client-" + reservation.getClient().getId()).getBytes()))
-                .guideId(guideUUID)
+                .id(reservation.getId())
+                .clientId(reservation.getClient().getId())
+                .guideId(guideId)
                 .statut(reservation.getStatut())
                 .date(reservation.getDate())
                 .build();

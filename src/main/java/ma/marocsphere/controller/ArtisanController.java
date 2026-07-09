@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/api/artisans")
@@ -20,7 +20,7 @@ public class ArtisanController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ArtisanResponseDTO> getById(@PathVariable UUID id) {
+    public ResponseEntity<ArtisanResponseDTO> getById(@PathVariable Long id) {
         ArtisanResponseDTO response = artisanService.getById(id);
         return ResponseEntity.ok(response);
     }

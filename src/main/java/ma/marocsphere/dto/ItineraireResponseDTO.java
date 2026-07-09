@@ -5,15 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class ItineraireResponseDTO {
-    private UUID id;
-    private UUID clientId;
+    private Long id;
+    private Long clientId;
     private Boolean genereParIA;
     private String jours;
 }

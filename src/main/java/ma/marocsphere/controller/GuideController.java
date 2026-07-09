@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/api/guides")
@@ -20,7 +20,7 @@ public class GuideController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<GuideResponseDTO> getById(@PathVariable UUID id) {
+    public ResponseEntity<GuideResponseDTO> getById(@PathVariable Long id) {
         GuideResponseDTO response = guideService.getById(id);
         return ResponseEntity.ok(response);
     }

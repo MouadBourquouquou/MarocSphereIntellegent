@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/api/clients")
@@ -20,7 +20,7 @@ public class ClientController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ClientResponseDTO> getById(@PathVariable UUID id) {
+    public ResponseEntity<ClientResponseDTO> getById(@PathVariable Long id) {
         ClientResponseDTO response = clientService.getById(id);
         return ResponseEntity.ok(response);
     }

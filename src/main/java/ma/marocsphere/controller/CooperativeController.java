@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/api/cooperatives")
@@ -20,7 +20,7 @@ public class CooperativeController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CooperativeResponseDTO> getById(@PathVariable UUID id) {
+    public ResponseEntity<CooperativeResponseDTO> getById(@PathVariable Long id) {
         CooperativeResponseDTO response = cooperativeService.getById(id);
         return ResponseEntity.ok(response);
     }

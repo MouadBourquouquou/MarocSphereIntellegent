@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Configuration locale - ne pas committer ###
+src/main/resources/application.properties

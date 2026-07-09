@@ -5,16 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class AvisResponseDTO {
-    private UUID id;
-    private UUID auteurId;
-    private UUID cibleId;
+    private Long id;
+    private Long auteurId;
+    private Long cibleId;
     private Integer note;
     private String commentaire;
 }

@@ -10,10 +10,8 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
 @Service
-@Primary // remplace AdminServiceFake comme implémentation par défaut
+@Primary
 @RequiredArgsConstructor
 public class AdminServiceImpl implements AdminService {
 
@@ -21,8 +19,8 @@ public class AdminServiceImpl implements AdminService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public AdminResponseDTO getById(UUID id) {
-        Admin admin = adminRepo.findById(id.getMostSignificantBits() & Long.MAX_VALUE)
+    public AdminResponseDTO getById(Long id) {
+        Admin admin = adminRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Admin non trouvé avec l'id : " + id));
         return toResponseDTO(admin);
     }
@@ -32,7 +30,6 @@ public class AdminServiceImpl implements AdminService {
         if (adminRepo.existsByEmail(dto.getEmail())) {
             throw new RuntimeException("Un admin avec cet email existe déjà : " + dto.getEmail());
         }
-
         Admin admin = Admin.builder()
                 .email(dto.getEmail())
                 .password(passwordEncoder.encode(dto.getPassword()))
@@ -43,15 +40,13 @@ public class AdminServiceImpl implements AdminService {
                 .languePreferee(dto.getLanguePreferee())
                 .role(Role.ADMIN)
                 .build();
-
         Admin saved = adminRepo.save(admin);
         return toResponseDTO(saved);
     }
 
-    // ---- Méthode de mapping entité → DTO ----
     private AdminResponseDTO toResponseDTO(Admin admin) {
         return AdminResponseDTO.builder()
-                .id(UUID.nameUUIDFromBytes(("admin-" + admin.getId()).getBytes()))
+                .id(admin.getId())
                 .email(admin.getEmail())
                 .nom(admin.getNom())
                 .prenom(admin.getPrenom())

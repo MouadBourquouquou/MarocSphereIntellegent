@@ -12,10 +12,8 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
 @Service
-@Primary // remplace ArtisanServiceFake comme implémentation par défaut
+@Primary
 @RequiredArgsConstructor
 public class ArtisanServiceImpl implements ArtisanService {
 
@@ -24,8 +22,8 @@ public class ArtisanServiceImpl implements ArtisanService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public ArtisanResponseDTO getById(UUID id) {
-        Artisan artisan = artisanRepo.findById(id.getMostSignificantBits() & Long.MAX_VALUE)
+    public ArtisanResponseDTO getById(Long id) {
+        Artisan artisan = artisanRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Artisan non trouvé avec l'id : " + id));
         return toResponseDTO(artisan);
     }
@@ -35,15 +33,11 @@ public class ArtisanServiceImpl implements ArtisanService {
         if (artisanRepo.existsByEmail(dto.getEmail())) {
             throw new RuntimeException("Un artisan avec cet email existe déjà : " + dto.getEmail());
         }
-
-        // Récupérer la coopérative si l'artisan n'est pas indépendant
         Cooperative cooperative = null;
         if (dto.getCooperativeId() != null && !Boolean.TRUE.equals(dto.getIndependant())) {
-            Long coopId = dto.getCooperativeId().getMostSignificantBits() & Long.MAX_VALUE;
-            cooperative = cooperativeRepo.findById(coopId)
-                    .orElseThrow(() -> new RuntimeException("Coopérative non trouvée avec l'id : " + dto.getCooperativeId()));
+            cooperative = cooperativeRepo.findById(dto.getCooperativeId())
+                    .orElseThrow(() -> new RuntimeException("Coopérative non trouvée : " + dto.getCooperativeId()));
         }
-
         Artisan artisan = Artisan.builder()
                 .email(dto.getEmail())
                 .password(passwordEncoder.encode(dto.getPassword()))
@@ -59,19 +53,14 @@ public class ArtisanServiceImpl implements ArtisanService {
                 .cooperative(cooperative)
                 .role(Role.ARTISAN)
                 .build();
-
         Artisan saved = artisanRepo.save(artisan);
         return toResponseDTO(saved);
     }
 
-    // ---- Méthode de mapping entité → DTO ----
     private ArtisanResponseDTO toResponseDTO(Artisan artisan) {
-        UUID cooperativeUUID = artisan.getCooperative() != null
-                ? UUID.nameUUIDFromBytes(("cooperative-" + artisan.getCooperative().getId()).getBytes())
-                : null;
-
+        Long cooperativeId = artisan.getCooperative() != null ? artisan.getCooperative().getId() : null;
         return ArtisanResponseDTO.builder()
-                .id(UUID.nameUUIDFromBytes(("artisan-" + artisan.getId()).getBytes()))
+                .id(artisan.getId())
                 .email(artisan.getEmail())
                 .nom(artisan.getNom())
                 .prenom(artisan.getPrenom())
@@ -82,7 +71,7 @@ public class ArtisanServiceImpl implements ArtisanService {
                 .qrTraceId(artisan.getQrTraceId())
                 .eligibleExport(artisan.getEligibleExport())
                 .independant(artisan.getIndependant())
-                .cooperativeId(cooperativeUUID)
+                .cooperativeId(cooperativeId)
                 .dateCreation(artisan.getDateCreation())
                 .build();
     }

@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/api/admins")
@@ -20,7 +20,7 @@ public class AdminController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AdminResponseDTO> getById(@PathVariable UUID id) {
+    public ResponseEntity<AdminResponseDTO> getById(@PathVariable Long id) {
         AdminResponseDTO response = adminService.getById(id);
         return ResponseEntity.ok(response);
     }

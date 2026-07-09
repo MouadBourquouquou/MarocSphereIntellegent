@@ -6,15 +6,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class EvenementTraceResponseDTO {
-    private UUID id;
-    private UUID artisanId;
+    private Long id;
+    private Long artisanId;
     private String etape;
     private LocalDateTime timestamp;
     private String gps;

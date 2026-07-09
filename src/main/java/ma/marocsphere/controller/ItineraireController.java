@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/api/itineraires")
@@ -20,7 +20,7 @@ public class ItineraireController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ItineraireResponseDTO> getById(@PathVariable UUID id) {
+    public ResponseEntity<ItineraireResponseDTO> getById(@PathVariable Long id) {
         ItineraireResponseDTO response = itineraireService.getById(id);
         return ResponseEntity.ok(response);
     }

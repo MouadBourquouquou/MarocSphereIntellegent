@@ -10,10 +10,8 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
 @Service
-@Primary // remplace ClientServiceFake comme implémentation par défaut
+@Primary
 @RequiredArgsConstructor
 public class ClientServiceImpl implements ClientService {
 
@@ -21,8 +19,8 @@ public class ClientServiceImpl implements ClientService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public ClientResponseDTO getById(UUID id) {
-        Client client = clientRepo.findById(id.getMostSignificantBits() & Long.MAX_VALUE)
+    public ClientResponseDTO getById(Long id) {
+        Client client = clientRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Client non trouvé avec l'id : " + id));
         return toResponseDTO(client);
     }
@@ -32,7 +30,6 @@ public class ClientServiceImpl implements ClientService {
         if (clientRepo.existsByEmail(dto.getEmail())) {
             throw new RuntimeException("Un client avec cet email existe déjà : " + dto.getEmail());
         }
-
         Client client = Client.builder()
                 .email(dto.getEmail())
                 .password(passwordEncoder.encode(dto.getPassword()))
@@ -44,15 +41,13 @@ public class ClientServiceImpl implements ClientService {
                 .tierAbonnement(dto.getTierAbonnement())
                 .role(Role.CLIENT)
                 .build();
-
         Client saved = clientRepo.save(client);
         return toResponseDTO(saved);
     }
 
-    // ---- Méthode de mapping entité → DTO ----
     private ClientResponseDTO toResponseDTO(Client client) {
         return ClientResponseDTO.builder()
-                .id(UUID.nameUUIDFromBytes(("client-" + client.getId()).getBytes()))
+                .id(client.getId())
                 .email(client.getEmail())
                 .nom(client.getNom())
                 .prenom(client.getPrenom())

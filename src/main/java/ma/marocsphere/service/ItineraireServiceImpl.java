@@ -10,10 +10,8 @@ import ma.marocsphere.repository.ItineraireRepo;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
 @Service
-@Primary // remplace ItineraireServiceFake comme implémentation par défaut
+@Primary
 @RequiredArgsConstructor
 public class ItineraireServiceImpl implements ItineraireService {
 
@@ -21,33 +19,29 @@ public class ItineraireServiceImpl implements ItineraireService {
     private final ClientRepo clientRepo;
 
     @Override
-    public ItineraireResponseDTO getById(UUID id) {
-        Itineraire itineraire = itineraireRepo.findById(id.getMostSignificantBits() & Long.MAX_VALUE)
+    public ItineraireResponseDTO getById(Long id) {
+        Itineraire itineraire = itineraireRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Itinéraire non trouvé avec l'id : " + id));
         return toResponseDTO(itineraire);
     }
 
     @Override
     public ItineraireResponseDTO create(ItineraireCreationDTO dto) {
-        Long clientId = dto.getClientId().getMostSignificantBits() & Long.MAX_VALUE;
-        Client client = clientRepo.findById(clientId)
-                .orElseThrow(() -> new RuntimeException("Client non trouvé avec l'id : " + dto.getClientId()));
-
+        Client client = clientRepo.findById(dto.getClientId())
+                .orElseThrow(() -> new RuntimeException("Client non trouvé : " + dto.getClientId()));
         Itineraire itineraire = Itineraire.builder()
                 .client(client)
                 .genereParIA(dto.getGenereParIA())
                 .jours(dto.getJours())
                 .build();
-
         Itineraire saved = itineraireRepo.save(itineraire);
         return toResponseDTO(saved);
     }
 
-    // ---- Méthode de mapping entité → DTO ----
     private ItineraireResponseDTO toResponseDTO(Itineraire itineraire) {
         return ItineraireResponseDTO.builder()
-                .id(UUID.nameUUIDFromBytes(("itineraire-" + itineraire.getId()).getBytes()))
-                .clientId(UUID.nameUUIDFromBytes(("client-" + itineraire.getClient().getId()).getBytes()))
+                .id(itineraire.getId())
+                .clientId(itineraire.getClient().getId())
                 .genereParIA(itineraire.getGenereParIA())
                 .jours(itineraire.getJours())
                 .build();

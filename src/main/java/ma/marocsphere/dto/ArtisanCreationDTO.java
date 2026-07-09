@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,5 +21,5 @@ public class ArtisanCreationDTO {
     private String qrTraceId;
     private Boolean eligibleExport;
     private Boolean independant;
-    private UUID cooperativeId; // nullable : null si l'artisan est indépendant
+    private Long cooperativeId; // nullable : null si l'artisan est indépendant
 }

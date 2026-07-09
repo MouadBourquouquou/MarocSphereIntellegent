@@ -12,10 +12,8 @@ import ma.marocsphere.repository.GuideRepo;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
 @Service
-@Primary // remplace AvisServiceFake comme implémentation par défaut
+@Primary
 @RequiredArgsConstructor
 public class AvisServiceImpl implements AvisService {
 
@@ -24,41 +22,33 @@ public class AvisServiceImpl implements AvisService {
     private final GuideRepo guideRepo;
 
     @Override
-    public AvisResponseDTO getById(UUID id) {
-        Avis avis = avisRepo.findById(id.getMostSignificantBits() & Long.MAX_VALUE)
+    public AvisResponseDTO getById(Long id) {
+        Avis avis = avisRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Avis non trouvé avec l'id : " + id));
         return toResponseDTO(avis);
     }
 
     @Override
     public AvisResponseDTO create(AvisCreationDTO dto) {
-        // L'auteur est toujours un client
-        Long clientId = dto.getAuteurId().getMostSignificantBits() & Long.MAX_VALUE;
-        Client client = clientRepo.findById(clientId)
-                .orElseThrow(() -> new RuntimeException("Client (auteur) non trouvé avec l'id : " + dto.getAuteurId()));
-
-        // La cible est un guide
-        Long guideId = dto.getCibleId().getMostSignificantBits() & Long.MAX_VALUE;
-        Guide guide = guideRepo.findById(guideId)
-                .orElseThrow(() -> new RuntimeException("Guide (cible) non trouvé avec l'id : " + dto.getCibleId()));
-
+        Client client = clientRepo.findById(dto.getAuteurId())
+                .orElseThrow(() -> new RuntimeException("Client non trouvé : " + dto.getAuteurId()));
+        Guide guide = guideRepo.findById(dto.getCibleId())
+                .orElseThrow(() -> new RuntimeException("Guide non trouvé : " + dto.getCibleId()));
         Avis avis = Avis.builder()
                 .client(client)
                 .guide(guide)
                 .note(dto.getNote())
                 .commentaire(dto.getCommentaire())
                 .build();
-
         Avis saved = avisRepo.save(avis);
         return toResponseDTO(saved);
     }
 
-    // ---- Méthode de mapping entité → DTO ----
     private AvisResponseDTO toResponseDTO(Avis avis) {
         return AvisResponseDTO.builder()
-                .id(UUID.nameUUIDFromBytes(("avis-" + avis.getId()).getBytes()))
-                .auteurId(UUID.nameUUIDFromBytes(("client-" + avis.getClient().getId()).getBytes()))
-                .cibleId(UUID.nameUUIDFromBytes(("guide-" + avis.getGuide().getId()).getBytes()))
+                .id(avis.getId())
+                .auteurId(avis.getClient().getId())
+                .cibleId(avis.getGuide().getId())
                 .note(avis.getNote())
                 .commentaire(avis.getCommentaire())
                 .build();

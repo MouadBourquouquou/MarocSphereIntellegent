@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/api/hotels")
@@ -20,7 +20,7 @@ public class HotelController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<HotelResponseDTO> getById(@PathVariable UUID id) {
+    public ResponseEntity<HotelResponseDTO> getById(@PathVariable Long id) {
         HotelResponseDTO response = hotelService.getById(id);
         return ResponseEntity.ok(response);
     }

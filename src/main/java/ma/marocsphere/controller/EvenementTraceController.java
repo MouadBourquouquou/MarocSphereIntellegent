@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/api/evenements-trace")
@@ -20,7 +20,7 @@ public class EvenementTraceController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EvenementTraceResponseDTO> getById(@PathVariable UUID id) {
+    public ResponseEntity<EvenementTraceResponseDTO> getById(@PathVariable Long id) {
         EvenementTraceResponseDTO response = evenementTraceService.getById(id);
         return ResponseEntity.ok(response);
     }
