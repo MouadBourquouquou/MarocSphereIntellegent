@@ -25,13 +25,9 @@
               }
             ],
             "styles": [
-              "src/styles.css",
-              "src/app/pages/landingPage/styles.css",
-              "src/app/pages/landingPage/swipers.css"
+              "src/styles.css"
             ],
-            "scripts": [
-              "src/app/pages/landingPage/script.js"
-            ]
+            "scripts": [],
             "server": "src/main.server.ts",
             "outputMode": "server",
             "security": {
