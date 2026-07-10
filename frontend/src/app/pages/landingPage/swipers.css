@@ -1,0 +1,46 @@
+@import "swiper/css";
+@import "swiper/css/navigation";
+@import "swiper/css/pagination";
+@import "swiper/css/effect-coverflow";
+
+swiper-slide{
+    display: flex;
+    justify-content: center;
+    transition:all 0.4s ease;
+    width:420px;
+}
+swiper-slide article{
+
+    Width: 420px;
+    transition:all 0.4s ease;
+
+}
+
+/* Active card */
+
+swiper-slide.swiper-slide-active{
+
+    opacity:1;
+    transform:scale(1);
+
+}
+
+/* Side cards */
+
+swiper-slide.swiper-slide-prev,
+swiper-slide.swiper-slide-next{
+
+    opacity:.6;
+    transform:scale(.85);
+    filter:blur(3px);
+
+}
+
+swiper-container{
+
+    width:100%;
+    padding:40px 50px;
+
+}
+
+
