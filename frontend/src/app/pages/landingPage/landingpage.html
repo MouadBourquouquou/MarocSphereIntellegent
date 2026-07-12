@@ -2,7 +2,13 @@
       <div
         class="min-h-screen w-full bg-background flex flex-col relative text-foreground font-sans"
       >
-        <header class="border-b border-border bg-card/95 backdrop-blur-sm">
+        <header class="
+        sticky top-0 z-50 
+        border-b border-border 
+        bg-white/80 
+        backdrop-blur-xl 
+        shadow-md
+        transition-all duration-300">
           <div
             class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between gap-4"
           >
@@ -23,29 +29,36 @@
                 </p>
               </div>
             </div>
-            <nav
-              class="hidden lg:flex items-center gap-2 bg-muted p-1 rounded-xl border border-border"
-            >
+            <nav class=" 
+            flex items-center justify-between
+            rounded-xl
+            px-2 py-2
+            bg-muted/70
+            backdrop-blur-xl
+            border border-border
+            shadow-md
+            transition-all duration-300 
+            hover:shadow-lg">
               <a
-                href="/experiences"
+                href="#blogs"
                 class="px-4 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-card"
-                >Experiences</a
+                >Blogs </a
               ><a
-                href="/guides"
+                href="#guides"
                 class="px-4 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-card"
                 >Guides</a
               ><a
-                href="/artisans"
+                href="#artisans"
                 class="px-4 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-card"
                 >Artisans</a
               ><a
-                href="/dmcs"
+                href="#dmcs"
                 class="px-4 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-card"
                 >DMCs</a
               ><a
-                href="/blogs"
+                href="#experiences"
                 class="px-4 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-card"
-                >Blogs</a
+                >Experiences</a
               >
             </nav>
             <div class="flex items-center gap-3">
@@ -213,7 +226,7 @@
 
           <!-- Latest Blogs -->
 
-          <section class="py-16 border-b border-border">
+          <section class="py-16 border-b border-border" id ="blogs">
             <div class="max-w-7xl mx-auto px-6">
               <div class="flex items-end justify-between gap-4 mb-8">
                 <div>
@@ -617,7 +630,7 @@
               </button>
             </div>
           </section>
-          <section class="py-16 border-b border-border bg-muted/40">
+          <section class="py-16 border-b border-border bg-muted/40" id="experiences">
             <div class="max-w-7xl mx-auto px-6 space-y-16">
               <div>
                 <div class="flex items-end justify-between gap-4 mb-6">
@@ -741,7 +754,7 @@
                 </div>
               </div>
               <div>
-                <div class="flex items-end justify-between gap-4 mb-6">
+                <div class="flex items-end justify-between gap-4 mb-6" id="guides">
                   <div>
                     <p class="text-sm font-semibold text-primary">
                       Featured Guides
@@ -851,7 +864,7 @@
                 </div>
               </div>
               <div>
-                <div class="flex items-end justify-between gap-4 mb-6">
+                <div class="flex items-end justify-between gap-4 mb-6" id="artisans">
                   <div>
                     <p class="text-sm font-semibold text-primary">
                       Featured Artisans
