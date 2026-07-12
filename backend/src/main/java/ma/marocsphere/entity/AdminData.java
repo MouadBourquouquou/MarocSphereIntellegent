@@ -1,0 +1,19 @@
+package ma.marocsphere.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+@Entity
+@Table(name = "admin_data")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class AdminData {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String modeAcces;
+}
