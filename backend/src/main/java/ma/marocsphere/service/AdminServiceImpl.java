@@ -9,6 +9,7 @@ import ma.marocsphere.repository.AdminRepo;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Primary
@@ -26,6 +27,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional
     public AdminResponseDTO create(AdminCreationDTO dto) {
         if (adminRepo.existsByEmail(dto.getEmail())) {
             throw new RuntimeException("Un admin avec cet email existe déjà : " + dto.getEmail());
