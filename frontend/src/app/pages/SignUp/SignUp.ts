@@ -19,7 +19,7 @@ export class SignUp {
   errorMessage = signal('');
   successMessage = signal('');
 
-  roles = ['CLIENT', 'GUIDE', 'ARTISAN', 'DMC'];
+  roles = ['CLIENT', 'ARTISAN'];
   languages = ['French', 'English', 'Arabic', 'Spanish'];
 
   form: FormGroup = this.fb.group({
