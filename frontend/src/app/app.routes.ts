@@ -26,7 +26,13 @@ export const routes: Routes = [
   {
     path: 'dashboard-client',
     loadComponent: () =>
-      import('./pages/dashboards/client/dashClient').then((m) => m.DashboardClient),
+      import('./pages/dashboards/client/home/dashClient').then((m) => m.DashboardClient),
+  },
+
+  {
+    path: 'marketplace',
+    loadComponent: () =>
+      import('./pages/dashboards/client/Artisan & Guides Marketplace/marketplace').then((m) => m.marketplace),
   },
 
 ];
