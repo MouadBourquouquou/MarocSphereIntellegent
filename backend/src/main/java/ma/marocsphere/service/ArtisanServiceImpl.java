@@ -11,6 +11,7 @@ import ma.marocsphere.repository.CooperativeRepo;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Primary
@@ -29,6 +30,7 @@ public class ArtisanServiceImpl implements ArtisanService {
     }
 
     @Override
+    @Transactional
     public ArtisanResponseDTO create(ArtisanCreationDTO dto) {
         if (artisanRepo.existsByEmail(dto.getEmail())) {
             throw new RuntimeException("Un artisan avec cet email existe déjà : " + dto.getEmail());

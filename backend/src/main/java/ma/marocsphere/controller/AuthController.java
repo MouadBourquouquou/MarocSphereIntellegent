@@ -1,9 +1,12 @@
 package ma.marocsphere.controller;
 
 import lombok.RequiredArgsConstructor;
-import ma.marocsphere.dto.ClientCreationDTO;
-import ma.marocsphere.dto.ClientResponseDTO;
+import ma.marocsphere.dto.*;
+import ma.marocsphere.entity.Role;
+import ma.marocsphere.service.AdminService;
+import ma.marocsphere.service.ArtisanService;
 import ma.marocsphere.service.ClientService;
+import ma.marocsphere.service.GuideService;
 import ma.marocsphere.util.JwtUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,9 +27,12 @@ public class AuthController {
     private final UserDetailsService userDetailsService;
     private final JwtUtil jwtUtil;
     private final ClientService clientService;
+    private final AdminService adminService;
+    private final GuideService guideService;
+    private final ArtisanService artisanService;
 
     /**
-     * Connexion — retourne un token JWT
+     * Connexion — retourne un token JWT + le role
      * POST /api/auth/login
      * Body: { "email": "...", "password": "..." }
      */
@@ -35,30 +41,100 @@ public class AuthController {
         String email = credentials.get("email");
         String password = credentials.get("password");
 
-        // Vérifier les identifiants — lance BadCredentialsException si incorrect
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(email, password)
         );
 
-        // Charger l'utilisateur et générer le token
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
         String token = jwtUtil.generateToken(userDetails);
+
+        String role = userDetails.getAuthorities().iterator().next().getAuthority()
+                .replace("ROLE_", "");
 
         return ResponseEntity.ok(Map.of(
                 "token", token,
                 "email", email,
+                "role", role,
                 "message", "Connexion réussie"
         ));
     }
 
     /**
-     * Inscription d'un nouveau client
+     * Inscription — choisit le role via le champ "role"
      * POST /api/auth/register
-     * Body: { "email": "...", "password": "...", "nom": "...", ... }
+     * Body: { "email", "password", "nom", "prenom", "telephone",
+     *         "nationalite", "languePreferee", "role": "CLIENT"|"GUIDE"|"ARTISAN" }
      */
     @PostMapping("/register")
-    public ResponseEntity<ClientResponseDTO> register(@RequestBody ClientCreationDTO dto) {
-        ClientResponseDTO newClient = clientService.create(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(newClient);
+    public ResponseEntity<?> register(@RequestBody RegisterDTO dto) {
+        Role roleEnum;
+        try {
+            roleEnum = Role.valueOf(dto.getRole().toUpperCase());
+        } catch (IllegalArgumentException | NullPointerException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "message", "Role invalide. Valeurs acceptées : CLIENT, GUIDE, ARTISAN"
+            ));
+        }
+
+        switch (roleEnum) {
+            case CLIENT -> {
+                ClientCreationDTO clientDto = ClientCreationDTO.builder()
+                        .email(dto.getEmail())
+                        .password(dto.getPassword())
+                        .nom(dto.getNom())
+                        .prenom(dto.getPrenom())
+                        .telephone(dto.getTelephone())
+                        .nationalite(dto.getNationalite())
+                        .languePreferee(dto.getLanguePreferee())
+                        .build();
+                return ResponseEntity.status(HttpStatus.CREATED)
+                        .body(clientService.create(clientDto));
+            }
+            case GUIDE -> {
+                GuideCreationDTO guideDto = GuideCreationDTO.builder()
+                        .email(dto.getEmail())
+                        .password(dto.getPassword())
+                        .nom(dto.getNom())
+                        .prenom(dto.getPrenom())
+                        .telephone(dto.getTelephone())
+                        .nationalite(dto.getNationalite())
+                        .languePreferee(dto.getLanguePreferee())
+                        .build();
+                return ResponseEntity.status(HttpStatus.CREATED)
+                        .body(guideService.create(guideDto));
+            }
+            case ARTISAN -> {
+                ArtisanCreationDTO artisanDto = ArtisanCreationDTO.builder()
+                        .email(dto.getEmail())
+                        .password(dto.getPassword())
+                        .nom(dto.getNom())
+                        .prenom(dto.getPrenom())
+                        .telephone(dto.getTelephone())
+                        .nationalite(dto.getNationalite())
+                        .languePreferee(dto.getLanguePreferee())
+                        .build();
+                return ResponseEntity.status(HttpStatus.CREATED)
+                        .body(artisanService.create(artisanDto));
+            }
+            case ADMIN -> {
+                AdminCreationDTO adminDto = AdminCreationDTO.builder()
+                        .email(dto.getEmail())
+                        .password(dto.getPassword())
+                        .nom(dto.getNom())
+                        .prenom(dto.getPrenom())
+                        .telephone(dto.getTelephone())
+                        .nationalite(dto.getNationalite())
+                        .languePreferee(dto.getLanguePreferee())
+                        .role(dto.getRole())
+                        .build();
+                return ResponseEntity.status(HttpStatus.CREATED)
+                        .body(adminService.create(adminDto));
+            }
+            default -> {
+                return ResponseEntity.badRequest().body(Map.of(
+                        "message", "Ce rôle ne peut pas être créé via l'inscription"
+                ));
+            }
+        }
     }
 }

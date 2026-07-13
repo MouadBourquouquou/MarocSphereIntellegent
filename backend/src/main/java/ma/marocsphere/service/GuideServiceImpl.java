@@ -9,6 +9,7 @@ import ma.marocsphere.repository.GuideRepo;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Primary
@@ -26,6 +27,7 @@ public class GuideServiceImpl implements GuideService {
     }
 
     @Override
+    @Transactional
     public GuideResponseDTO create(GuideCreationDTO dto) {
         if (guideRepo.existsByEmail(dto.getEmail())) {
             throw new RuntimeException("Un guide avec cet email existe déjà : " + dto.getEmail());

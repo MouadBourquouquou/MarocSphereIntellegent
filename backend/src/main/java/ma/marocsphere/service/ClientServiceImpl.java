@@ -9,6 +9,7 @@ import ma.marocsphere.repository.ClientRepo;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Primary
@@ -26,6 +27,7 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
+    @Transactional
     public ClientResponseDTO create(ClientCreationDTO dto) {
         if (clientRepo.existsByEmail(dto.getEmail())) {
             throw new RuntimeException("Un client avec cet email existe déjà : " + dto.getEmail());
