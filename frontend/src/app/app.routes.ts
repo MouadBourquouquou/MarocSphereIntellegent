@@ -23,4 +23,10 @@ export const routes: Routes = [
       import('./pages/Login/login').then((m) => m.login),
   },
 
+  {
+    path: 'dashboard-client',
+    loadComponent: () =>
+      import('./pages/dashboards/client/dashClient').then((m) => m.DashboardClient),
+  },
+
 ];
