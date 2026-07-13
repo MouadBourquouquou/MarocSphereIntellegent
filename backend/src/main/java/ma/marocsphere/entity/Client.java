@@ -31,6 +31,10 @@ public class Client extends Utilisateur {
     @ToString.Exclude
     private List<Avis> avis = new ArrayList<>();
 
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private List<Subscription> subscriptions = new ArrayList<>();
+
     @Override
     protected Role assignerRole() {
         return Role.CLIENT;
