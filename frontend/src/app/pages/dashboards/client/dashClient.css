@@ -1,0 +1,66 @@
+    @import "tailwindcss";
+    @theme inline 
+    {
+        --color-background: var(--background);
+        --color-foreground: var(--foreground);
+        --color-primary: var(--primary);
+        --color-primary-foreground: var(--primary-foreground);
+        --color-secondary: var(--secondary);
+        --color-secondary-foreground: var(--secondary-foreground);
+        --color-tertiary: var(--tertiary);
+        --color-muted: var(--muted);
+        --color-muted-foreground: var(--muted-foreground);
+        --color-accent: var(--accent);
+        --color-destructive: var(--destructive);
+        --color-card: var(--card);
+        --color-card-foreground: var(--card-foreground);
+        --color-border: var(--border);
+        --color-input: var(--input);
+        --color-ring: var(--ring);
+        --radius-sm: calc(var(--radius) - 4px);
+        --radius-md: calc(var(--radius) - 2px);
+        --radius-lg: var(--radius);
+        --font-family-sans: var(--font-sans);
+        --font-family-heading: var(--font-heading);
+        --font-family-mono: var(--font-mono);
+    }
+    :root 
+    { --background: #FAF9F4;
+        --foreground: #2D2E30;
+        --primary: #9D3E26;
+        --primary-foreground: #FAF9F4;
+        --secondary: #006233;
+        --secondary-foreground: #FAF9F4;
+        --tertiary: #9D3E26;
+        --muted: #F2EFE6;
+        --muted-foreground: #5A5C5E;
+        --accent: #EBDBD3;
+        --accent-foreground: #2D2E30;
+        --card: #FFFFFF;
+        --card-foreground: #2D2E30;
+        --destructive: #EF4444;
+        --border: #E3DFD5;
+        --input: #E3DFD5;
+        --ring: #1661A1;
+        --radius: 0.75rem;
+        --font-sans: Inter, system-ui, sans-serif;
+        --font-heading: Playfair Display, Georgia, serif;
+        --font-mono: JetBrains Mono, monospace;
+        --shadow-offset-x: 0;
+        --shadow-offset-y: 10;
+        --shadow-blur: 30;
+        --shadow-spread: -8;
+        --shadow-color: rgba(15, 23, 42, 0.12); 
+    }
+    .brand-gradient { background-image: linear-gradient(135deg, var(--primary), var(--accent)); }
+    .shadow-theme {
+        box-shadow:
+        calc(var(--shadow-offset-x, 0) * 1px) calc(var(--shadow-offset-y, 10) * 1px)
+        calc(var(--shadow-blur, 30) * 1px) calc(var(--shadow-spread, -8) * 1px)
+        var(--shadow-color, rgba(15, 23, 42, 0.12));
+    }
+    .logo {
+        height: 50px;
+        width: auto;
+        object-fit: contain;
+    }
