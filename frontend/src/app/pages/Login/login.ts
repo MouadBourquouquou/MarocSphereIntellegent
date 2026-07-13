@@ -1,15 +1,46 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
-  imports: [],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './login.html',
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class login {
-  showAllServices = signal(false);
+  private fb = inject(FormBuilder);
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
-  toggleServices(): void {
-    this.showAllServices.update((v) => !v);
+  isLoading = signal(false);
+  errorMessage = signal('');
+
+  form: FormGroup = this.fb.group({
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', Validators.required],
+  });
+
+  onSubmit(): void {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    this.isLoading.set(true);
+    this.errorMessage.set('');
+
+    this.authService.login(this.form.value).subscribe({
+      next: (response) => {
+        this.isLoading.set(false);
+        const role = response.role.toLowerCase();
+        this.router.navigate([`/${role}`]);
+      },
+      error: (err) => {
+        this.isLoading.set(false);
+        const msg = err.error?.message ?? 'Email ou mot de passe incorrect.';
+        this.errorMessage.set(msg);
+      },
+    });
   }
 }

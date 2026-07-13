@@ -100,7 +100,7 @@
                 >
                   SignUp
                 </button>
-                <a href="/login">
+                <a routerLink="/login">
                   <button class="px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground">
                     Login
                   </button>
@@ -119,115 +119,131 @@
             </div>
           </div>
 
-          <!-- Role Selection -->
+          <!-- Error / Success messages -->
+          @if (errorMessage()) {
+            <div class="mx-6 mt-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
+              {{ errorMessage() }}
+            </div>
+          }
+          @if (successMessage()) {
+            <div class="mx-6 mt-4 p-3 rounded-xl bg-green-50 border border-green-200 text-green-700 text-sm">
+              {{ successMessage() }}
+            </div>
+          }
 
+          <!-- Role Selection -->
           <div class="p-6 lg:p-1 space-y-4">
             <div>
               <p class="text-sm font-semibold text-primary">Select your role</p>
               <div class="mt-2 grid grid-cols-2 gap-3">
-                <button
-                  class="px-4 py-3 rounded-2xl border border-primary bg-primary/5 p-5 shadow-sm font-semibold text-sm"
-                >
-                  Client</button
-                ><button class="px-4 py-3 rounded-2xl bg-muted text-foreground font-medium text-sm">
-                  Guide</button
-                ><button class="px-4 py-3 rounded-2xl bg-muted text-foreground font-medium text-sm">
-                  Artisan</button
-                ><button class="px-4 py-3 rounded-2xl bg-muted text-foreground font-medium text-sm">
-                  DMC
-                </button>
+                @for (role of roles; track role) {
+                  <button
+                    type="button"
+                    (click)="selectRole(role)"
+                    class="px-4 py-3 rounded-2xl font-semibold text-sm transition-colors"
+                    [class]="selectedRole() === role
+                      ? 'border border-primary bg-primary/5 shadow-sm text-foreground'
+                      : 'bg-muted text-foreground font-medium'"
+                  >
+                    {{ role }}
+                  </button>
+                }
               </div>
             </div>
           </div>
-          <div class="p-4 lg:p-8 space-y-2">
+
+          <!-- Registration Form -->
+          <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-4 lg:p-8 space-y-2">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div class="space-y-4">
                 <div>
-                  <label class="text-sm font-medium">Full name</label
-                  ><input
+                  <label class="text-sm font-medium">Prénom</label>
+                  <input
                     type="text"
-                    value="Yasmine Bensaid"
+                    formControlName="prenom"
+                    placeholder="Yasmine"
                     class="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm"
                   />
                 </div>
                 <div>
-                  <label class="text-sm font-medium">Email address</label
-                  ><input
+                  <label class="text-sm font-medium">Nom</label>
+                  <input
+                    type="text"
+                    formControlName="nom"
+                    placeholder="Bensaid"
+                    class="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm"
+                  />
+                </div>
+                <div>
+                  <label class="text-sm font-medium">Email address</label>
+                  <input
                     type="email"
-                    value="yasmine@marocsphere.com"
+                    formControlName="email"
+                    placeholder="yasmine@marocsphere.com"
                     class="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm"
                   />
                 </div>
                 <div>
-                  <label class="text-sm font-medium">Password</label
-                  ><input
+                  <label class="text-sm font-medium">Password</label>
+                  <input
                     type="password"
-                    value="password"
-                    class="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm"
-                  />
-                </div>
-                <div>
-                  <label class="text-sm font-medium">Nationality</label
-                  ><input
-                    type="text"
-                    value="Moroccan"
+                    formControlName="password"
+                    placeholder="Min 6 characters"
                     class="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm"
                   />
                 </div>
               </div>
               <div class="space-y-4">
                 <div>
-                  <label class="text-sm font-medium">Preferred language</label>
-                  <div class="mt-2 grid grid-cols-2 gap-3">
-                    <button
-                      class="px-4 py-3 rounded-xl bg-secondary text-secondary-foreground font-semibold text-sm"
-                    >
-                      French</button
-                    ><button
-                      class="px-4 py-3 rounded-xl bg-muted text-foreground font-medium text-sm"
-                    >
-                      English</button
-                    ><button
-                      class="px-4 py-3 rounded-xl bg-muted text-foreground font-medium text-sm"
-                    >
-                      Arabic</button
-                    ><button
-                      class="px-4 py-3 rounded-xl bg-muted text-foreground font-medium text-sm"
-                    >
-                      Spanish
-                    </button>
-                  </div>
+                  <label class="text-sm font-medium">Téléphone</label>
+                  <input
+                    type="tel"
+                    formControlName="telephone"
+                    placeholder="+212 6XX XX XX XX"
+                    class="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm"
+                  />
                 </div>
                 <div>
-                  <label class="text-sm font-medium">Travel style</label>
-                  <div class="mt-2 flex flex-wrap gap-2">
-                    <span class="px-3 py-2 rounded-full bg-muted text-sm font-medium">Culture</span
-                    ><span class="px-3 py-2 rounded-full bg-muted text-sm font-medium">Food</span
-                    ><span
-                      class="px-3 py-2 rounded-full bg-primary text-primary-foreground text-sm font-semibold"
-                      >Authentic stays</span
-                    >
+                  <label class="text-sm font-medium">Nationality</label>
+                  <input
+                    type="text"
+                    formControlName="nationalite"
+                    class="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm"
+                  />
+                </div>
+                <div>
+                  <label class="text-sm font-medium">Preferred language</label>
+                  <div class="mt-2 grid grid-cols-2 gap-3">
+                    @for (lang of languages; track lang) {
+                      <button
+                        type="button"
+                        (click)="selectLanguage(lang)"
+                        class="px-4 py-3 rounded-xl font-medium text-sm transition-colors"
+                        [class]="selectedLanguage() === lang
+                          ? 'bg-secondary text-secondary-foreground font-semibold'
+                          : 'bg-muted text-foreground'"
+                      >
+                        {{ lang }}
+                      </button>
+                    }
                   </div>
                 </div>
               </div>
             </div>
-            <div class="flex items-center justify-between pt-2">
+            <div class="flex items-center justify-end pt-4">
               <button
-                class="px-5 py-3 rounded-lg border border-border bg-background text-foreground font-semibold"
+                type="submit"
+                [disabled]="isLoading()"
+                class="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-semibold shadow-md disabled:opacity-50"
               >
-                Back
+                @if (isLoading()) {
+                  Création en cours...
+                } @else {
+                  Créer mon compte
+                }
               </button>
-              <div class="flex items-center gap-3">
-                <button class="px-5 py-3 rounded-lg bg-muted text-foreground font-semibold">
-                  Save Draft</button
-                ><button
-                  class="px-5 py-3 rounded-lg bg-primary text-primary-foreground font-semibold shadow-md"
-                >
-                  save Profile & Continue
-                </button>
-              </div>
             </div>
-          </div>
+          </form>
         </div>
       </section>
     </div>
