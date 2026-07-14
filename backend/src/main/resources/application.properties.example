@@ -17,3 +17,6 @@ jwt.expiration=86400000
 
 # Server
 server.port=8080
+
+# Frontend
+app.cors.allowed-origins=${FRONTEND_ORIGINS:http://localhost:4200,http://127.0.0.1:4200}

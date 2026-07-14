@@ -25,7 +25,6 @@ export class SignUp {
   errorMessage = signal('');
   successMessage = signal('');
 
-  // Cooperative lookup state
   cooperativeCheckStatus = signal<'idle' | 'checking' | 'found' | 'not-found'>('idle');
   cooperativeFoundName = signal<string>('');
 
@@ -51,9 +50,7 @@ export class SignUp {
     telephone: ['', Validators.required],
     nationalite: ['Moroccan'],
     languePreferee: ['French'],
-    // CLIENT-specific
     tierAbonnement: ['BASIC'],
-    // ARTISAN-specific
     categorieArtisanat: [''],
     eligibleExport: [false],
     independant: [true],
@@ -61,19 +58,19 @@ export class SignUp {
   });
 
   constructor() {
-    // Toggle required validator on ARTISAN fields when role changes
     effect(() => {
       const role = this.selectedRole();
       const ctrl = this.form.get('categorieArtisanat')!;
+
       if (role === 'ARTISAN') {
         ctrl.setValidators(Validators.required);
       } else {
         ctrl.clearValidators();
       }
+
       ctrl.updateValueAndValidity();
     });
 
-    // Live cooperative name lookup with debounce
     this.form.get('cooperativeNom')!.valueChanges
       .pipe(
         debounceTime(500),
@@ -84,6 +81,7 @@ export class SignUp {
             this.cooperativeCheckStatus.set('idle');
             return of(null);
           }
+
           this.cooperativeCheckStatus.set('checking');
           return this.authService.checkCooperativeNom(trimmed).pipe(
             catchError(() => {
@@ -123,13 +121,12 @@ export class SignUp {
 
     const role = this.selectedRole();
 
-    // For ARTISAN in cooperative, block submit if name not validated
     if (
       role === 'ARTISAN' &&
       !this.isIndependant &&
       this.cooperativeCheckStatus() !== 'found'
     ) {
-      this.errorMessage.set('Veuillez saisir un nom de coopérative valide.');
+      this.errorMessage.set('Veuillez saisir un nom de cooperative valide.');
       return;
     }
 
@@ -166,13 +163,13 @@ export class SignUp {
     this.authService.register(request).subscribe({
       next: () => {
         this.isLoading.set(false);
-        this.successMessage.set('Compte créé avec succès ! Redirection...');
+        this.successMessage.set('Compte cree avec succes ! Redirection...');
         setTimeout(() => this.router.navigate(['/login']), 1500);
       },
       error: (err) => {
         this.isLoading.set(false);
         const msg =
-          err.error?.message ?? "Erreur lors de l'inscription. Veuillez réessayer.";
+          err.error?.message ?? "Erreur lors de l'inscription. Veuillez reessayer.";
         this.errorMessage.set(msg);
       },
     });

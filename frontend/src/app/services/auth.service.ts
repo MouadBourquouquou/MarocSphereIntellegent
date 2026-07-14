@@ -2,6 +2,7 @@ import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs';
+import { API_BASE_URL } from '../config/api.config';
 
 export interface LoginRequest {
   email: string;
@@ -23,7 +24,7 @@ export interface RegisterRequest {
   categorieArtisanat?: string;
   eligibleExport?: boolean;
   independant?: boolean;
-  cooperativeNom?: string | null; // name typed by user — resolved to ID server-side
+  cooperativeNom?: string | null; // name typed by user, resolved to ID server-side
 }
 
 export interface AuthUser {
@@ -43,8 +44,8 @@ interface LoginResponse {
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
-  private readonly apiUrl = 'http://localhost:8080/api/auth';
-  private readonly cooperativesUrl = 'http://localhost:8080/api/cooperatives';
+  private readonly apiUrl = `${API_BASE_URL}/auth`;
+  private readonly cooperativesUrl = `${API_BASE_URL}/cooperatives`;
 
   currentUser = signal<AuthUser | null>(this.loadUser());
   isAuthenticated = computed(() => !!this.currentUser());

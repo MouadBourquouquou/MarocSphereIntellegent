@@ -8,7 +8,7 @@ export function avatarUrl(name: string): string {
 
 export function itineraireTitle(jours: string | null | undefined): string {
   if (!jours) {
-    return 'Itinéraire personnalisé';
+    return 'Itineraire personnalise';
   }
   try {
     const parsed = JSON.parse(jours) as unknown;
@@ -16,9 +16,9 @@ export function itineraireTitle(jours: string | null | undefined): string {
       return `Voyage de ${parsed.length} jour(s)`;
     }
   } catch {
-    // jours n'est pas du JSON
+    // jours is not JSON.
   }
-  return jours.length > 50 ? `${jours.slice(0, 50)}…` : jours;
+  return jours.length > 50 ? `${jours.slice(0, 50)}...` : jours;
 }
 
 export function itineraireDaysCount(jours: string | null | undefined): number {
@@ -31,17 +31,18 @@ export function itineraireDaysCount(jours: string | null | undefined): number {
       return parsed.length;
     }
   } catch {
-    // ignore
+    // ignore invalid JSON
   }
   return 0;
 }
 
 export function roleDashboardPath(role: string | null | undefined): string {
+  const normalizedRole = role?.toLowerCase().replace('role_', '') ?? '';
   const routes: Record<string, string> = {
     client: '/dashboard-client',
-    guide: '/dashboard-client',
-    artisan: '/dashboard-client',
-    admin: '/dashboard-client',
+    guide: '/dashboard-guide',
+    artisan: '/dashboard-artisan',
   };
-  return routes[role?.toLowerCase() ?? ''] ?? '/landing';
+
+  return routes[normalizedRole] ?? '/landing';
 }
