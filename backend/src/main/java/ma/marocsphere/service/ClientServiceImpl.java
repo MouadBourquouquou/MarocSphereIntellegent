@@ -3,6 +3,7 @@ package ma.marocsphere.service;
 import lombok.RequiredArgsConstructor;
 import ma.marocsphere.dto.ClientCreationDTO;
 import ma.marocsphere.dto.ClientResponseDTO;
+import ma.marocsphere.dto.ClientUpdateDTO;
 import ma.marocsphere.entity.Client;
 import ma.marocsphere.entity.Role;
 import ma.marocsphere.entity.Utilisateur;
@@ -56,6 +57,20 @@ public class ClientServiceImpl implements ClientService {
                 .tierAbonnement(dto.getTierAbonnement())
                 .role(Role.CLIENT)
                 .build();
+        Client saved = clientRepo.save(client);
+        return toResponseDTO(saved);
+    }
+
+    @Override
+    @Transactional
+    public ClientResponseDTO update(Long id, ClientUpdateDTO dto) {
+        Client client = clientRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Client non trouvé avec l'id : " + id));
+        if (dto.getNom() != null) client.setNom(dto.getNom());
+        if (dto.getPrenom() != null) client.setPrenom(dto.getPrenom());
+        if (dto.getTelephone() != null) client.setTelephone(dto.getTelephone());
+        if (dto.getNationalite() != null) client.setNationalite(dto.getNationalite());
+        if (dto.getLanguePreferee() != null) client.setLanguePreferee(dto.getLanguePreferee());
         Client saved = clientRepo.save(client);
         return toResponseDTO(saved);
     }

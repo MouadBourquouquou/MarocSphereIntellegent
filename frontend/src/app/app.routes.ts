@@ -41,6 +41,7 @@ export const routes: Routes = [
 
   {
     path: 'client-profile',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./pages/profiles/client/profileClient').then((m) => m.profileClient),
   },

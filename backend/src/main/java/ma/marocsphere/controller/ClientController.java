@@ -2,6 +2,7 @@ package ma.marocsphere.controller;
 
 import ma.marocsphere.dto.ClientCreationDTO;
 import ma.marocsphere.dto.ClientResponseDTO;
+import ma.marocsphere.dto.ClientUpdateDTO;
 import ma.marocsphere.dto.ItineraireResponseDTO;
 import ma.marocsphere.dto.ReservationResponseDTO;
 import ma.marocsphere.service.ClientService;
@@ -51,6 +52,12 @@ public class ClientController {
     @GetMapping("/{id}")
     public ResponseEntity<ClientResponseDTO> getById(@PathVariable Long id) {
         ClientResponseDTO response = clientService.getById(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ClientResponseDTO> update(@PathVariable Long id, @RequestBody ClientUpdateDTO dto) {
+        ClientResponseDTO response = clientService.update(id, dto);
         return ResponseEntity.ok(response);
     }
 

@@ -18,16 +18,16 @@
 
             <!-- Center Navigation Tabs -->
             <nav class="hidden md:flex items-center gap-1 bg-muted p-1 rounded-full border border-border/50">
-                <a href="dashboard-client">
+                <a routerLink="/dashboard-client">
                 <button
                     class="px-4 py-1.5 rounded-full text-sm font-medium text-muted-foreground hover:text-foreground transition-all">Explore</button>
                 </a>
-                <a href="marketplace">
+                <a routerLink="/marketplace">
                 <button
                     class="px-4 py-1.5 rounded-full text-sm font-medium text-muted-foreground hover:text-foreground transition-all">Artisans
                     &amp; Guides</button>
                 </a>
-                <a href="client-profile">
+                <a routerLink="/client-profile">
                 <button
                     class="px-4 py-1.5 rounded-full text-sm font-medium bg-card text-foreground shadow-sm transition-all">My
                     Profile</button>
@@ -48,10 +48,21 @@
                             class="absolute top-1 right-1 w-2.5 h-2.5 bg-primary rounded-full border-2 border-card"></span>
                     </button>
                 </div>
-                <img src="https://randomuser.me/api/portraits/men/12.jpg" alt="Youssef Alami"
+                <img [src]="avatar()" [alt]="displayName()"
                     class="w-10 h-10 rounded-full border-2 border-primary shadow-sm">
+                <button type="button" (click)="logout()"
+                    class="text-xs text-muted-foreground hover:text-primary">Déconnexion</button>
             </div>
         </header>
+
+        @if (isLoading()) {
+        <div class="p-6 text-center text-muted-foreground">Chargement de votre profil…</div>
+        }
+        @if (errorMessage()) {
+        <div class="mx-6 mt-4 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm" role="alert">
+            {{ errorMessage() }}
+        </div>
+        }
 
         <!-- Main Content Layout -->
         <main class="max-w-7xl mx-auto px-4 md:px-6 py-8 w-full flex-grow grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -71,7 +82,7 @@
                     <!-- Profile details -->
                     <div class="px-6 pb-6 relative -mt-12 flex flex-col items-center text-center">
                         <div class="relative group">
-                            <img src="https://randomuser.me/api/portraits/men/12.jpg" alt="Youssef Alami"
+                            <img [src]="avatar()" [alt]="displayName()"
                                 class="w-24 h-24 rounded-full border-4 border-card shadow-lg object-cover">
                             <button
                                 class="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-accent text-primary-foreground flex items-center justify-center shadow-md hover:scale-105 active:scale-95 transition-all"
@@ -81,7 +92,7 @@
                         </div>
 
                         <div class="mt-3 flex items-center gap-1.5 justify-center">
-                            <h2 class="text-xl font-heading font-bold text-foreground">Youssef Alami</h2>
+                            <h2 class="text-xl font-heading font-bold text-foreground">{{ displayName() }}</h2>
                             <span
                                 class="inline-flex items-center gap-1 bg-secondary/10 text-secondary text-xs font-semibold px-2 py-0.5 rounded-full border border-secondary/20">
                                 <iconify-icon icon="lucide:shield" class="text-xs"></iconify-icon>
@@ -91,22 +102,22 @@
 
                         <p class="text-xs text-muted-foreground mt-1 flex items-center gap-1">
                             <iconify-icon icon="lucide:map-pin" class="text-accent"></iconify-icon>
-                            Marrakech, Morocco
+                            {{ client()?.nationalite ?? 'Maroc' }}
                         </p>
 
                         <!-- Badges & Progress -->
                         <div class="w-full mt-6 pt-6 border-t border-border/40 flex flex-col gap-3">
                             <div class="flex justify-between items-center text-xs">
                                 <span class="text-muted-foreground">Membership Tier</span>
-                                <span class="font-bold text-accent tracking-wider uppercase">Royal Atlas Elite</span>
+                                <span class="font-bold text-accent tracking-wider uppercase">{{ client()?.tierAbonnement ?? 'Standard' }}</span>
                             </div>
                             <div class="flex justify-between items-center text-xs">
                                 <span class="text-muted-foreground">Profile Completion</span>
-                                <span class="font-bold text-secondary">85%</span>
+                                <span class="font-bold text-secondary">{{ profileCompletion() }}%</span>
                             </div>
                             <div class="w-full bg-muted h-2 rounded-full overflow-hidden">
                                 <div class="bg-secondary-foreground h-full rounded-full transition-all duration-500"
-                                    style="width: 85%"></div>
+                                    [style.width.%]="profileCompletion()"></div>
                             </div>
                         </div>
 
@@ -115,17 +126,17 @@
                             class="w-full mt-4 grid grid-cols-2 gap-2 text-left text-xs bg-muted/50 p-3 rounded-xl border border-border/30">
                             <div>
                                 <span class="text-muted-foreground block">Language</span>
-                                <span class="font-semibold text-foreground">English, Arabic, French</span>
+                                <span class="font-semibold text-foreground">{{ client()?.languePreferee ?? '—' }}</span>
                             </div>
                             <div>
                                 <span class="text-muted-foreground block">Member Since</span>
-                                <span class="font-semibold text-foreground">Oct 2025</span>
+                                <span class="font-semibold text-foreground">{{ memberSince() }}</span>
                             </div>
                         </div>
 
                         <!-- Edit action -->
                         <button
-                            (click)="switchTab('personal-info')"
+                            (click)="switchTab('personal-info'); startEdit()"
                             class="mt-5 w-full py-2.5 bg-primary text-primary-foreground rounded-xl font-medium text-sm shadow-md shadow-primary/10 hover:bg-primary/95 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
                             <iconify-icon icon="lucide:pencil" class="text-sm"></iconify-icon>
                             Edit Profile Details
@@ -141,19 +152,19 @@
                         Quick Actions
                     </h3>
                     <div class="grid grid-cols-2 gap-3">
-                        <a href="dashboard-client"
+                        <a routerLink="/dashboard-client"
                             class="flex flex-col items-center justify-center p-3 rounded-xl bg-muted/40 border border-border/30 hover:border-accent hover:bg-card hover:shadow-md hover:-translate-y-0.5 transition-all group text-center">
                             <iconify-icon icon="lucide:map"
                                 class="text-2xl text-primary group-hover:scale-110 transition-transform"></iconify-icon>
                             <span class="text-xs font-semibold mt-2 text-foreground">AI Itinerary</span>
                         </a>
-                        <a href="marketplace"
+                        <a routerLink="/marketplace"
                             class="flex flex-col items-center justify-center p-3 rounded-xl bg-muted/40 border border-border/30 hover:border-accent hover:bg-card hover:shadow-md hover:-translate-y-0.5 transition-all group text-center">
                             <iconify-icon icon="lucide:user"
                                 class="text-2xl text-secondary-foreground group-hover:scale-110 transition-transform"></iconify-icon>
                             <span class="text-xs font-semibold mt-2 text-foreground">Find Guide</span>
                         </a>
-                        <a href="marketplace"
+                        <a routerLink="/marketplace"
                             class="flex flex-col items-center justify-center p-3 rounded-xl bg-muted/40 border border-border/30 hover:border-accent hover:bg-card hover:shadow-md hover:-translate-y-0.5 transition-all group text-center">
                             <iconify-icon icon="lucide:shopping-cart"
                                 class="text-2xl text-accent group-hover:scale-110 transition-transform"></iconify-icon>
@@ -204,8 +215,7 @@
                                 <span class="p-1.5 rounded-lg bg-primary/10 text-primary"><iconify-icon
                                         icon="lucide:calendar" class="text-base"></iconify-icon></span>
                             </div>
-                            <p class="text-2xl font-bold text-foreground mt-2">2</p>
-                            <p class="text-[10px] text-secondary-foreground font-medium mt-1">Next: Sahara Dunes Nov 24</p>
+                            <p class="text-2xl font-bold text-foreground mt-2">{{ upcomingTrips() }}</p>
                         </div>
 
                         <div
@@ -216,8 +226,7 @@
                                 <span class="p-1.5 rounded-lg bg-secondary/10 text-secondary"><iconify-icon
                                         icon="lucide:circle-check" class="text-base text-secondary-foreground" ></iconify-icon></span>
                             </div>
-                            <p class="text-2xl font-bold text-foreground mt-2">14</p>
-                            <p class="text-[10px] text-muted-foreground mt-1">Across 6 regions</p>
+                            <p class="text-2xl font-bold text-foreground mt-2">{{ completedTrips() }}</p>
                         </div>
 
                         <div
@@ -228,8 +237,10 @@
                                 <span class="p-1.5 rounded-lg bg-accent/10 text-accent"><iconify-icon icon="lucide:map"
                                         class="text-base"></iconify-icon></span>
                             </div>
-                            <p class="text-2xl font-bold text-foreground mt-2">8</p>
-                            <p class="text-[10px] font-medium mt-1" style="color: #C19344;">5 AI-generated</p>
+                            <p class="text-2xl font-bold text-foreground mt-2">{{ itineraires().length }}</p>
+                            @if (aiItineraries() > 0) {
+                            <p class="text-[10px] font-medium mt-1" style="color: #C19344;">{{ aiItineraries() }} AI-generated</p>
+                            }
                         </div>
 
                         <div
@@ -240,8 +251,7 @@
                                 <span class="p-1.5 rounded-lg bg-red-500/10 text-red-500"><iconify-icon
                                         icon="lucide:heart" class="text-base"></iconify-icon></span>
                             </div>
-                            <p class="text-2xl font-bold text-foreground mt-2">19</p>
-                            <p class="text-[10px] text-muted-foreground mt-1">12 Artisans, 7 Guides</p>
+                            <p class="text-2xl font-bold text-foreground mt-2">0</p>
                         </div>
                     </div>
 
@@ -253,13 +263,13 @@
                                 <iconify-icon icon="lucide:activity" class="text-primary"></iconify-icon>
                                 Recent Travel Activity
                             </h3>
-                            <span
-                                class="text-xs text-muted-foreground hover:text-primary cursor-pointer flex items-center gap-1">View
-                                Full History <iconify-icon icon="lucide:arrow-right"></iconify-icon></span>
                         </div>
 
                         <div class="relative pl-6 border-l border-border flex flex-col gap-8">
-                            <!-- Timeline Item 1 -->
+                            @if (reservations().length === 0 && itineraires().length === 0) {
+                            <p class="text-sm text-muted-foreground">Aucune activité récente. Commencez par planifier un voyage !</p>
+                            }
+                            @for (reservation of reservations(); track reservation.id) {
                             <div class="relative">
                                 <div
                                     class="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-secondary border-4 border-card ring-4 ring-secondary/20">
@@ -267,52 +277,15 @@
                                 <div class="flex items-start justify-between">
                                     <div>
                                         <span
-                                            class="text-[10px] uppercase font-bold tracking-wider text-secondary-foreground">Reservation
-                                            Confirmed</span>
-                                        <h4 class="font-bold text-sm text-foreground mt-0.5">Atlas Mountains Trekking
-                                            Experience</h4>
-                                        <p class="text-xs text-muted-foreground mt-1">Booked with certified guide Amin
-                                            Bouaza for Oct 12 - 14.</p>
+                                            class="text-[10px] uppercase font-bold tracking-wider text-secondary-foreground">Réservation
+                                        </span>
+                                        <h4 class="font-bold text-sm text-foreground mt-0.5">Réservation #{{ reservation.id }}</h4>
+                                        <p class="text-xs text-muted-foreground mt-1">Statut: {{ reservation.statut }}</p>
                                     </div>
-                                    <span class="text-xs text-muted-foreground font-medium">Yesterday</span>
+                                    <span class="text-xs text-muted-foreground font-medium">{{ reservation.date }}</span>
                                 </div>
                             </div>
-
-                            <!-- Timeline Item 2 -->
-                            <div class="relative">
-                                <div
-                                    class="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-accent border-4 border-card ring-4 ring-accent/20">
-                                </div>
-                                <div class="flex items-start justify-between">
-                                    <div>
-                                        <span class="text-[10px] uppercase font-bold tracking-wider" style="color:#C19344">Review
-                                            Written</span>
-                                        <h4 class="font-bold text-sm text-foreground mt-0.5">Handcrafted Brass Lantern -
-                                            Fez Workshop</h4>
-                                        <p class="text-xs text-muted-foreground mt-1">Rated 5 stars: "An exquisite
-                                            masterpiece, the lighting pattern is magical."</p>
-                                    </div>
-                                    <span class="text-xs text-muted-foreground font-medium">3 days ago</span>
-                                </div>
-                            </div>
-
-                            <!-- Timeline Item 3 -->
-                            <div class="relative">
-                                <div
-                                    class="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-primary border-4 border-card ring-4 ring-primary/20">
-                                </div>
-                                <div class="flex items-start justify-between">
-                                    <div>
-                                        <span class="text-[10px] uppercase font-bold tracking-wider text-primary">AI
-                                            Itinerary Generated</span>
-                                        <h4 class="font-bold text-sm text-foreground mt-0.5">7-Day Morocco Cultural
-                                            Escape</h4>
-                                        <p class="text-xs text-muted-foreground mt-1">Customized budget-aware itinerary
-                                            including riads, artisans, and historical landmarks.</p>
-                                    </div>
-                                    <span class="text-xs text-muted-foreground font-medium">1 week ago</span>
-                                </div>
-                            </div>
+                            }
                         </div>
                     </div>
                 </div>
@@ -327,7 +300,7 @@
                                 <p class="text-xs text-muted-foreground mt-0.5">Manage your personal information and
                                     contact details.</p>
                             </div>
-                            <button id="edit-details-btn" (click)="toggleEditMode(true)"
+                            <button id="edit-details-btn" (click)="startEdit()"
                                 class="px-4 py-2 bg-muted hover:bg-border/40 text-foreground rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5">
                                 <iconify-icon icon="lucide:pencil" class="text-xs"></iconify-icon>
                                 Edit Details
@@ -338,95 +311,91 @@
                             <div>
                                 <span class="text-xs text-muted-foreground block">First Name</span>
                                 <span
-                                    class="text-sm font-semibold text-foreground mt-1 block border-b border-border/20 pb-2">Youssef</span>
+                                    class="text-sm font-semibold text-foreground mt-1 block border-b border-border/20 pb-2">{{ client()?.prenom ?? '—' }}</span>
                             </div>
                             <div>
                                 <span class="text-xs text-muted-foreground block">Last Name</span>
                                 <span
-                                    class="text-sm font-semibold text-foreground mt-1 block border-b border-border/20 pb-2">Alami</span>
-                            </div>
-                            <div>
-                                <span class="text-xs text-muted-foreground block">Username</span>
-                                <span
-                                    class="text-sm font-semibold text-foreground mt-1 block border-b border-border/20 pb-2">@youssef_alami</span>
+                                    class="text-sm font-semibold text-foreground mt-1 block border-b border-border/20 pb-2">{{ client()?.nom ?? '—' }}</span>
                             </div>
                             <div>
                                 <span class="text-xs text-muted-foreground block">Email Address</span>
                                 <span
-                                    class="text-sm font-semibold text-foreground mt-1 block border-b border-border/20 pb-2">youssef.alami@gmail.com</span>
+                                    class="text-sm font-semibold text-foreground mt-1 block border-b border-border/20 pb-2">{{ client()?.email ?? '—' }}</span>
                             </div>
                             <div>
                                 <span class="text-xs text-muted-foreground block">Phone Number</span>
                                 <span
-                                    class="text-sm font-semibold text-foreground mt-1 block border-b border-border/20 pb-2">+212
-                                    612-345678</span>
+                                    class="text-sm font-semibold text-foreground mt-1 block border-b border-border/20 pb-2">{{ client()?.telephone ?? '—' }}</span>
                             </div>
                             <div>
                                 <span class="text-xs text-muted-foreground block">Nationality</span>
                                 <span
-                                    class="text-sm font-semibold text-foreground mt-1 block border-b border-border/20 pb-2">Moroccan</span>
-                            </div>
-                            <div>
-                                <span class="text-xs text-muted-foreground block">City</span>
-                                <span
-                                    class="text-sm font-semibold text-foreground mt-1 block border-b border-border/20 pb-2">Marrakech</span>
+                                    class="text-sm font-semibold text-foreground mt-1 block border-b border-border/20 pb-2">{{ client()?.nationalite ?? '—' }}</span>
                             </div>
                             <div>
                                 <span class="text-xs text-muted-foreground block">Preferred Language</span>
                                 <span
-                                    class="text-sm font-semibold text-foreground mt-1 block border-b border-border/20 pb-2">English
-                                    (US)</span>
+                                    class="text-sm font-semibold text-foreground mt-1 block border-b border-border/20 pb-2">{{ client()?.languePreferee ?? '—' }}</span>
                             </div>
                         </div>
 
                         <!-- Interactive Edit Form (Hidden by Default) -->
-                        <form id="details-edit-form" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4"
-                            onsubmit="saveDetails(event)">
+                        <form id="details-edit-form" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="text-xs font-semibold text-muted-foreground">First Name</label>
-                                <input type="text" value="Youssef"
-                                    class="w-full mt-1 px-4 py-2.5 rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-accent text-sm">
+                                <input type="text"
+                                    class="w-full mt-1 px-4 py-2.5 rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-accent text-sm"
+                                    [value]="editPrenom()"
+                                    (input)="editPrenom.set($any($event.target).value)" />
                             </div>
                             <div>
                                 <label class="text-xs font-semibold text-muted-foreground">Last Name</label>
-                                <input type="text" value="Alami"
-                                    class="w-full mt-1 px-4 py-2.5 rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-accent text-sm">
-                            </div>
-                            <div>
-                                <label class="text-xs font-semibold text-muted-foreground">Username</label>
-                                <input type="text" value="@youssef_alami"
-                                    class="w-full mt-1 px-4 py-2.5 rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-accent text-sm">
-                            </div>
-                            <div>
-                                <label class="text-xs font-semibold text-muted-foreground">Email Address</label>
-                                <input type="email" value="youssef.alami@gmail.com"
-                                    class="w-full mt-1 px-4 py-2.5 rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-accent text-sm">
+                                <input type="text"
+                                    class="w-full mt-1 px-4 py-2.5 rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-accent text-sm"
+                                    [value]="editNom()"
+                                    (input)="editNom.set($any($event.target).value)" />
                             </div>
                             <div>
                                 <label class="text-xs font-semibold text-muted-foreground">Phone Number</label>
-                                <input type="text" value="+212 612-345678"
-                                    class="w-full mt-1 px-4 py-2.5 rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-accent text-sm">
+                                <input type="text"
+                                    class="w-full mt-1 px-4 py-2.5 rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-accent text-sm"
+                                    [value]="editTelephone()"
+                                    (input)="editTelephone.set($any($event.target).value)" />
                             </div>
                             <div>
-                                <label class="text-xs font-semibold text-muted-foreground">City</label>
-                                <input type="text" value="Marrakech"
-                                    class="w-full mt-1 px-4 py-2.5 rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-accent text-sm">
+                                <label class="text-xs font-semibold text-muted-foreground">Nationality</label>
+                                <input type="text"
+                                    class="w-full mt-1 px-4 py-2.5 rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-accent text-sm"
+                                    [value]="editNationalite()"
+                                    (input)="editNationalite.set($any($event.target).value)" />
+                            </div>
+                            <div>
+                                <label class="text-xs font-semibold text-muted-foreground">Preferred Language</label>
+                                <input type="text"
+                                    class="w-full mt-1 px-4 py-2.5 rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-accent text-sm"
+                                    [value]="editLanguePreferee()"
+                                    (input)="editLanguePreferee.set($any($event.target).value)" />
                             </div>
                             <div class="md:col-span-2 flex justify-end gap-3 mt-4 pt-4 border-t border-border/40">
-                                <button type="button" (click)="toggleEditMode(false)"
+                                <button type="button" (click)="cancelEdit()"
                                     class="px-4 py-2.5 rounded-xl border border-border text-xs font-semibold text-foreground hover:bg-muted transition-all">Cancel</button>
-                                <button type="submit"
-                                    class="px-5 py-2.5 rounded-xl bg-primary text-primary-foreground text-xs font-semibold shadow-md shadow-primary/15 hover:bg-primary/95 transition-all">Save
-                                    Changes</button>
+                                <button type="submit" (click)="saveDetails($event)"
+                                    class="px-5 py-2.5 rounded-xl bg-primary text-primary-foreground text-xs font-semibold shadow-md shadow-primary/15 hover:bg-primary/95 transition-all"
+                                    [disabled]="isSaving()">
+                                    {{ isSaving() ? 'Saving...' : 'Save Changes' }}
+                                </button>
                             </div>
                         </form>
 
-                        <!-- Toast Success Alert (Hidden) -->
-                        <div id="success-toast"
-                            class="hidden mt-4 p-3 bg-secondary/15 border border-secondary/30 rounded-xl flex items-center gap-2.5 text-secondary text-xs font-semibold animate-pulse">
+                        <!-- Toast Success Alert -->
+                        @if (showSuccessToast()) {
+                        <div
+                            class="mt-4 p-3 bg-secondary/15 border border-secondary/30 rounded-xl flex items-center gap-2.5 text-secondary text-xs font-semibold animate-pulse">
                             <iconify-icon icon="lucide:circle-check" class="text-lg"></iconify-icon>
-                            Profile details updated successfully with rich transitions!
+                            Profile details updated successfully!
                         </div>
+                        }
                     </div>
                 </div>
 
@@ -460,10 +429,6 @@
                                         class="px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-semibold flex items-center gap-1">
                                         <iconify-icon icon="lucide:map" class="text-sm"></iconify-icon> Historical
                                         Exploration
-                                    </span>
-                                    <span
-                                        class="px-3 py-1.5 rounded-full bg-muted border border-border/50 text-muted-foreground text-xs font-medium hover:text-foreground hover:bg-border/20 cursor-pointer transition-all">
-                                        + Add Style
                                     </span>
                                 </div>
                             </div>

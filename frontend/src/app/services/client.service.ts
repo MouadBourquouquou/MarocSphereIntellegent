@@ -16,6 +16,10 @@ export class ClientService {
     return this.http.get<ClientProfile>(`${this.baseUrl}/${id}`);
   }
 
+  updateProfile(id: number, data: Partial<ClientProfile>) {
+    return this.http.put<ClientProfile>(`${this.baseUrl}/${id}`, data);
+  }
+
   getItineraires(clientId: number) {
     return this.http.get<Itineraire[]>(`${this.baseUrl}/${clientId}/itineraires`);
   }
