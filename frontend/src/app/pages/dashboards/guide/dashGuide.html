@@ -1,0 +1,363 @@
+<div data-page="guide-profile-agenda-workspace">
+
+    <div class="min-h-screen w-full bg-background flex flex-col relative font-sans text-foreground">
+        <!-- Top Navigation Bar -->
+        <header
+            class="bg-card border-b border-border px-6 py-3 flex items-center justify-between sticky top-0 z-50 shadow-sm">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-heading font-bold text-lg shadow-md">
+                    M</div>
+                <div>
+                    <span class="font-heading font-bold text-lg tracking-wide text-foreground">MarocSphere</span>
+                    <span class="block text-[10px] text-muted-foreground uppercase tracking-wider">Professional Guide
+                        Workspace</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div
+                    class="flex items-center gap-2 bg-secondary/15 text-secondary px-3.5 py-1.5 rounded-full border border-secondary/20">
+                    <span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+                    <span class="text-xs font-bold uppercase tracking-wider">Available For Bookings</span>
+                </div>
+                <div class="flex items-center gap-3 border-l border-border pl-4">
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Amin Bouaza"
+                        class="w-9 h-9 rounded-full border-2 border-primary shadow-sm">
+                    <div class="hidden sm:block text-left">
+                        <p class="text-xs font-bold text-foreground leading-tight">Amin Bouaza</p>
+                        <p class="text-[10px] text-muted-foreground">Certified Heritage Guide</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Profile Workspace Grid -->
+        <div class="flex-1 flex flex-col lg:flex-row">
+            <!-- Left Column: Guide Biography & Professional Info (4 Cols equivalent) -->
+            <aside
+                class="w-full lg:w-96 bg-card border-r border-border p-6 flex flex-col gap-6 shrink-0 overflow-y-auto">
+                <!-- Profile Header Hero -->
+                <div class="text-center">
+                    <div class="relative w-28 h-28 mx-auto mb-4">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Amin Bouaza"
+                            class="w-full h-full rounded-full object-cover border-4 border-card shadow-lg">
+                        <span
+                            class="absolute bottom-1 right-1 w-6 h-6 bg-tertiary text-card rounded-full flex items-center justify-center shadow-md"
+                            title="Certified Expert">
+                            <iconify-icon icon="lucide:shield" class="text-sm"></iconify-icon>
+                        </span>
+                    </div>
+                    <h2 class="font-heading font-bold text-xl text-foreground">Amin Bouaza</h2>
+                    <p class="text-xs text-muted-foreground mt-1">Medina History &amp; Architectural Specialist</p>
+
+                    <!-- Certification Status Badge -->
+                    <div class="flex justify-center gap-1.5 mt-3">
+                        <span
+                            class="bg-tertiary/10 text-tertiary text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1">
+                            <iconify-icon icon="lucide:star"></iconify-icon> Score: 4.9 (124 Reviews)
+                        </span>
+                        <span
+                            class="bg-secondary/10 text-secondary text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                            Lic. #2948-MA
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Quick Bio -->
+                <div class="border-t border-border pt-5">
+                    <h3 class="font-heading font-bold text-sm text-foreground mb-2">Biography</h3>
+                    <p class="text-xs text-muted-foreground leading-relaxed">
+                        Born and raised in the heart of the Marrakech Medina, I have spent over 12 years guiding
+                        visitors through Morocco's architectural wonders, royal palaces, and hidden craft cooperatives.
+                        Passionate about preserving authentic heritage and storytelling.
+                    </p>
+                </div>
+
+                <!-- Language Filter & Languages Spoken -->
+                <div class="border-t border-border pt-5">
+                    <h3 class="font-heading font-bold text-sm text-foreground mb-2.5">Languages Spoken</h3>
+                    <div class="flex flex-wrap gap-1.5">
+                        <span class="bg-muted text-foreground text-xs font-semibold px-2.5 py-1 rounded-md">Arabic
+                            (Native)</span>
+                        <span class="bg-muted text-foreground text-xs font-semibold px-2.5 py-1 rounded-md">French
+                            (Fluent)</span>
+                        <span class="bg-muted text-foreground text-xs font-semibold px-2.5 py-1 rounded-md">English
+                            (Fluent)</span>
+                        <span class="bg-muted text-foreground text-xs font-semibold px-2.5 py-1 rounded-md">Spanish
+                            (Conversational)</span>
+                    </div>
+
+                    <!-- Language Filter Demo Box for clients -->
+                    <div class="mt-4 bg-accent/40 border border-border rounded-lg p-3">
+                        <p class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Client
+                            Search Filter Demo</p>
+                        <div class="flex items-center gap-2">
+                            <select
+                                class="bg-card border border-border rounded px-2 py-1 text-xs text-foreground flex-1">
+                                <option>Filter by English</option>
+                                <option>Filter by German</option>
+                                <option>Filter by French</option>
+                            </select>
+                            <button
+                                class="bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded">Search</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="border-t border-border pt-5 grid grid-cols-2 gap-3 text-center">
+                    <div class="bg-muted/50 p-3 rounded-lg border border-border">
+                        <p class="text-[10px] text-muted-foreground uppercase font-bold">Total Bookings</p>
+                        <p class="text-lg font-bold text-foreground mt-0.5">342</p>
+                    </div>
+                    <div class="bg-muted/50 p-3 rounded-lg border border-border">
+                        <p class="text-[10px] text-muted-foreground uppercase font-bold">Hourly Rate</p>
+                        <p class="text-lg font-bold text-primary mt-0.5">350 MAD</p>
+                    </div>
+                </div>
+
+                <!-- Guide Actions -->
+                <div class="border-t border-border pt-5 flex flex-col gap-2">
+                    <button
+                        class="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs py-3 rounded-lg shadow-md transition-all flex items-center justify-center gap-2">
+                        <iconify-icon icon="lucide:calendar" class="text-base"></iconify-icon> Book Guide Now
+                    </button>
+                    <button
+                        class="border border-border hover:bg-accent/50 text-foreground font-semibold text-xs py-3 rounded-lg transition-all flex items-center justify-center gap-2">
+                        <iconify-icon icon="lucide:message-circle" class="text-base"></iconify-icon> Contact Guide
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Right Column: Interactive Agenda & Schedule Workspace -->
+            <main class="flex-1 bg-background p-6 flex flex-col gap-6 overflow-y-auto">
+                <!-- Agenda Header -->
+                <div
+                    class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
+                    <div>
+                        <h1 class="font-heading font-bold text-2xl text-foreground">Guide Agenda &amp; Availability</h1>
+                        <p class="text-xs text-muted-foreground mt-0.5">Manage working hours, block vacation periods,
+                            and approve incoming reservation requests.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button
+                            class="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-bold text-xs px-4 py-2.5 rounded-lg transition-all flex items-center gap-1.5 shadow-sm">
+                            <iconify-icon icon="lucide:plus" class="text-base"></iconify-icon> Add Available Dates
+                        </button>
+                        <button
+                            class="border border-border hover:bg-card text-foreground font-semibold text-xs px-4 py-2.5 rounded-lg transition-all">
+                            Sync Calendar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Calendar & Reservations Grid -->
+                <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+                    <!-- Interactive Calendar Widget (7 Cols) -->
+                    <div class="xl:col-span-7 bg-card border border-border rounded-xl p-5 shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-heading font-bold text-base text-foreground">October 2026</h3>
+                            <div class="flex items-center gap-1">
+                                <button class="p-1.5 rounded-lg hover:bg-muted text-foreground transition-colors">
+                                    <iconify-icon icon="lucide:arrow-left" class="text-lg"></iconify-icon>
+                                </button>
+                                <button class="p-1.5 rounded-lg hover:bg-muted text-foreground transition-colors">
+                                    <iconify-icon icon="lucide:arrow-right" class="text-lg"></iconify-icon>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Calendar Days Grid -->
+                        <div
+                            class="grid grid-cols-7 gap-2 text-center text-xs font-semibold text-muted-foreground mb-2">
+                            <div>Mon</div>
+                            <div>Tue</div>
+                            <div>Wed</div>
+                            <div>Thu</div>
+                            <div>Fri</div>
+                            <div>Sat</div>
+                            <div>Sun</div>
+                        </div>
+                        <div class="grid grid-cols-7 gap-2">
+                            <!-- Row 1 -->
+                            <div
+                                class="aspect-square bg-muted/30 rounded-lg p-1 text-muted-foreground text-xs cursor-not-allowed flex flex-col justify-between">
+                                <span>28</span>
+                            </div>
+                            <div
+                                class="aspect-square bg-muted/30 rounded-lg p-1 text-muted-foreground text-xs cursor-not-allowed flex flex-col justify-between">
+                                <span>29</span>
+                            </div>
+                            <div
+                                class="aspect-square bg-muted/30 rounded-lg p-1 text-muted-foreground text-xs cursor-not-allowed flex flex-col justify-between">
+                                <span>30</span>
+                            </div>
+                            <div
+                                class="aspect-square bg-card border border-border rounded-lg p-1 text-foreground text-xs hover:border-primary cursor-pointer flex flex-col justify-between">
+                                <span>1</span>
+                            </div>
+                            <div
+                                class="aspect-square bg-card border border-border rounded-lg p-1 text-foreground text-xs hover:border-primary cursor-pointer flex flex-col justify-between">
+                                <span>2</span>
+                            </div>
+                            <div
+                                class="aspect-square bg-card border border-border rounded-lg p-1 text-foreground text-xs hover:border-primary cursor-pointer flex flex-col justify-between">
+                                <span>3</span>
+                            </div>
+                            <div
+                                class="aspect-square bg-card border border-border rounded-lg p-1 text-foreground text-xs hover:border-primary cursor-pointer flex flex-col justify-between">
+                                <span>4</span>
+                            </div>
+
+                            <!-- Row 2 -->
+                            <div
+                                class="aspect-square bg-card border border-border rounded-lg p-1 text-foreground text-xs hover:border-primary cursor-pointer flex flex-col justify-between">
+                                <span>5</span>
+                            </div>
+                            <div
+                                class="aspect-square bg-card border border-border rounded-lg p-1 text-foreground text-xs hover:border-primary cursor-pointer flex flex-col justify-between">
+                                <span>6</span>
+                            </div>
+                            <div
+                                class="aspect-square bg-card border border-border rounded-lg p-1 text-foreground text-xs hover:border-primary cursor-pointer flex flex-col justify-between">
+                                <span>7</span>
+                            </div>
+                            <div
+                                class="aspect-square bg-card border border-border rounded-lg p-1 text-foreground text-xs hover:border-primary cursor-pointer flex flex-col justify-between">
+                                <span>8</span>
+                            </div>
+                            <!-- Blocked Vacation Date -->
+                            <div class="aspect-square bg-destructive/10 border border-destructive/20 rounded-lg p-1 text-destructive text-xs cursor-pointer flex flex-col justify-between"
+                                title="Blocked Vacation">
+                                <span>9</span>
+                                <span class="block text-[8px] font-bold text-center">Vacation</span>
+                            </div>
+                            <div
+                                class="aspect-square bg-card border border-border rounded-lg p-1 text-foreground text-xs hover:border-primary cursor-pointer flex flex-col justify-between">
+                                <span>10</span>
+                            </div>
+                            <div
+                                class="aspect-square bg-card border border-border rounded-lg p-1 text-foreground text-xs hover:border-primary cursor-pointer flex flex-col justify-between">
+                                <span>11</span>
+                            </div>
+
+                            <!-- Row 3 -->
+                            <!-- Active Booked Date -->
+                            <div class="aspect-square bg-secondary/15 border border-secondary/30 rounded-lg p-1 text-secondary text-xs cursor-pointer flex flex-col justify-between"
+                                title="Booked Trip">
+                                <span>12</span>
+                                <span class="block text-[8px] font-bold text-center">Booked</span>
+                            </div>
+                            <div class="aspect-square bg-secondary/15 border border-secondary/30 rounded-lg p-1 text-secondary text-xs cursor-pointer flex flex-col justify-between"
+                                title="Booked Trip">
+                                <span>13</span>
+                                <span class="block text-[8px] font-bold text-center">Booked</span>
+                            </div>
+                            <div class="aspect-square bg-secondary/15 border border-secondary/30 rounded-lg p-1 text-secondary text-xs cursor-pointer flex flex-col justify-between"
+                                title="Booked Trip">
+                                <span>14</span>
+                                <span class="block text-[8px] font-bold text-center">Booked</span>
+                            </div>
+                            <div
+                                class="aspect-square bg-card border border-border rounded-lg p-1 text-foreground text-xs hover:border-primary cursor-pointer flex flex-col justify-between">
+                                <span>15</span>
+                            </div>
+                            <div
+                                class="aspect-square bg-card border border-border rounded-lg p-1 text-foreground text-xs hover:border-primary cursor-pointer flex flex-col justify-between">
+                                <span>16</span>
+                            </div>
+                            <div
+                                class="aspect-square bg-card border border-border rounded-lg p-1 text-foreground text-xs hover:border-primary cursor-pointer flex flex-col justify-between">
+                                <span>17</span>
+                            </div>
+                            <div
+                                class="aspect-square bg-card border border-border rounded-lg p-1 text-foreground text-xs hover:border-primary cursor-pointer flex flex-col justify-between">
+                                <span>18</span>
+                            </div>
+                        </div>
+
+                        <div
+                            class="flex items-center gap-4 mt-4 pt-4 border-t border-border text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded bg-secondary"></span> Booked Date
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded bg-destructive"></span> Blocked/Vacation
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded border border-border bg-card"></span> Available
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Incoming Reservations & Requests (5 Cols) -->
+                    <div class="xl:col-span-5 flex flex-col gap-4">
+                        <div class="bg-card border border-border rounded-xl p-5 shadow-sm">
+                            <h3 class="font-heading font-bold text-base text-foreground mb-4">Pending Reservations</h3>
+
+                            <div class="flex flex-col gap-3">
+                                <!-- Request Card 1 -->
+                                <div class="border border-border rounded-lg p-4 bg-accent/30 relative">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <span
+                                            class="text-[9px] bg-tertiary/10 text-tertiary px-2 py-0.5 rounded font-bold uppercase">ID:
+                                            #RES-9482</span>
+                                        <span class="text-xs font-bold text-primary">350 MAD/hr</span>
+                                    </div>
+                                    <div class="flex items-center gap-2.5 mb-3">
+                                        <img src="https://randomuser.me/api/portraits/men/12.jpg"
+                                            class="w-7 h-7 rounded-full" alt="Client Youssef">
+                                        <div>
+                                            <p class="text-xs font-bold text-foreground">Youssef Alami</p>
+                                            <p class="text-[10px] text-muted-foreground">Oct 20, 2026 • 3 Hours</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <button
+                                            class="bg-secondary hover:bg-secondary/95 text-secondary-foreground font-bold text-[11px] px-3 py-1.5 rounded flex-1 transition-all">
+                                            Accept
+                                        </button>
+                                        <button
+                                            class="border border-border hover:bg-destructive/10 hover:text-destructive text-muted-foreground font-semibold text-[11px] px-3 py-1.5 rounded flex-1 transition-all">
+                                            Reject
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Request Card 2 -->
+                                <div class="border border-border rounded-lg p-4 bg-accent/30 relative">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <span
+                                            class="text-[9px] bg-tertiary/10 text-tertiary px-2 py-0.5 rounded font-bold uppercase">ID:
+                                            #RES-9411</span>
+                                        <span class="text-xs font-bold text-primary">350 MAD/hr</span>
+                                    </div>
+                                    <div class="flex items-center gap-2.5 mb-3">
+                                        <img src="https://randomuser.me/api/portraits/women/44.jpg"
+                                            class="w-7 h-7 rounded-full" alt="Client Sarah">
+                                        <div>
+                                            <p class="text-xs font-bold text-foreground">Sarah Jenkins</p>
+                                            <p class="text-[10px] text-muted-foreground">Oct 22, 2026 • Full Day</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <button
+                                            class="bg-secondary hover:bg-secondary/95 text-secondary-foreground font-bold text-[11px] px-3 py-1.5 rounded flex-1 transition-all">
+                                            Accept
+                                        </button>
+                                        <button
+                                            class="border border-border hover:bg-destructive/10 hover:text-destructive text-muted-foreground font-semibold text-[11px] px-3 py-1.5 rounded flex-1 transition-all">
+                                            Reject
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+</div>
