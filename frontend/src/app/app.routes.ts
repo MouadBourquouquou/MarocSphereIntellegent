@@ -53,5 +53,11 @@ export const routes: Routes = [
       import('./pages/dashboards/guide/dashGuide').then((m) => m.dashGuide),
   },
 
+  {
+    path: 'admin',
+    loadComponent: () =>
+      import('./pages/admin/admin').then((m) => m.admin),
+  },
+
 
 ];
