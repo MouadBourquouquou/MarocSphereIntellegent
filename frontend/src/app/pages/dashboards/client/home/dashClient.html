@@ -43,15 +43,16 @@
                 <span class="text-xs text-muted-foreground font-medium">My Wallet:</span>
                 <span class="text-sm font-bold text-foreground">0 MAD</span>
             </div>
-
-            <div class="flex items-center gap-2">
-                <img [src]="avatar()" [alt]="displayName()"
-                    class="w-9 h-9 rounded-full border-2 border-primary object-cover" />
-                <div class="hidden md:block text-left">
-                    <p class="text-xs font-semibold">{{ displayName() }}</p>
-                    <button type="button" (click)="logout()" class="text-[10px] text-muted-foreground hover:text-primary">Déconnexion</button>
-                </div>
-            </div>
+              <div class="flex items-center gap-2">
+                <a href="client-profile">
+                  <img [src]="avatar()" [alt]="displayName()"
+                      class="w-9 h-9 rounded-full border-2 border-primary object-cover" />
+                            </a>
+                  <div class="hidden md:block text-left">
+                      <p class="text-xs font-semibold">{{ displayName() }}</p>
+                      <button type="button" (click)="logout()" class="text-[10px] text-muted-foreground hover:text-primary">Déconnexion</button>
+                  </div>
+              </div>
         </div>
     </header>
 
