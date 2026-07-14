@@ -18,4 +18,13 @@ public class RegisterDTO {
     private String nationalite;
     private String languePreferee;
     private String role; // "CLIENT", "GUIDE", "ARTISAN"
+
+    // CLIENT-specific
+    private String tierAbonnement;
+
+    // ARTISAN-specific
+    private String categorieArtisanat;
+    private Boolean eligibleExport;
+    private Boolean independant;
+    private String cooperativeNom; // user types the name; resolved to ID server-side
 }

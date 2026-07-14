@@ -8,6 +8,8 @@ import ma.marocsphere.repository.CooperativeRepo;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @Primary
 @RequiredArgsConstructor
@@ -20,6 +22,11 @@ public class CooperativeServiceImpl implements CooperativeService {
         Cooperative cooperative = cooperativeRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Coopérative non trouvée avec l'id : " + id));
         return toResponseDTO(cooperative);
+    }
+
+    @Override
+    public Optional<CooperativeResponseDTO> findByNom(String nom) {
+        return cooperativeRepo.findByNom(nom).map(this::toResponseDTO);
     }
 
     @Override
