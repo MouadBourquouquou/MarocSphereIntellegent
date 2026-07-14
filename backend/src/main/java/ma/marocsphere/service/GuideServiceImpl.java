@@ -11,6 +11,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Primary
 @RequiredArgsConstructor
@@ -24,6 +26,13 @@ public class GuideServiceImpl implements GuideService {
         Guide guide = guideRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Guide non trouvé avec l'id : " + id));
         return toResponseDTO(guide);
+    }
+
+    @Override
+    public List<GuideResponseDTO> getAll() {
+        return guideRepo.findAll().stream()
+                .map(this::toResponseDTO)
+                .toList();
     }
 
     @Override

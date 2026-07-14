@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { roleDashboardPath } from '../../utils/display.utils';
 
 @Component({
   selector: 'app-login',
@@ -33,8 +34,7 @@ export class login {
     this.authService.login(this.form.value).subscribe({
       next: (response) => {
         this.isLoading.set(false);
-        const role = response.role.toLowerCase();
-        this.router.navigate([`/${role}`]);
+        this.router.navigate([roleDashboardPath(response.role)]);
       },
       error: (err) => {
         this.isLoading.set(false);

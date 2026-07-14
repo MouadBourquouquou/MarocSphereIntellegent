@@ -13,6 +13,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Primary
 @RequiredArgsConstructor
@@ -27,6 +29,13 @@ public class ArtisanServiceImpl implements ArtisanService {
         Artisan artisan = artisanRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Artisan non trouvé avec l'id : " + id));
         return toResponseDTO(artisan);
+    }
+
+    @Override
+    public List<ArtisanResponseDTO> getAll() {
+        return artisanRepo.findAll().stream()
+                .map(this::toResponseDTO)
+                .toList();
     }
 
     @Override

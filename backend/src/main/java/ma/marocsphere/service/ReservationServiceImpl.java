@@ -12,6 +12,8 @@ import ma.marocsphere.repository.ReservationRepo;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Primary
 @RequiredArgsConstructor
@@ -26,6 +28,13 @@ public class ReservationServiceImpl implements ReservationService {
         Reservation reservation = reservationRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Réservation non trouvée avec l'id : " + id));
         return toResponseDTO(reservation);
+    }
+
+    @Override
+    public List<ReservationResponseDTO> getByClientId(Long clientId) {
+        return reservationRepo.findByClientId(clientId).stream()
+                .map(this::toResponseDTO)
+                .toList();
     }
 
     @Override

@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -25,12 +26,14 @@ export const routes: Routes = [
 
   {
     path: 'dashboard-client',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./pages/dashboards/client/home/dashClient').then((m) => m.DashboardClient),
   },
 
   {
     path: 'marketplace',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./pages/dashboards/client/Artisan & Guides Marketplace/marketplace').then((m) => m.marketplace),
   },

@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 
 @RestController
@@ -17,6 +19,11 @@ public class GuideController {
 
     public GuideController(GuideService guideService) {
         this.guideService = guideService;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<GuideResponseDTO>> getAll() {
+        return ResponseEntity.ok(guideService.getAll());
     }
 
     @GetMapping("/{id}")

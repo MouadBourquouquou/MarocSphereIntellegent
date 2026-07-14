@@ -10,6 +10,8 @@ import ma.marocsphere.repository.ItineraireRepo;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Primary
 @RequiredArgsConstructor
@@ -23,6 +25,13 @@ public class ItineraireServiceImpl implements ItineraireService {
         Itineraire itineraire = itineraireRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Itinéraire non trouvé avec l'id : " + id));
         return toResponseDTO(itineraire);
+    }
+
+    @Override
+    public List<ItineraireResponseDTO> getByClientId(Long clientId) {
+        return itineraireRepo.findByClientId(clientId).stream()
+                .map(this::toResponseDTO)
+                .toList();
     }
 
     @Override

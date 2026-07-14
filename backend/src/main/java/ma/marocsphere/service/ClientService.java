@@ -5,5 +5,6 @@ import ma.marocsphere.dto.ClientResponseDTO;
 
 public interface ClientService {
     ClientResponseDTO getById(Long id);
+    ClientResponseDTO getByEmail(String email);
     ClientResponseDTO create(ClientCreationDTO dto);
 }
