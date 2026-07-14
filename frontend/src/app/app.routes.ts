@@ -38,4 +38,23 @@ export const routes: Routes = [
       import('./pages/dashboards/client/Artisan & Guides Marketplace/marketplace').then((m) => m.marketplace),
   },
 
+
+  {
+    path: 'client-profile',
+    loadComponent: () =>
+      import('./pages/profiles/client/profileClient').then((m) => m.profileClient),
+  },
+  {
+    path: 'dashboard-artisan',
+    loadComponent: () =>
+      import('./pages/dashboards/artisan/dashArtisan').then((m) => m.dashboardArtisan),
+  },
+
+  {
+    path: 'dashboard-guide',
+    loadComponent: () =>
+      import('./pages/dashboards/guide/dashGuide').then((m) => m.dashGuide),
+  },
+
+
 ];
