@@ -165,3 +165,9 @@ img {
           calc(var(--shadow-blur, 30) * 1px) calc(var(--shadow-spread, -8) * 1px)
           var(--shadow-color, rgba(15, 23, 42, 0.12));
       }
+
+.logo {
+        height: 50px;
+        width: auto;
+        object-fit: contain;
+    }
