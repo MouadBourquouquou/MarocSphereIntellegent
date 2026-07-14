@@ -61,3 +61,16 @@ export interface ReservationRequest {
   guideId: number;
   date: string;
 }
+
+export interface ChatMessage {
+  id: number;
+  clientId: number;
+  contenu: string;
+  role: 'USER' | 'AI';
+  dateEnvoi: string;
+}
+
+export interface ChatMessageRequest {
+  clientId: number;
+  contenu: string;
+}

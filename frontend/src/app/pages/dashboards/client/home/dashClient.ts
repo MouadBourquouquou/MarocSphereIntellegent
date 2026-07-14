@@ -1,9 +1,10 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, computed, inject, OnInit, signal, ElementRef, ViewChild, AfterViewChecked } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { ClientService } from '../../../../services/client.service';
 import { AuthService } from '../../../../services/auth.service';
-import { ClientProfile, Itineraire, Reservation } from '../../../../models/api.models';
+import { ChatService } from '../../../../services/chat.service';
+import { ClientProfile, Itineraire, Reservation, ChatMessage } from '../../../../models/api.models';
 import {
   avatarUrl,
   fullName,
@@ -18,15 +19,23 @@ import {
   styleUrls: ['./dashClient.css'],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class DashboardClient implements OnInit {
+export class DashboardClient implements OnInit, AfterViewChecked {
   private clientService = inject(ClientService);
   private authService = inject(AuthService);
+  private chatService = inject(ChatService);
+
+  @ViewChild('chatContainer') chatContainer!: ElementRef<HTMLDivElement>;
 
   isLoading = signal(true);
   errorMessage = signal('');
   client = signal<ClientProfile | null>(null);
   itineraires = signal<Itineraire[]>([]);
   reservations = signal<Reservation[]>([]);
+
+  chatMessages = signal<ChatMessage[]>([]);
+  chatInput = signal('');
+  isSending = signal(false);
+  private shouldScroll = false;
 
   displayName = computed(() => {
     const profile = this.client();
@@ -47,6 +56,13 @@ export class DashboardClient implements OnInit {
     this.loadDashboard();
   }
 
+  ngAfterViewChecked(): void {
+    if (this.shouldScroll) {
+      this.scrollToBottom();
+      this.shouldScroll = false;
+    }
+  }
+
   loadDashboard(): void {
     this.isLoading.set(true);
     this.errorMessage.set('');
@@ -62,6 +78,7 @@ export class DashboardClient implements OnInit {
             this.itineraires.set(itineraires);
             this.reservations.set(reservations);
             this.isLoading.set(false);
+            this.loadChatHistory(profile.id);
           },
           error: () => {
             this.errorMessage.set('Impossible de charger vos voyages et réservations.');
@@ -76,6 +93,78 @@ export class DashboardClient implements OnInit {
         this.isLoading.set(false);
       },
     });
+  }
+
+  loadChatHistory(clientId: number): void {
+    this.chatService.getHistory(clientId).subscribe({
+      next: (messages) => {
+        this.chatMessages.set(messages);
+        this.shouldScroll = true;
+      },
+      error: () => {},
+    });
+  }
+
+  updateChatInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.chatInput.set(input.value);
+  }
+
+  sendMessage(): void {
+    const contenu = this.chatInput().trim();
+    const profile = this.client();
+    if (!contenu || !profile || this.isSending()) return;
+
+    this.isSending.set(true);
+    this.chatInput.set('');
+
+    this.chatService.sendMessage({ clientId: profile.id, contenu }).subscribe({
+      next: (aiMessage) => {
+        this.chatMessages.update((msgs) => [
+          ...msgs,
+          {
+            id: Date.now(),
+            clientId: profile.id,
+            contenu,
+            role: 'USER' as const,
+            dateEnvoi: new Date().toISOString(),
+          },
+          aiMessage,
+        ]);
+        this.isSending.set(false);
+        this.shouldScroll = true;
+      },
+      error: () => {
+        this.isSending.set(false);
+      },
+    });
+  }
+
+  sendSuggestion(text: string): void {
+    this.chatInput.set(text);
+    this.sendMessage();
+  }
+
+  onChatKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      this.sendMessage();
+    }
+  }
+
+  resetChat(): void {
+    this.chatMessages.set([]);
+    const profile = this.client();
+    if (profile) {
+      this.loadChatHistory(profile.id);
+    }
+  }
+
+  private scrollToBottom(): void {
+    if (this.chatContainer) {
+      const el = this.chatContainer.nativeElement;
+      el.scrollTop = el.scrollHeight;
+    }
   }
 
   getItineraireTitle(jours: string): string {
