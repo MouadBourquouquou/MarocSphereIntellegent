@@ -102,28 +102,28 @@
           }
 
           <!-- Role Selection -->
-          <div class="p-6 lg:p-1 space-y-4">
-            <div>
-              <p class="text-sm font-semibold text-primary">Select your role</p>
-              <div class="mt-2 grid grid-cols-2 gap-3">
-                @for (role of roles; track role) {
-                  <button
-                    type="button"
-                    (click)="selectRole(role)"
-                    class="px-4 py-3 rounded-2xl font-semibold text-sm transition-colors"
-                    [class]="selectedRole() === role
-                      ? 'border border-primary bg-primary/5 shadow-sm text-foreground'
-                      : 'bg-muted text-foreground font-medium'"
-                  >
-                    {{ role }}
-                  </button>
-                }
-              </div>
+          <div class="px-6 pt-6 pb-2">
+            <p class="text-sm font-semibold text-primary">Select your role</p>
+            <div class="mt-2 grid grid-cols-2 gap-3">
+              @for (role of roles; track role) {
+                <button
+                  type="button"
+                  (click)="selectRole(role)"
+                  class="px-4 py-3 rounded-2xl font-semibold text-sm transition-colors"
+                  [class]="selectedRole() === role
+                    ? 'border border-primary bg-primary/5 shadow-sm text-foreground'
+                    : 'bg-muted text-foreground font-medium'"
+                >
+                  {{ role }}
+                </button>
+              }
             </div>
           </div>
 
           <!-- Registration Form -->
-          <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-4 lg:p-8 space-y-2">
+          <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-4 lg:p-8 space-y-6">
+
+            <!-- ── Common fields ── -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div class="space-y-4">
                 <div>
@@ -200,7 +200,161 @@
                 </div>
               </div>
             </div>
-            <div class="flex items-center justify-end pt-4">
+
+            <!-- ── CLIENT-specific fields ── -->
+            @if (selectedRole() === 'CLIENT') {
+              <div class="border-t border-border pt-5">
+                <p class="text-sm font-semibold text-primary mb-4">Informations client</p>
+                <div>
+                  <label class="text-sm font-medium">Tier d'abonnement</label>
+                  <div class="mt-2 grid grid-cols-3 gap-3">
+                    @for (tier of tierOptions; track tier) {
+                      <button
+                        type="button"
+                        (click)="form.patchValue({ tierAbonnement: tier })"
+                        class="px-4 py-3 rounded-xl font-medium text-sm transition-colors"
+                        [class]="form.get('tierAbonnement')!.value === tier
+                          ? 'border border-primary bg-primary/5 shadow-sm text-foreground font-semibold'
+                          : 'bg-muted text-foreground'"
+                      >
+                        {{ tier }}
+                      </button>
+                    }
+                  </div>
+                </div>
+              </div>
+            }
+
+            <!-- ── ARTISAN-specific fields ── -->
+            @if (selectedRole() === 'ARTISAN') {
+              <div class="border-t border-border pt-5">
+                <p class="text-sm font-semibold text-primary mb-4">Informations artisan</p>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+                  <!-- Catégorie -->
+                  <div class="lg:col-span-2">
+                    <label class="text-sm font-medium">Catégorie d'artisanat <span class="text-red-500">*</span></label>
+                    <select
+                      formControlName="categorieArtisanat"
+                      class="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm"
+                    >
+                      <option value="" disabled>Choisir une catégorie...</option>
+                      @for (cat of categorieOptions; track cat) {
+                        <option [value]="cat">{{ cat }}</option>
+                      }
+                    </select>
+                  </div>
+
+                  <!-- Eligible export -->
+                  <div>
+                    <label class="text-sm font-medium block mb-2">Éligible à l'export</label>
+                    <div class="flex gap-3">
+                      <button
+                        type="button"
+                        (click)="form.patchValue({ eligibleExport: true })"
+                        class="flex-1 px-4 py-3 rounded-xl font-medium text-sm transition-colors"
+                        [class]="form.get('eligibleExport')!.value === true
+                          ? 'border border-primary bg-primary/5 shadow-sm text-foreground font-semibold'
+                          : 'bg-muted text-foreground'"
+                      >
+                        Oui
+                      </button>
+                      <button
+                        type="button"
+                        (click)="form.patchValue({ eligibleExport: false })"
+                        class="flex-1 px-4 py-3 rounded-xl font-medium text-sm transition-colors"
+                        [class]="form.get('eligibleExport')!.value === false
+                          ? 'border border-primary bg-primary/5 shadow-sm text-foreground font-semibold'
+                          : 'bg-muted text-foreground'"
+                      >
+                        Non
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Indépendant -->
+                  <div>
+                    <label class="text-sm font-medium block mb-2">Statut</label>
+                    <div class="flex gap-3">
+                      <button
+                        type="button"
+                        (click)="form.patchValue({ independant: true, cooperativeId: null })"
+                        class="flex-1 px-4 py-3 rounded-xl font-medium text-sm transition-colors"
+                        [class]="form.get('independant')!.value === true
+                          ? 'border border-primary bg-primary/5 shadow-sm text-foreground font-semibold'
+                          : 'bg-muted text-foreground'"
+                      >
+                        Indépendant
+                      </button>
+                      <button
+                        type="button"
+                        (click)="form.patchValue({ independant: false })"
+                        class="flex-1 px-4 py-3 rounded-xl font-medium text-sm transition-colors"
+                        [class]="form.get('independant')!.value === false
+                          ? 'border border-primary bg-primary/5 shadow-sm text-foreground font-semibold'
+                          : 'bg-muted text-foreground'"
+                      >
+                        En coopérative
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Cooperative name — visible seulement si pas indépendant -->
+                  @if (!isIndependant) {
+                    <div class="lg:col-span-2">
+                      <label class="text-sm font-medium">Nom de la coopérative</label>
+                      <div class="relative mt-2">
+                        <input
+                          type="text"
+                          formControlName="cooperativeNom"
+                          placeholder="Ex: Coopérative Tissage Fès"
+                          class="w-full rounded-xl border px-4 py-3 text-sm pr-10"
+                          [class]="cooperativeCheckStatus() === 'found'
+                            ? 'border-green-400 bg-green-50'
+                            : cooperativeCheckStatus() === 'not-found'
+                              ? 'border-red-400 bg-red-50'
+                              : 'border-input bg-background'"
+                        />
+                        <!-- Spinner while checking -->
+                        @if (cooperativeCheckStatus() === 'checking') {
+                          <span class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs animate-pulse">
+                            ⏳
+                          </span>
+                        }
+                        <!-- Found checkmark -->
+                        @if (cooperativeCheckStatus() === 'found') {
+                          <span class="absolute right-3 top-1/2 -translate-y-1/2 text-green-500 text-base">✓</span>
+                        }
+                        <!-- Not found cross -->
+                        @if (cooperativeCheckStatus() === 'not-found') {
+                          <span class="absolute right-3 top-1/2 -translate-y-1/2 text-red-500 text-base">✗</span>
+                        }
+                      </div>
+                      <!-- Feedback messages -->
+                      @if (cooperativeCheckStatus() === 'found') {
+                        <p class="mt-1 text-xs text-green-600">
+                          Coopérative trouvée : <strong>{{ cooperativeFoundName() }}</strong>
+                        </p>
+                      }
+                      @if (cooperativeCheckStatus() === 'not-found') {
+                        <p class="mt-1 text-xs text-red-500">
+                          Aucune coopérative trouvée avec ce nom. Vérifiez l'orthographe.
+                        </p>
+                      }
+                      @if (cooperativeCheckStatus() === 'idle') {
+                        <p class="mt-1 text-xs text-muted-foreground">
+                          Saisissez le nom exact de votre coopérative.
+                        </p>
+                      }
+                    </div>
+                  }
+
+                </div>
+              </div>
+            }
+
+            <!-- Submit -->
+            <div class="flex items-center justify-end pt-2">
               <button
                 type="submit"
                 [disabled]="isLoading()"

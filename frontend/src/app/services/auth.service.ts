@@ -17,6 +17,13 @@ export interface RegisterRequest {
   nationalite: string;
   languePreferee: string;
   role: string;
+  // CLIENT-specific
+  tierAbonnement?: string;
+  // ARTISAN-specific
+  categorieArtisanat?: string;
+  eligibleExport?: boolean;
+  independant?: boolean;
+  cooperativeNom?: string | null; // name typed by user — resolved to ID server-side
 }
 
 export interface AuthUser {
@@ -37,6 +44,7 @@ export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
   private readonly apiUrl = 'http://localhost:8080/api/auth';
+  private readonly cooperativesUrl = 'http://localhost:8080/api/cooperatives';
 
   currentUser = signal<AuthUser | null>(this.loadUser());
   isAuthenticated = computed(() => !!this.currentUser());
@@ -60,6 +68,13 @@ export class AuthService {
 
   register(data: RegisterRequest) {
     return this.http.post(`${this.apiUrl}/register`, data);
+  }
+
+  /** Check if a cooperative name exists in the DB. Returns { id, nom } or throws 404. */
+  checkCooperativeNom(nom: string) {
+    return this.http.get<{ id: number; nom: string }>(
+      `${this.cooperativesUrl}/search?nom=${encodeURIComponent(nom)}`
+    );
   }
 
   logout() {

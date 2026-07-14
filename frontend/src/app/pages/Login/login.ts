@@ -32,9 +32,30 @@ export class login {
     this.errorMessage.set('');
 
     this.authService.login(this.form.value).subscribe({
-      next: (response) => {
+      next: (response: any) => {
         this.isLoading.set(false);
         this.router.navigate([roleDashboardPath(response.role)]);
+
+
+        // Try response directly first, then fall back to the stored signal
+        const rawRole: string =
+          response?.role ??
+          this.authService.currentUser()?.role ??
+          '';
+
+        const role = rawRole.toUpperCase().replace('ROLE_', '');
+
+        const dashboardRoutes: Record<string, string> = {
+          CLIENT:  '/dashboard-client',
+          ARTISAN: '/dashboard-artisan',
+          GUIDE:   '/dashboard-guide',
+          ADMIN:   '/dashboard-admin',
+          DMC:     '/dashboard-dmc',
+        };
+
+        const destination = dashboardRoutes[role] ?? '/dashboard-client';
+        this.router.navigate([destination]);
+
       },
       error: (err) => {
         this.isLoading.set(false);
