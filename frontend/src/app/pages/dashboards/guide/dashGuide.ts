@@ -8,10 +8,14 @@ import {
   ElementRef,
   Inject,
   PLATFORM_ID,
+  inject,
 } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Chart, registerables } from 'chart.js';
+import { GuideService } from '../../../services/guide.service';
+import { Guide } from '../../../models/api.models';
+import { AuthService } from '../../../services/auth.service';
 
 interface ReservationRequest {
   id: string;
@@ -41,20 +45,26 @@ interface CalendarDay {
   styleUrls: ['./dashGuide.css'],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-
 export class dashGuide implements AfterViewInit, OnDestroy {
+  private guideService = inject(GuideService);
+  private authService = inject(AuthService);
+
   showAllServices = signal(false);
-  guideName = signal('Amin Bouaza');
-  specialty = signal('Medina History & Architectural Specialist');
-  biography = signal(
-    "Born and raised in the heart of the Marrakech Medina, I have spent over 12 years guiding visitors through Morocco's architectural wonders, royal palaces, and hidden craft cooperatives. Passionate about preserving authentic heritage and storytelling."
-  );
-  languages = signal(['Arabic (Native)', 'French (Fluent)', 'English (Fluent)', 'Spanish (Conversational)']);
-  totalBookings = signal(342);
-  hourlyRate = signal('350 MAD');
-  blockedDates = signal(['2026-10-09']);
-  availableDates = signal(['2026-10-16', '2026-10-18']);
-  calendarSynced = signal(false);
+  guide = signal<Guide | null>(null);
+  guideName = signal('Chargement...');
+  guidePrenom = signal('');
+  guideEmail = signal('');
+  telephone = signal('');
+  nationalite = signal('');
+  languePreferee = signal('');
+  numeroLicence = signal('');
+  statutCertification = signal('PENDING');
+  scoreCertification = signal(0);
+  disponible = signal(true);
+  isLoading = signal(true);
+  isSaving = signal(false);
+  isEditing = signal(false);
+
   notificationMessage = signal('');
   notificationType = signal<'success' | 'error'>('success');
   showNotification = signal(false);
@@ -69,6 +79,9 @@ export class dashGuide implements AfterViewInit, OnDestroy {
   workingHours = signal<Record<string, string>>({});
   recurringAvailabilityEnabled = signal(false);
   dateNotes = signal<Record<string, string>>({});
+  blockedDates = signal<string[]>(['2026-10-09']);
+  availableDates = signal<string[]>(['2026-10-16', '2026-10-18']);
+  calendarSynced = signal(false);
 
   reservationRequests = signal<ReservationRequest[]>([
     {
@@ -182,33 +195,21 @@ export class dashGuide implements AfterViewInit, OnDestroy {
     this.isBrowser = isPlatformBrowser(platformId);
   }
 
-  // ==========================
-  // Toggle Services
-  // ==========================
   toggleServices(): void {
     this.showAllServices.update((v) => !v);
   }
 
-  // ==========================
-  // Toggle Any Element
-  // ==========================
   toggleElement(selector: string): void {
     if (!this.isBrowser) return;
-
     const element = document.querySelector<HTMLElement>(selector);
-
     if (element) {
-      element.style.display =
-        element.style.display === 'none' ? '' : 'none';
+      element.style.display = element.style.display === 'none' ? '' : 'none';
     }
   }
 
-  // ==========================
-  // Lifecycle
-  // ==========================
   ngAfterViewInit(): void {
+    this.loadGuide();
     if (!this.isBrowser) return;
-
     this.setupSmoothScroll();
     this.setupFormPreventDefault();
     this.initAdminMetricsChart();
@@ -217,87 +218,80 @@ export class dashGuide implements AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this.cleanupFns.forEach((fn) => fn());
     this.cleanupFns = [];
-
-    if (this.chartTimeoutId !== null) {
-      clearTimeout(this.chartTimeoutId);
-    }
-
-    if (this.toastTimeoutId !== null) {
-      clearTimeout(this.toastTimeoutId);
-    }
-
+    if (this.chartTimeoutId !== null) clearTimeout(this.chartTimeoutId);
+    if (this.toastTimeoutId !== null) clearTimeout(this.toastTimeoutId);
     this.chart?.destroy();
   }
 
-  // ==========================
-  // Smooth Scroll
-  // ==========================
-  private setupSmoothScroll(): void {
-    const anchors =
-      this.elRef.nativeElement.querySelectorAll<HTMLAnchorElement>(
-        'a[href^="#"]'
-      );
-
-    anchors.forEach((anchor) => {
-      const onClick = (event: Event): void => {
-        const href = anchor.getAttribute('href');
-
-        if (!href) return;
-
-        const target =
-          this.elRef.nativeElement.querySelector<HTMLElement>(href);
-
-        if (target) {
-          event.preventDefault();
-          target.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start',
-          });
-        }
-      };
-
-      anchor.addEventListener('click', onClick);
-      this.cleanupFns.push(() =>
-        anchor.removeEventListener('click', onClick)
-      );
+  private loadGuide(): void {
+    this.guideService.getMe().subscribe({
+      next: (guide) => {
+        this.guide.set(guide);
+        this.guideName.set(guide.nom ?? '');
+        this.guidePrenom.set(guide.prenom ?? '');
+        this.guideEmail.set(guide.email ?? '');
+        this.telephone.set(guide.telephone ?? '');
+        this.nationalite.set(guide.nationalite ?? '');
+        this.languePreferee.set(guide.languePreferee ?? '');
+        this.numeroLicence.set(guide.numeroLicence ?? '');
+        this.statutCertification.set(guide.statutCertification ?? 'PENDING');
+        this.scoreCertification.set(guide.scoreCertification ?? 0);
+        this.disponible.set(guide.disponible ?? true);
+        this.isLoading.set(false);
+      },
+      error: () => {
+        this.showNotificationMessage('Erreur lors du chargement du profil.', 'error');
+        this.isLoading.set(false);
+      },
     });
   }
 
   toggleEditMode(isEdit: boolean): void {
-    const root = this.elRef.nativeElement;
-    const viewGrid = root.querySelector<HTMLElement>('#details-view-grid');
-    const editForm = root.querySelector<HTMLElement>('#details-edit-form');
-    const editBtn = root.querySelector<HTMLElement>('#edit-details-btn');
-
-    if (isEdit) {
-      viewGrid?.classList.add('hidden');
-      editForm?.classList.remove('hidden');
-      editBtn?.classList.add('hidden');
-    } else {
-      viewGrid?.classList.remove('hidden');
-      editForm?.classList.add('hidden');
-      editBtn?.classList.remove('hidden');
+    this.isEditing.set(isEdit);
+    if (!isEdit) {
+      const g = this.guide();
+      if (g) {
+        this.guideName.set(g.nom ?? '');
+        this.guidePrenom.set(g.prenom ?? '');
+        this.telephone.set(g.telephone ?? '');
+        this.nationalite.set(g.nationalite ?? '');
+        this.languePreferee.set(g.languePreferee ?? '');
+        this.numeroLicence.set(g.numeroLicence ?? '');
+      }
     }
   }
 
   saveDetails(event: Event): void {
     event.preventDefault();
+    const g = this.guide();
+    if (!g) return;
 
-    if (this.newPassword || this.confirmPassword) {
-      if (this.newPassword !== this.confirmPassword) {
-        this.showNotificationMessage('New password and confirmation do not match.', 'error');
-        return;
-      }
-
-      this.currentPassword = '';
-      this.newPassword = '';
-      this.confirmPassword = '';
-      this.showNotificationMessage('Password updated successfully.', 'success');
-    } else {
-      this.showNotificationMessage('Profile details saved successfully.', 'success');
-    }
-
-    this.toggleEditMode(false);
+    this.isSaving.set(true);
+    this.guideService.updateProfile(g.id!, {
+      nom: this.guideName(),
+      prenom: this.guidePrenom(),
+      telephone: this.telephone(),
+      nationalite: this.nationalite(),
+      languePreferee: this.languePreferee(),
+      numeroLicence: this.numeroLicence(),
+    }).subscribe({
+      next: (updated) => {
+        this.guide.set(updated);
+        this.guideName.set(updated.nom ?? '');
+        this.guidePrenom.set(updated.prenom ?? '');
+        this.telephone.set(updated.telephone ?? '');
+        this.nationalite.set(updated.nationalite ?? '');
+        this.languePreferee.set(updated.languePreferee ?? '');
+        this.numeroLicence.set(updated.numeroLicence ?? '');
+        this.isEditing.set(false);
+        this.isSaving.set(false);
+        this.showNotificationMessage('Profil mis a jour avec succes.', 'success');
+      },
+      error: () => {
+        this.isSaving.set(false);
+        this.showNotificationMessage('Erreur lors de la mise a jour du profil.', 'error');
+      },
+    });
   }
 
   toIsoDate(value: string | Date): string {
@@ -309,10 +303,7 @@ export class dashGuide implements AfterViewInit, OnDestroy {
   }
 
   formatMonthLabel(date: Date): string {
-    return date.toLocaleDateString('en-US', {
-      month: 'long',
-      year: 'numeric',
-    });
+    return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
   }
 
   calculateDayStatus(date: Date, iso: string, reservations: ReservationRequest[]): 'past' | 'today' | 'available' | 'booked' | 'blocked' | 'selected' {
@@ -321,26 +312,11 @@ export class dashGuide implements AfterViewInit, OnDestroy {
     const isSelected = this.selectedDates().includes(iso);
     const isPast = iso < todayIso;
 
-    if (isPast) {
-      return 'past';
-    }
-
-    if (isSelected) {
-      return 'selected';
-    }
-
-    if (this.blockedDates().includes(iso)) {
-      return 'blocked';
-    }
-
-    if (this.bookedDateSet().has(iso)) {
-      return 'booked';
-    }
-
-    if (isToday) {
-      return 'today';
-    }
-
+    if (isPast) return 'past';
+    if (isSelected) return 'selected';
+    if (this.blockedDates().includes(iso)) return 'blocked';
+    if (this.bookedDateSet().has(iso)) return 'booked';
+    if (isToday) return 'today';
     return 'available';
   }
 
@@ -366,17 +342,13 @@ export class dashGuide implements AfterViewInit, OnDestroy {
 
   syncCalendar(): void {
     this.calendarSynced.update((value) => !value);
-    const message = this.calendarSynced()
-      ? 'Calendar synced successfully.'
-      : 'Calendar sync paused.';
+    const message = this.calendarSynced() ? 'Calendar synced successfully.' : 'Calendar sync paused.';
     this.showNotificationMessage(message, 'success');
   }
 
   toggleReservationStatus(id: string, status: ReservationRequest['status']): void {
     this.reservationRequests.update((requests) =>
-      requests.map((request) =>
-        request.id === id ? { ...request, status } : request
-      )
+      requests.map((request) => request.id === id ? { ...request, status } : request)
     );
   }
 
@@ -401,14 +373,9 @@ export class dashGuide implements AfterViewInit, OnDestroy {
   }
 
   toggleDateSelection(iso: string): void {
-    if (this.toIsoDate(this.today) > iso) {
-      return;
-    }
-
+    if (this.toIsoDate(this.today) > iso) return;
     this.selectedDates.update((current) => {
-      if (current.includes(iso)) {
-        return current.filter((item) => item !== iso);
-      }
+      if (current.includes(iso)) return current.filter((item) => item !== iso);
       return [...current, iso];
     });
   }
@@ -455,50 +422,41 @@ export class dashGuide implements AfterViewInit, OnDestroy {
     this.notificationMessage.set(message);
     this.notificationType.set(type);
     this.showNotification.set(true);
-
-    if (this.toastTimeoutId !== null) {
-      clearTimeout(this.toastTimeoutId);
-    }
-
-    this.toastTimeoutId = setTimeout(() => {
-      this.showNotification.set(false);
-    }, 4000);
+    if (this.toastTimeoutId !== null) clearTimeout(this.toastTimeoutId);
+    this.toastTimeoutId = setTimeout(() => this.showNotification.set(false), 4000);
   }
 
-  // ==========================
-  // Prevent Form Submit
-  // ==========================
-  private setupFormPreventDefault(): void {
-    const forms =
-      this.elRef.nativeElement.querySelectorAll<HTMLFormElement>('form');
-
-    forms.forEach((form) => {
-      const onSubmit = (event: Event): void => {
-        event.preventDefault();
+  private setupSmoothScroll(): void {
+    const anchors = this.elRef.nativeElement.querySelectorAll<HTMLAnchorElement>('a[href^="#"]');
+    anchors.forEach((anchor) => {
+      const onClick = (event: Event): void => {
+        const href = anchor.getAttribute('href');
+        if (!href) return;
+        const target = this.elRef.nativeElement.querySelector<HTMLElement>(href);
+        if (target) {
+          event.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
       };
-
-      form.addEventListener('submit', onSubmit);
-
-      this.cleanupFns.push(() =>
-        form.removeEventListener('submit', onSubmit)
-      );
+      anchor.addEventListener('click', onClick);
+      this.cleanupFns.push(() => anchor.removeEventListener('click', onClick));
     });
   }
 
-  // ==========================
-  // Chart.js
-  // ==========================
+  private setupFormPreventDefault(): void {
+    const forms = this.elRef.nativeElement.querySelectorAll<HTMLFormElement>('form');
+    forms.forEach((form) => {
+      const onSubmit = (event: Event): void => event.preventDefault();
+      form.addEventListener('submit', onSubmit);
+      this.cleanupFns.push(() => form.removeEventListener('submit', onSubmit));
+    });
+  }
+
   private initAdminMetricsChart(): void {
     this.chartTimeoutId = setTimeout(() => {
-      const canvas =
-        this.elRef.nativeElement.querySelector<HTMLCanvasElement>(
-          '#adminMetricsChart'
-        );
-
+      const canvas = this.elRef.nativeElement.querySelector<HTMLCanvasElement>('#adminMetricsChart');
       if (!canvas) return;
-
       Chart.register(...registerables);
-
       this.chart = new Chart(canvas, {
         type: 'line',
         data: {
@@ -506,14 +464,7 @@ export class dashGuide implements AfterViewInit, OnDestroy {
           datasets: [
             {
               label: 'Secure Escrow Volume',
-              data: [
-                800000,
-                1100000,
-                1300000,
-                1500000,
-                1700000,
-                1800000,
-              ],
+              data: [800000, 1100000, 1300000, 1500000, 1700000, 1800000],
               borderColor: '#B63739',
               backgroundColor: 'rgba(182,55,57,0.1)',
               borderWidth: 2,
@@ -522,14 +473,7 @@ export class dashGuide implements AfterViewInit, OnDestroy {
             },
             {
               label: 'Released Payouts',
-              data: [
-                600000,
-                850000,
-                1000000,
-                1200000,
-                1350000,
-                1500000,
-              ],
+              data: [600000, 850000, 1000000, 1200000, 1350000, 1500000],
               borderColor: '#006233',
               backgroundColor: 'rgba(0,98,51,0.1)',
               borderWidth: 2,
@@ -545,36 +489,19 @@ export class dashGuide implements AfterViewInit, OnDestroy {
             legend: {
               position: 'bottom',
               labels: {
-                font: {
-                  size: 11,
-                  family: 'Plus Jakarta Sans',
-                },
+                font: { size: 11, family: 'Plus Jakarta Sans' },
                 color: '#665E54',
               },
             },
           },
           scales: {
             y: {
-              grid: {
-                color: '#EFEAE2',
-              },
-              ticks: {
-                color: '#665E54',
-                font: {
-                  size: 10,
-                },
-              },
+              grid: { color: '#EFEAE2' },
+              ticks: { color: '#665E54', font: { size: 10 } },
             },
             x: {
-              grid: {
-                display: false,
-              },
-              ticks: {
-                color: '#665E54',
-                font: {
-                  size: 10,
-                },
-              },
+              grid: { display: false },
+              ticks: { color: '#665E54', font: { size: 10 } },
             },
           },
         },

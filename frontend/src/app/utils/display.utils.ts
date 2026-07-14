@@ -39,8 +39,8 @@ export function itineraireDaysCount(jours: string | null | undefined): number {
 export function roleDashboardPath(role: string | null | undefined): string {
   const routes: Record<string, string> = {
     client: '/dashboard-client',
-    guide: '/dashboard-client',
-    artisan: '/dashboard-client',
+    guide: '/dashboard-guide',
+    artisan: '/dashboard-artisan',
     admin: '/dashboard-client',
   };
   return routes[role?.toLowerCase() ?? ''] ?? '/landing';

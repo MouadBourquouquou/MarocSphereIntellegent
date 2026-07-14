@@ -2,7 +2,6 @@ import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { roleDashboardPath } from '../../utils/display.utils';
 
 @Component({
   selector: 'app-login',
@@ -34,28 +33,15 @@ export class login {
     this.authService.login(this.form.value).subscribe({
       next: (response: any) => {
         this.isLoading.set(false);
-        this.router.navigate([roleDashboardPath(response.role)]);
-
-
-        // Try response directly first, then fall back to the stored signal
-        const rawRole: string =
-          response?.role ??
-          this.authService.currentUser()?.role ??
-          '';
-
-        const role = rawRole.toUpperCase().replace('ROLE_', '');
-
+        const role: string = response?.role ?? '';
         const dashboardRoutes: Record<string, string> = {
-          CLIENT:  '/dashboard-client',
+          CLIENT: '/dashboard-client',
           ARTISAN: '/dashboard-artisan',
-          GUIDE:   '/dashboard-guide',
-          ADMIN:   '/dashboard-admin',
-          DMC:     '/dashboard-dmc',
+          GUIDE: '/dashboard-guide',
+          ADMIN: '/dashboard-client',
         };
-
-        const destination = dashboardRoutes[role] ?? '/dashboard-client';
+        const destination = dashboardRoutes[role.toUpperCase()] ?? '/dashboard-client';
         this.router.navigate([destination]);
-
       },
       error: (err) => {
         this.isLoading.set(false);

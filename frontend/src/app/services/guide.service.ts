@@ -15,4 +15,12 @@ export class GuideService {
   getById(id: number) {
     return this.http.get<Guide>(`${this.baseUrl}/${id}`);
   }
+
+  getMe() {
+    return this.http.get<Guide>(`${this.baseUrl}/me`);
+  }
+
+  updateProfile(id: number, data: Partial<Guide>) {
+    return this.http.put<Guide>(`${this.baseUrl}/${id}`, data);
+  }
 }

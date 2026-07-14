@@ -47,12 +47,14 @@ export const routes: Routes = [
   },
   {
     path: 'dashboard-artisan',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./pages/dashboards/artisan/dashArtisan').then((m) => m.dashboardArtisan),
   },
 
   {
     path: 'dashboard-guide',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./pages/dashboards/guide/dashGuide').then((m) => m.dashGuide),
   },
