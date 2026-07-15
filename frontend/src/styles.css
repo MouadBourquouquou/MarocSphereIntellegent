@@ -1,4 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Inter:wght@100..900&display=swap');
 @import "tailwindcss";
       @theme inline {
         --color-background: var(--background);
@@ -101,32 +102,32 @@
 [data-page="marocsphere-landing-page"],
 [data-page="multi-role-authentication"],
 [data-page="guide-search-directory"] {
-  --background: #FAF9F4;
-  --foreground: #5A5C5E;
-  --primary: #9D3E26;
-  --primary-foreground: #FAF9F4;
-  --secondary: #E6EEF5;
-  --secondary-foreground: #006233;
-  --tertiary: #006233;
-  --muted: #F2EEE7;
-  --muted-foreground: #6B6D6F;
-  --accent: #E9D9C8;
-  --accent-foreground: #5A5C5E;
-  --card: #FFFCF8;
-  --card-foreground: #5A5C5E;
-  --destructive: #B84A3A;
-  --border: #E5DDD3;
-  --input: #DDD2C7;
-  --ring: #006233;
+  --background: #F6F1E8;
+  --foreground: #2E2A25;
+  --primary: #B03A22;
+  --primary-foreground: #F6F1E8;
+  --secondary: #1E5B44;
+  --secondary-foreground: #F6F1E8;
+  --tertiary: #1E5B44;
+  --muted: #EDE8DE;
+  --muted-foreground: #5C5852;
+  --accent: #1E5B44;
+  --accent-foreground: #2E2A25;
+  --card: #FCFAF6;
+  --card-foreground: #2E2A25;
+  --destructive: #B03A22;
+  --border: #E3DAC9;
+  --input: #D9CDBC;
+  --ring: #1E5B44;
   --radius: 0.9rem;
-  --font-sans: Inter,sans-serif;
-  --font-heading: Inter,sans-serif;
+  --font-sans: 'Inter', sans-serif;
+  --font-heading: 'Fraunces', Georgia, serif;
   --font-mono: JetBrains Mono, monospace;
   --shadow-offset-x: 0;
   --shadow-offset-y: 10;
   --shadow-blur: 30;
   --shadow-spread: -8;
-  --shadow-color: rgba(15, 23, 42, 0.12);
+  --shadow-color: rgba(46, 42, 37, 0.08);
 }
 
 /* ==========================================================================
@@ -2607,3 +2608,351 @@ img {
           var(--shadow-color, rgba(15, 23, 42, 0.12));
       }
 
+/* ==========================================================================
+   MarocSphere Redesign Design Utilities
+   ========================================================================== */
+
+/* Fine Paper Grain Overlay */
+.fine-grain-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  content: '';
+  opacity: 0.04;
+  pointer-events: none;
+  z-index: 9999;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+
+/* Repeating Low-Opacity Zellige Star Pattern */
+.zellige-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 0l5.878 18.09h19.024l-15.39 11.18 5.878 18.09-15.39-11.18-15.39 11.18 5.878-18.09-15.39-11.18h19.024z' fill='%231e5b44' fill-opacity='0.035'/%3E%3C/svg%3E");
+}
+
+/* Animated Underscore Link Effect */
+.hover-underline {
+  position: relative;
+}
+.hover-underline::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  transform: scaleX(0);
+  height: 1.5px;
+  bottom: -2px;
+  left: 0;
+  background-color: var(--primary);
+  transform-origin: bottom right;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hover-underline:hover::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
+/* Premium Card elevation & transition */
+.card-premium {
+  background-color: var(--card);
+  border: 1px border-color var(--border);
+  box-shadow: 0 4px 20px -2px rgba(46, 42, 37, 0.03), 0 2px 8px -1px rgba(46, 42, 37, 0.02);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.card-premium:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px -10px rgba(46, 42, 37, 0.06), 0 8px 16px -4px rgba(46, 42, 37, 0.04);
+  border-color: rgba(30, 91, 68, 0.3); /* green accent border glow */
+}
+
+/* Scroll reveal properties */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-on-scroll.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Rotating Keyword transition styling */
+.keyword-slide {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  position: absolute;
+}
+.keyword-slide.active {
+  opacity: 1;
+  transform: translateY(0);
+  position: relative;
+}
+
+/* Wishlist Heart pulse animations */
+@keyframes heartPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+.heart-pulse {
+  animation: heartPulse 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Custom testimonial slider progress */
+.progress-bar-fill {
+  height: 3px;
+}
+
+@property --tw-backdrop-brightness {
+
+}
+
+@property --tw-backdrop-contrast {
+
+}
+
+@property --tw-backdrop-grayscale {
+
+}
+
+@property --tw-backdrop-hue-rotate {
+
+}
+
+@property --tw-backdrop-invert {
+
+}
+
+@property --tw-backdrop-opacity {
+
+}
+
+@property --tw-backdrop-saturate {
+
+}
+
+@property --tw-backdrop-sepia {
+
+}
+
+@layer properties {
+@supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {
+[data-page="multi-role-authentication"] *,
+[data-page="multi-role-authentication"] ::before,
+[data-page="multi-role-authentication"] ::after,
+[data-page="multi-role-authentication"] ::backdrop {
+      --tw-space-y-reverse: 0;
+      --tw-border-style: solid;
+      --tw-gradient-position: initial;
+      --tw-gradient-from: #0000;
+      --tw-gradient-via: #0000;
+      --tw-gradient-to: #0000;
+      --tw-gradient-stops: initial;
+      --tw-gradient-via-stops: initial;
+      --tw-gradient-from-position: 0%;
+      --tw-gradient-via-position: 50%;
+      --tw-gradient-to-position: 100%;
+      --tw-leading: initial;
+      --tw-font-weight: initial;
+      --tw-tracking: initial;
+      --tw-shadow: 0 0 #0000;
+      --tw-shadow-color: initial;
+      --tw-shadow-alpha: 100%;
+      --tw-inset-shadow: 0 0 #0000;
+      --tw-inset-shadow-color: initial;
+      --tw-inset-shadow-alpha: 100%;
+      --tw-ring-color: initial;
+      --tw-ring-shadow: 0 0 #0000;
+      --tw-inset-ring-color: initial;
+      --tw-inset-ring-shadow: 0 0 #0000;
+      --tw-ring-inset: initial;
+      --tw-ring-offset-width: 0px;
+      --tw-ring-offset-color: #fff;
+      --tw-ring-offset-shadow: 0 0 #0000;
+      --tw-backdrop-blur: initial;
+      --tw-backdrop-brightness: initial;
+      --tw-backdrop-contrast: initial;
+      --tw-backdrop-grayscale: initial;
+      --tw-backdrop-hue-rotate: initial;
+      --tw-backdrop-invert: initial;
+      --tw-backdrop-opacity: initial;
+      --tw-backdrop-saturate: initial;
+      --tw-backdrop-sepia: initial;
+    }
+}
+}
+
+[data-page="multi-role-authentication"] .brand-gradient { background-image: linear-gradient(135deg, var(--primary), var(--accent)); }
+
+[data-page="multi-role-authentication"] .shadow-theme {
+        box-shadow:
+          calc(var(--shadow-offset-x, 0) * 1px) calc(var(--shadow-offset-y, 10) * 1px)
+          calc(var(--shadow-blur, 30) * 1px) calc(var(--shadow-spread, -8) * 1px)
+          var(--shadow-color, rgba(15, 23, 42, 0.12));
+      }
+
+/* ── Guide Search & Directory page-specific styles ── */
+[data-page="guide-search-directory"] .brand-gradient { background-image: linear-gradient(135deg, var(--primary), var(--accent)); }
+
+[data-page="guide-search-directory"] .shadow-theme {
+        box-shadow:
+          calc(var(--shadow-offset-x, 0) * 1px) calc(var(--shadow-offset-y, 10) * 1px)
+          calc(var(--shadow-blur, 30) * 1px) calc(var(--shadow-spread, -8) * 1px)
+          var(--shadow-color, rgba(15, 23, 42, 0.12));
+      }
+
+/* ==========================================================================
+   MarocSphere Redesign Design Utilities
+   ========================================================================== */
+
+/* Fine Paper Grain Overlay */
+.fine-grain-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  content: '';
+  opacity: 0.04;
+  pointer-events: none;
+  z-index: 9999;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+
+/* Repeating Low-Opacity Zellige Star Pattern */
+.zellige-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 0l5.878 18.09h19.024l-15.39 11.18 5.878 18.09-15.39-11.18-15.39 11.18 5.878-18.09-15.39-11.18h19.024z' fill='%231e5b44' fill-opacity='0.035'/%3E%3C/svg%3E");
+}
+
+/* Animated Underscore Link Effect */
+.hover-underline {
+  position: relative;
+}
+.hover-underline::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  transform: scaleX(0);
+  height: 1.5px;
+  bottom: -2px;
+  left: 0;
+  background-color: var(--primary);
+  transform-origin: bottom right;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hover-underline:hover::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
+/* Premium Card elevation & transition */
+.card-premium {
+  background-color: var(--card);
+  border: 1px border-color var(--border);
+  box-shadow: 0 4px 20px -2px rgba(46, 42, 37, 0.03), 0 2px 8px -1px rgba(46, 42, 37, 0.02);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.card-premium:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px -10px rgba(46, 42, 37, 0.06), 0 8px 16px -4px rgba(46, 42, 37, 0.04);
+  border-color: rgba(30, 91, 68, 0.3); /* green accent border glow */
+}
+
+/* Scroll reveal properties */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-on-scroll.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Rotating Keyword transition styling */
+.keyword-slide {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  position: absolute;
+}
+.keyword-slide.active {
+  opacity: 1;
+  transform: translateY(0);
+  position: relative;
+}
+
+/* Wishlist Heart pulse animations */
+@keyframes heartPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+.heart-pulse {
+  animation: heartPulse 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Custom testimonial slider progress */
+.progress-bar-fill {
+  height: 3px;
+  background-color: var(--primary);
+  width: 0%;
+  transition: width 3.5s linear;
+}
+
+/* Hero Strict Animations */
+@keyframes wordReveal {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.word-reveal {
+  display: inline-block;
+  opacity: 0;
+  animation: wordReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes kenBurnsSlide {
+  0% { transform: scale(1.0); }
+  100% { transform: scale(1.06); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .animate-ken-burns-slide {
+    animation: kenBurnsSlide 5s linear forwards;
+  }
+}
+
+@keyframes floatLoop {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .animate-float-loop {
+    animation: floatLoop 5s ease-in-out infinite;
+  }
+  .animate-float-loop-delay {
+    animation: floatLoop 5s ease-in-out 2.5s infinite;
+  }
+}
+
+/* Typewriter Blink Cursor */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.typing-cursor::after {
+  content: '|';
+  animation: blink 1s step-end infinite;
+  color: var(--primary);
+  margin-left: 2px;
+}
+
+@keyframes fillProgress {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+.animate-progress-fill {
+  animation: fillProgress 5s linear forwards;
+}

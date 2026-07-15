@@ -45,6 +45,18 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/profiles/client/profileClient').then((m) => m.profileClient),
   },
+
+  {
+    path: 'artisan-profile/:id',
+    loadComponent: () =>
+      import('./pages/profiles/artisan/profileArtisan').then((m) => m.profileArtisan),
+  },
+
+  {
+    path: 'guide-profile/:id',
+    loadComponent: () =>
+      import('./pages/profiles/guide/profileGuide').then((m) => m.profileGuide),
+  },
   {
     path: 'dashboard-artisan',
     canActivate: [authGuard],

@@ -1,0 +1,136 @@
+<div class="min-h-screen w-full bg-background flex flex-col text-foreground font-sans">
+  <!-- Header -->
+  <header class="border-b border-border bg-card px-6 py-4 flex items-center justify-between sticky top-0 z-50 shadow-sm">
+    <div class="flex items-center gap-3">
+      <a class="navbar-brand" routerLink="/">
+        <img src="/pics/LOGOPRINCIPALE.png" alt="MarocSphere" class="logo" />
+      </a>
+      <div>
+        <h1 class="text-xl font-heading font-bold text-primary tracking-wide">MarocSphere</h1>
+        <p class="text-xs text-muted-foreground font-sans">Artisan Profile</p>
+      </div>
+    </div>
+    <a routerLink="/marketplace" class="text-sm font-bold text-primary hover:underline flex items-center gap-1">
+      <iconify-icon icon="lucide:arrow-left" class="text-xs"></iconify-icon> Back to Marketplace
+    </a>
+  </header>
+
+  <main class="flex-1 max-w-4xl mx-auto w-full p-6 space-y-6">
+    @if (isLoading()) {
+      <div class="text-center text-muted-foreground py-12">Chargement du profil...</div>
+    }
+
+    @if (errorMessage()) {
+      <div class="text-center py-12">
+        <p class="text-muted-foreground">{{ errorMessage() }}</p>
+        <a routerLink="/marketplace" class="text-sm text-primary hover:underline mt-2 inline-block">Retour a la marketplace</a>
+      </div>
+    }
+
+    @if (artisan(); as a) {
+      <!-- Profile Hero -->
+      <div class="bg-card border border-border rounded-2xl p-8 shadow-sm flex flex-col items-center text-center">
+        <div class="relative w-32 h-32 mb-4">
+          <img [src]="avatar()" [alt]="displayName()"
+            class="w-full h-full rounded-full object-cover border-4 border-primary/20 shadow-lg" />
+          @if (a.eligibleExport) {
+            <span class="absolute -top-2 -right-2 bg-primary text-primary-foreground text-[10px] font-bold px-2 py-1 rounded-full uppercase shadow">
+              Export
+            </span>
+          }
+        </div>
+        <h2 class="font-heading font-bold text-2xl text-foreground">{{ a.prenom }} {{ a.nom }}</h2>
+        <p class="text-sm text-muted-foreground mt-1">{{ a.categorieArtisanat || 'Artisan traditionnel' }}</p>
+
+        <div class="flex flex-wrap justify-center gap-2 mt-3">
+          @if (a.independant) {
+            <span class="bg-secondary/10 text-secondary text-[10px] font-bold px-3 py-1 rounded-full uppercase">Independant</span>
+          } @else {
+            <span class="bg-muted text-muted-foreground text-[10px] font-bold px-3 py-1 rounded-full uppercase">Cooperative</span>
+          }
+          @if (a.eligibleExport) {
+            <span class="bg-primary/10 text-primary text-[10px] font-bold px-3 py-1 rounded-full uppercase">Eligible Export</span>
+          }
+        </div>
+      </div>
+
+      <!-- Details Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Personal Info -->
+        <div class="bg-card border border-border rounded-2xl p-6 shadow-sm">
+          <h3 class="font-heading font-bold text-base text-foreground mb-4 flex items-center gap-2">
+            <iconify-icon icon="lucide:user" class="text-primary"></iconify-icon>
+            Informations personnelles
+          </h3>
+          <div class="space-y-3 text-sm">
+            <div class="flex justify-between">
+              <span class="text-muted-foreground">Nom complet</span>
+              <span class="font-medium text-foreground">{{ a.prenom }} {{ a.nom }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-muted-foreground">Email</span>
+              <span class="font-medium text-foreground">{{ a.email }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-muted-foreground">Telephone</span>
+              <span class="font-medium text-foreground">{{ a.telephone }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-muted-foreground">Nationalite</span>
+              <span class="font-medium text-foreground">{{ a.nationalite }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-muted-foreground">Langue preferee</span>
+              <span class="font-medium text-foreground">{{ a.languePreferee }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Professional Info -->
+        <div class="bg-card border border-border rounded-2xl p-6 shadow-sm">
+          <h3 class="font-heading font-bold text-base text-foreground mb-4 flex items-center gap-2">
+            <iconify-icon icon="lucide:briefcase" class="text-primary"></iconify-icon>
+            Informations professionnelles
+          </h3>
+          <div class="space-y-3 text-sm">
+            <div class="flex justify-between">
+              <span class="text-muted-foreground">Categorie</span>
+              <span class="font-medium text-foreground">{{ a.categorieArtisanat || '—' }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-muted-foreground">Statut</span>
+              <span class="font-medium text-foreground">{{ a.independant ? 'Independant' : 'Cooperative' }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-muted-foreground">Export eligible</span>
+              <span class="font-medium" [class]="a.eligibleExport ? 'text-secondary' : 'text-muted-foreground'">
+                {{ a.eligibleExport ? 'Oui' : 'Non' }}
+              </span>
+            </div>
+            @if (a.qrTraceId) {
+              <div class="flex justify-between">
+                <span class="text-muted-foreground">QR Trace ID</span>
+                <span class="font-mono text-xs text-foreground">{{ a.qrTraceId }}</span>
+              </div>
+            }
+            <div class="flex justify-between">
+              <span class="text-muted-foreground">Membre depuis</span>
+              <span class="font-medium text-foreground">
+                {{ a.dateCreation ? (a.dateCreation | date:'MMM yyyy') : '—' }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Back to marketplace -->
+      <div class="text-center pt-4 pb-8">
+        <a routerLink="/marketplace"
+          class="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-xl font-bold text-sm shadow-md hover:bg-primary/90 transition-all">
+          <iconify-icon icon="lucide:arrow-left" class="text-base"></iconify-icon>
+          Retour a la marketplace
+        </a>
+      </div>
+    }
+  </main>
+</div>
