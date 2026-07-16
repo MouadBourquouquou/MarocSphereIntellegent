@@ -5,14 +5,7 @@
   <div
     class="min-h-screen w-full bg-background flex flex-col relative text-foreground font-sans zellige-pattern"
   >
-    <header
-      [class.py-2]="isScrolled()"
-      [class.py-3.5]="!isScrolled()"
-      [class.bg-background/90]="isScrolled()"
-      [class.backdrop-blur-md]="isScrolled()"
-      [class.shadow-md]="isScrolled()"
-      class="sticky top-0 z-50 border-b border-border/30 bg-background/40 transition-all duration-300"
-    >
+    <header class="hero-nav absolute inset-x-0 top-0 z-50">
       <div class="max-w-7xl mx-auto px-6 flex items-center justify-between gap-4 transition-all duration-300">
         <div class="flex items-center">
           <!-- LOGO -->
@@ -54,59 +47,57 @@
           >
           <a
             href="/sign-up"
-            class="inline-flex px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider bg-primary text-primary-foreground hover:bg-primary/90 hover:scale-[1.03] active:scale-[0.97] transition-all duration-300 shadow-md shadow-primary/20"
+            class="hero-primary-action hero-primary-action--compact inline-flex px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider bg-primary text-primary-foreground transition-all duration-300"
             >Create Account</a
           >
         </div>
       </div>
     </header>
         <main class="flex-1">
-          <section
-            class="border-b border-border bg-gradient-to-br from-background via-muted/40 to-card relative overflow-hidden"
-          >
+          <section class="hero-landing border-b border-border relative overflow-hidden">
             <!-- Background Decorative Stars -->
             <div class="absolute top-10 left-10 w-32 h-32 opacity-10 bg-no-repeat bg-contain zellige-pattern pointer-events-none"></div>
             <div class="absolute bottom-10 right-10 w-48 h-48 opacity-10 bg-no-repeat bg-contain zellige-pattern pointer-events-none"></div>
 
             <div
-              class="max-w-7xl mx-auto px-6 py-16 lg:py-24 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
+              class="hero-landing-inner max-w-7xl mx-auto px-6 py-16 lg:py-24 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
             >
               <!-- LEFT COLUMN -->
-              <div class="flex flex-col justify-center reveal-on-scroll">
+              <div class="hero-copy flex flex-col justify-center">
                 <!-- Eyebrow Badge -->
-                <div class="self-start inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#FFFDF8] border border-[#2E2A25]/10 shadow-sm text-xs font-semibold text-[#1E5B44] mb-8">
+                <div class="hero-eyebrow self-start inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#FFFDF8] border border-[#2E2A25]/10 shadow-sm text-xs font-semibold text-[#1E5B44] mb-8">
                   <span>1st AI-powered Moroccan travel planning platform</span>
                 </div>
                 
                 <!-- H1 -->
-                <h1 class="text-6xl lg:text-6.5xl leading-tight font-heading font-bold text-[#2E2A25] tracking-tight mb-4 flex flex-col">
-                  <span class="word-reveal" style="animation-delay: 0s;">Discover Morocco</span>
-                  <span class="italic text-[#B03A22] font-light font-heading mt-1 word-reveal" style="animation-delay: 0.08s;">Beyond the Map</span>
+                <h1 class="hero-title text-6xl lg:text-6.5xl leading-tight font-heading font-bold text-[#2E2A25] tracking-tight mb-4" aria-label="Discover Morocco Beyond the Map">
+                  <span class="hero-title__line hero-title__line--primary" aria-hidden="true">Discover Morocco</span>
+                  <span class="hero-title__line hero-title__line--accent" aria-hidden="true">Beyond the Map</span>
                 </h1>
                 
                 <!-- Sub line -->
-                <p class="text-base lg:text-lg text-[#2E2A25]/60 max-w-xl leading-relaxed mb-8">
+                <p class="hero-description text-base lg:text-lg text-[#2E2A25]/60 max-w-xl leading-relaxed mb-8">
                   AI-crafted journeys through hidden souks, desert camps, and mountain villages.
                 </p>
                 
                 <!-- CTAs -->
-                <div class="flex flex-wrap gap-4 mb-6">
-                  <a href="#" class="inline-flex items-center justify-center px-8 py-3.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#B03A22] text-[#F6F1E8] hover:-translate-y-[2px] hover:shadow-lg hover:shadow-[#B03A22]/20 transition-all duration-300">
+                <div class="hero-actions flex flex-wrap gap-4 mb-6">
+                  <a href="#" class="hero-primary-action inline-flex items-center justify-center px-8 py-3.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#B03A22] text-[#F6F1E8] transition-all duration-300">
                     Start Your Journey
                   </a>
-                  <a href="#" class="inline-flex items-center justify-center px-8 py-3.5 rounded-full text-xs font-bold uppercase tracking-wider bg-white text-[#2E2A25] border border-[#2E2A25]/20 hover:bg-[#2E2A25]/5 transition-all duration-300">
+                  <a href="#" class="hero-secondary-action inline-flex items-center justify-center px-8 py-3.5 rounded-full text-xs font-bold uppercase tracking-wider bg-white text-[#2E2A25] border border-[#2E2A25]/20 transition-all duration-300">
                     Let's Collaborate
                   </a>
                 </div>
 
                 <!-- Trust Row -->
-                <p class="text-sm font-semibold text-[#2E2A25]/50">
+                <p class="hero-proof text-sm font-semibold text-[#2E2A25]/50">
                   ★ 4.9 · 320+ certified guides · 12k AI itineraries
                 </p>
               </div>
               
               <!-- RIGHT COLUMN: Slideshow Frame -->
-              <div class="relative w-full aspect-[4/5] rounded-2xl shadow-lg overflow-hidden group">
+              <div class="relative w-full aspect-[16/10] rounded-2xl shadow-lg overflow-hidden group hero-slideshow-frame">
                    
                 <!-- Crossfading Images -->
                 @for (slide of heroSlides; track slide; let i = $index) {
@@ -141,7 +132,7 @@
                 </div>
 
                 <!-- Floating Card 1: AI Planner Focus -->
-                <div class="absolute bottom-12 left-0 md:left-[-1.5rem] z-20 w-[280px] rounded-2xl bg-[#F6F1E8]/95 border border-[#2E2A25]/10 p-4 shadow-xl backdrop-blur-md animate-float-loop">
+                <div class="hero-info-card absolute bottom-5 left-5 z-20 w-[280px] rounded-2xl bg-[#F6F1E8]/95 border border-[#2E2A25]/10 p-4 shadow-xl backdrop-blur-md">
                   <div class="flex items-center justify-between">
                     <div>
                       <p class="text-[10px] uppercase tracking-wider text-[#2E2A25]/60 font-bold">
@@ -163,7 +154,7 @@
                 </div>
 
                 <!-- Floating Card 2: Live Navigation -->
-                <div class="absolute bottom-32 right-0 md:right-[-1.5rem] z-20 w-[260px] rounded-2xl bg-[#F6F1E8]/95 border border-[#2E2A25]/10 p-4 shadow-xl backdrop-blur-md animate-float-loop-delay">
+                <div class="hero-info-card absolute bottom-24 right-5 z-20 w-[260px] rounded-2xl bg-[#F6F1E8]/95 border border-[#2E2A25]/10 p-4 shadow-xl backdrop-blur-md">
                   <p class="text-[10px] uppercase tracking-wider text-[#2E2A25]/60 font-bold">
                     Live Navigation
                   </p>
@@ -179,7 +170,7 @@
             </div>
             
             <!--  Stats Section --> 
-            <div class="max-w-7xl mx-auto px-6 pb-16 reveal-on-scroll">
+            <div class="hero-stats max-w-7xl mx-auto px-6 pb-16 reveal-on-scroll">
               <div #statsSection class="grid grid-cols-2 md:grid-cols-4 gap-6">
                 <div
                   class="p-6 rounded-2xl bg-card border border-border/40 shadow-sm text-center hover:shadow-md transition-all duration-300"
@@ -332,72 +323,40 @@
                 </p>
               </div>
               
-              <!-- BENTO GRID -->
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[minmax(200px,_auto)]">
-                
-                <!-- Card 1: Who we are (Cream bg, spans 2 cols, has a subtle zellige background decoration) -->
-                <div
-                  class="p-8 rounded-2xl bg-background border border-border/60 shadow-sm md:col-span-2 flex flex-col justify-center relative overflow-hidden transition-all duration-300 hover:shadow-md hover:border-secondary/40 reveal-on-scroll"
-                >
-                  <div class="absolute right-0 bottom-0 w-36 h-36 opacity-[0.04] bg-no-repeat bg-contain zellige-pattern pointer-events-none"></div>
-                  <h4 class="text-lg font-heading font-bold text-foreground">Who we are</h4>
-                  <p class="text-sm text-muted-foreground mt-3 leading-relaxed max-w-xl">
-                    A premium Moroccan tourism platform connecting clients with guides, artisans, hotels, and DMCs.
-                  </p>
-                </div>
+              <!-- Editorial bento: original copy, recut as six bold visual stories. -->
+              <div class="identity-bento-art">
+                <article class="identity-art-card identity-art-card--who reveal-on-scroll">
+                  <div class="identity-art-card__image" aria-hidden="true"></div>
+                  <div class="identity-art-card__copy">
+                    <h4>Who we are</h4>
+                    <p>A premium Moroccan tourism platform connecting clients with guides, artisans, hotels, and DMCs.</p>
+                  </div>
+                </article>
 
-                <!-- Card 2: Our mission (Terracotta bg, spans 1 col) -->
-                <div
-                  class="p-8 rounded-2xl bg-primary text-primary-foreground md:col-span-1 flex flex-col justify-center relative overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-primary/20 reveal-on-scroll"
-                >
-                  <h4 class="text-lg font-heading font-bold">Our mission</h4>
-                  <p class="text-sm text-primary-foreground/90 mt-3 leading-relaxed">
-                    Support Moroccan tourism digitally while enabling safe reservations, verified professionals, and delightful trip planning.
-                  </p>
-                </div>
+                <article class="identity-art-card identity-art-card--mission reveal-on-scroll">
+                  <span class="identity-art-card__mission-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+                  <div class="identity-art-card__copy"><h4>Our mission</h4><p>Support Moroccan tourism digitally while enabling safe reservations, verified professionals, and delightful trip planning.</p></div>
+                </article>
 
-                <!-- Card 3: Our vision (Cream bg, spans 1 col) -->
-                <div
-                  class="p-8 rounded-2xl bg-background border border-border/60 shadow-sm md:col-span-1 flex flex-col justify-center relative overflow-hidden transition-all duration-300 hover:shadow-md hover:border-secondary/40 reveal-on-scroll"
-                >
-                  <h4 class="text-lg font-heading font-bold text-foreground">Our vision</h4>
-                  <p class="text-sm text-muted-foreground mt-3 leading-relaxed">
-                    Make Morocco the most discoverable and bookable cultural destination through AI-driven journeys and local partnerships.
-                  </p>
-                </div>
+                <article class="identity-art-card identity-art-card--vision reveal-on-scroll">
+                  <span class="identity-art-card__star" aria-hidden="true">✦</span>
+                  <div class="identity-art-card__copy"><h4>Our vision</h4><p>Make Morocco the most discoverable and bookable cultural destination through AI-driven journeys and local partnerships.</p></div>
+                </article>
 
-                <!-- Card 4: Local impact (Green bg, spans 2 cols) -->
-                <div
-                  class="p-8 rounded-2xl bg-secondary text-secondary-foreground md:col-span-2 flex flex-col justify-center relative overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-secondary/20 reveal-on-scroll"
-                >
-                  <div class="absolute right-0 bottom-0 w-36 h-36 opacity-[0.04] bg-no-repeat bg-contain zellige-pattern pointer-events-none" style="filter: brightness(0) invert(1);"></div>
-                  <h4 class="text-lg font-heading font-bold">Local impact</h4>
-                  <p class="text-sm text-secondary-foreground/90 mt-3 leading-relaxed max-w-xl">
-                    Promoting local artisans, cooperatives, and cultural heritage with traceable, authentic products.
-                  </p>
-                </div>
+                <article class="identity-art-card identity-art-card--impact reveal-on-scroll">
+                  <span class="identity-art-card__arrow" aria-hidden="true">↗</span>
+                  <div class="identity-art-card__copy"><h4>Local impact</h4><p>Promoting local artisans, cooperatives, and cultural heritage with traceable, authentic products.</p></div>
+                </article>
 
-                <!-- Card 5: Verified trust (Cream bg, spans 2 cols) -->
-                <div
-                  class="p-8 rounded-2xl bg-background border border-border/60 shadow-sm md:col-span-2 flex flex-col justify-center relative overflow-hidden transition-all duration-300 hover:shadow-md hover:border-secondary/40 reveal-on-scroll"
-                >
-                  <div class="absolute right-0 bottom-0 w-36 h-36 opacity-[0.04] bg-no-repeat bg-contain zellige-pattern pointer-events-none"></div>
-                  <h4 class="text-lg font-heading font-bold text-foreground">Verified trust</h4>
-                  <p class="text-sm text-muted-foreground mt-3 leading-relaxed max-w-xl">
-                    Certified local guides and trusted DMC partners with quality scoring, reviews, and reservation protection.
-                  </p>
-                </div>
+                <article class="identity-art-card identity-art-card--trust reveal-on-scroll">
+                  <div class="identity-art-card__image" aria-hidden="true"></div>
+                  <div class="identity-art-card__copy"><h4>Verified trust</h4><p>Certified local guides and trusted DMC partners with quality scoring, reviews, and reservation protection.</p></div>
+                </article>
 
-                <!-- Card 6: AI experiences (Terracotta bg, spans 1 col) -->
-                <div
-                  class="p-8 rounded-2xl bg-primary text-primary-foreground md:col-span-1 flex flex-col justify-center relative overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-primary/20 reveal-on-scroll"
-                >
-                  <h4 class="text-lg font-heading font-bold">AI experiences</h4>
-                  <p class="text-sm text-primary-foreground/90 mt-3 leading-relaxed">
-                    Smart itineraries, contextual recommendations, and route-aware suggestions tailored to each traveler.
-                  </p>
-                </div>
-
+                <article class="identity-art-card identity-art-card--ai reveal-on-scroll">
+                  <span class="identity-art-card__orbit" aria-hidden="true"><i></i></span>
+                  <div class="identity-art-card__copy"><h4>AI experiences</h4><p>Smart itineraries, contextual recommendations, and route-aware suggestions tailored to each traveler.</p></div>
+                </article>
               </div>
             </div>
           </section>
@@ -734,7 +693,7 @@
                   <!-- Image Container -->
                   <div class="relative overflow-hidden h-72">
                     <img
-                      src="/images/Dunes Aesthetic _ Travel Inspiration _ Travel Motivation _ Sahara.jpg"
+                      src="/images/Men walking through Moroccan desert.jpg"
                       alt="Sahara camp"
                       class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
@@ -796,7 +755,7 @@
                   <!-- Image Container -->
                   <div class="relative overflow-hidden h-72">
                     <img
-                      src="/images/Chefchaouen.jpg"
+                      src="/images/jardin majorelle 💙.jpg"
                       alt="Chefchaouen alley"
                       class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
@@ -1068,4 +1027,3 @@
         </footer>
     </div>
 </div>
-

@@ -1,5 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Inter:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Outfit:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
       @theme inline {
         --color-background: var(--background);
@@ -120,9 +120,9 @@
   --input: #D9CDBC;
   --ring: #1E5B44;
   --radius: 0.9rem;
-  --font-sans: 'Inter', sans-serif;
-  --font-heading: 'Fraunces', Georgia, serif;
-  --font-mono: JetBrains Mono, monospace;
+  --font-sans: 'Outfit', sans-serif;
+  --font-heading: 'DM Mono', monospace;
+  --font-mono: 'DM Mono', monospace;
   --shadow-offset-x: 0;
   --shadow-offset-y: 10;
   --shadow-blur: 30;
