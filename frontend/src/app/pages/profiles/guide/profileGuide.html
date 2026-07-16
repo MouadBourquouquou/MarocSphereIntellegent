@@ -1,0 +1,151 @@
+<div class="min-h-screen w-full bg-background flex flex-col text-foreground font-sans">
+  <!-- Header -->
+  <header class="border-b border-border bg-card px-6 py-4 flex items-center justify-between sticky top-0 z-50 shadow-sm">
+    <div class="flex items-center gap-3">
+      <a class="navbar-brand" routerLink="/">
+        <img src="/pics/LOGOPRINCIPALE.png" alt="MarocSphere" class="logo" />
+      </a>
+      <div>
+        <h1 class="text-xl font-heading font-bold text-primary tracking-wide">MarocSphere</h1>
+        <p class="text-xs text-muted-foreground font-sans">Guide Profile</p>
+      </div>
+    </div>
+    <a routerLink="/marketplace" class="text-sm font-bold text-primary hover:underline flex items-center gap-1">
+      <iconify-icon icon="lucide:arrow-left" class="text-xs"></iconify-icon> Retour a la marketplace
+    </a>
+  </header>
+
+  <main class="flex-1 max-w-4xl mx-auto w-full p-6 space-y-6">
+    @if (isLoading()) {
+      <div class="text-center text-muted-foreground py-12">Chargement du profil...</div>
+    }
+
+    @if (errorMessage()) {
+      <div class="text-center py-12">
+        <p class="text-muted-foreground">{{ errorMessage() }}</p>
+        <a routerLink="/marketplace" class="text-sm text-primary hover:underline mt-2 inline-block">Retour a la marketplace</a>
+      </div>
+    }
+
+    @if (guide(); as g) {
+      <!-- Profile Hero -->
+      <div class="bg-card border border-border rounded-2xl p-8 shadow-sm flex flex-col items-center text-center">
+        <div class="relative w-32 h-32 mb-4">
+          <img [src]="avatar()" [alt]="displayName()"
+            class="w-full h-full rounded-full object-cover border-4 border-primary/20 shadow-lg" />
+          @if (g.statutCertification === 'CERTIFIED') {
+            <span class="absolute -top-2 -right-2 bg-tertiary text-card text-[10px] font-bold px-2 py-1 rounded-full uppercase shadow flex items-center gap-1">
+              <iconify-icon icon="lucide:shield" class="text-xs"></iconify-icon> Certifie
+            </span>
+          }
+        </div>
+        <h2 class="font-heading font-bold text-2xl text-foreground">{{ g.prenom }} {{ g.nom }}</h2>
+        <p class="text-sm text-muted-foreground mt-1">{{ g.nationalite }}</p>
+
+        <div class="flex flex-wrap justify-center gap-2 mt-3">
+          <span [class]="g.disponible
+            ? 'bg-secondary/10 text-secondary text-[10px] font-bold px-3 py-1 rounded-full uppercase'
+            : 'bg-muted text-muted-foreground text-[10px] font-bold px-3 py-1 rounded-full uppercase'">
+            {{ g.disponible ? 'Disponible' : 'Indisponible' }}
+          </span>
+          <span [class]="g.statutCertification === 'CERTIFIED'
+            ? 'bg-tertiary/10 text-tertiary text-[10px] font-bold px-3 py-1 rounded-full uppercase flex items-center gap-1'
+            : g.statutCertification === 'PENDING'
+              ? 'bg-yellow-500/10 text-yellow-600 text-[10px] font-bold px-3 py-1 rounded-full uppercase'
+              : 'bg-muted text-muted-foreground text-[10px] font-bold px-3 py-1 rounded-full uppercase'">
+            <iconify-icon icon="lucide:star" class="text-xs"></iconify-icon>
+            Score: {{ g.scoreCertification ?? 0 }}
+          </span>
+          @if (g.numeroLicence) {
+            <span class="bg-primary/10 text-primary text-[10px] font-bold px-3 py-1 rounded-full uppercase">
+              Licence #{{ g.numeroLicence }}
+            </span>
+          }
+        </div>
+      </div>
+
+      <!-- Details Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Personal Info -->
+        <div class="bg-card border border-border rounded-2xl p-6 shadow-sm">
+          <h3 class="font-heading font-bold text-base text-foreground mb-4 flex items-center gap-2">
+            <iconify-icon icon="lucide:user" class="text-primary"></iconify-icon>
+            Informations personnelles
+          </h3>
+          <div class="space-y-3 text-sm">
+            <div class="flex justify-between">
+              <span class="text-muted-foreground">Nom complet</span>
+              <span class="font-medium text-foreground">{{ g.prenom }} {{ g.nom }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-muted-foreground">Email</span>
+              <span class="font-medium text-foreground">{{ g.email }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-muted-foreground">Telephone</span>
+              <span class="font-medium text-foreground">{{ g.telephone }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-muted-foreground">Nationalite</span>
+              <span class="font-medium text-foreground">{{ g.nationalite }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-muted-foreground">Langue preferee</span>
+              <span class="font-medium text-foreground">{{ g.languePreferee }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Professional Info -->
+        <div class="bg-card border border-border rounded-2xl p-6 shadow-sm">
+          <h3 class="font-heading font-bold text-base text-foreground mb-4 flex items-center gap-2">
+            <iconify-icon icon="lucide:briefcase" class="text-primary"></iconify-icon>
+            Informations professionnelles
+          </h3>
+          <div class="space-y-3 text-sm">
+            <div class="flex justify-between">
+              <span class="text-muted-foreground">Numero de licence</span>
+              <span class="font-medium text-foreground">{{ g.numeroLicence || '—' }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-muted-foreground">Statut certification</span>
+              <span class="font-medium"
+                [class]="g.statutCertification === 'CERTIFIED'
+                  ? 'text-secondary'
+                  : g.statutCertification === 'PENDING'
+                    ? 'text-yellow-600'
+                    : 'text-muted-foreground'">
+                {{ g.statutCertification }}
+              </span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-muted-foreground">Score</span>
+              <span class="font-medium text-foreground">{{ g.scoreCertification ?? 0 }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-muted-foreground">Disponibilite</span>
+              <span class="font-medium" [class]="g.disponible ? 'text-secondary' : 'text-muted-foreground'">
+                {{ g.disponible ? 'Disponible' : 'Indisponible' }}
+              </span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-muted-foreground">Membre depuis</span>
+              <span class="font-medium text-foreground">
+                {{ g.dateCreation ? (g.dateCreation | date:'MMM yyyy') : '—' }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Back to marketplace -->
+      <div class="text-center pt-4 pb-8">
+        <a routerLink="/marketplace"
+          class="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-xl font-bold text-sm shadow-md hover:bg-primary/90 transition-all">
+          <iconify-icon icon="lucide:arrow-left" class="text-base"></iconify-icon>
+          Retour a la marketplace
+        </a>
+      </div>
+    }
+  </main>
+</div>
