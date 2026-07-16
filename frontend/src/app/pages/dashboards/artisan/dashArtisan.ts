@@ -26,6 +26,11 @@ interface ArtisanProfile {
   location: string;
   avatar: string;
   banner: string;
+  independant?: boolean;
+  nationalite?: string;
+  languePreferee?: string;
+  qrTraceId?: string;
+  eligibleExport?: boolean;
 }
 
 interface Product {
@@ -104,12 +109,23 @@ export class dashboardArtisan implements AfterViewInit, OnDestroy {
     avatar: 'https://randomuser.me/api/portraits/men/12.jpg',
     banner:
       'https://uxmagic.blob.core.windows.net/public/agent-images/artisan-banner-1783967641773-ereo64iln1k.png',
+    independant: true,
+    nationalite: 'Moroccan',
+    languePreferee: 'Arabic',
+    qrTraceId: 'QR-ART-2024-001',
+    eligibleExport: true,
   });
 
   profileForm!: ArtisanProfile;
   productForm!: ProductForm;
   profileImagePreview = signal(this.profile().avatar);
   profileBannerPreview = signal(this.profile().banner);
+
+  isLoading = signal(false);
+  errorMessage = signal('');
+  displayName = computed(() => this.profile().name);
+  memberSince = computed(() => 'Jan 2024');
+  logout = (): void => {};
 
   toastMessage = signal('');
   toastType = signal<'success' | 'error'>('success');

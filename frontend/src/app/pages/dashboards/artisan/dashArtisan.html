@@ -10,7 +10,6 @@
           <span class="font-heading font-bold text-lg tracking-wider text-primary">MarocSphere</span>
           <p class="text-xs text-muted-foreground font-sans">Artisan Workspace &amp; Business Hub</p>
         </div>
-        </a>
       </div>
 
       <nav class="hidden md:flex items-center gap-1 bg-muted p-1 rounded-full border border-border/50">
@@ -31,7 +30,7 @@
             <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-primary rounded-full border-2 border-card"></span>
           </button>
         </div>
-        <img [src]="avatar()" [alt]="displayName()"
+        <img [src]="profile().avatar" [alt]="displayName()"
           class="w-10 h-10 rounded-full border-2 border-secondary shadow-sm">
         <button type="button" (click)="logout()"
           class="text-xs text-muted-foreground hover:text-primary">Déconnexion</button>
@@ -47,17 +46,6 @@
     </div>
     }
 
-    <!-- Main Content Layout -->
-        <button
-          class="relative w-9 h-9 rounded-full bg-muted flex items-center justify-center text-foreground hover:bg-border/30 transition-all">
-          <iconify-icon icon="lucide:bell" class="text-lg"></iconify-icon>
-          <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-primary rounded-full border-2 border-card"></span>
-        </button>
-        <img [src]="profile().avatar" alt="Artisan Avatar"
-          class="w-10 h-10 rounded-full border-2 border-secondary shadow-sm object-cover">
-      </div>
-    </header>
-
     <main class="max-w-7xl mx-auto px-4 md:px-6 py-8 w-full flex-grow grid grid-cols-1 lg:grid-cols-12 gap-8">
       <aside class="col-span-1 lg:col-span-4 flex flex-col gap-6">
         <div class="bg-card rounded-2xl border border-border/80 shadow-md overflow-hidden relative">
@@ -68,21 +56,21 @@
           </div>
 
           <div class="px-6 pb-6 relative -mt-12 flex flex-col items-center text-center">
-            <img [src]="avatar()" [alt]="displayName()"
+            <img [src]="profile().avatar" [alt]="displayName()"
               class="w-24 h-24 rounded-full border-4 border-card shadow-lg object-cover">
 
             <h2 class="text-xl font-heading font-bold text-foreground mt-3">{{ displayName() }}</h2>
-            <p class="text-xs text-secondary font-semibold">{{ artisan()?.categorieArtisanat ?? 'Artisan' }}</p>
+            <p class="text-xs text-secondary font-semibold">{{ profile()?.category ?? 'Artisan' }}</p>
 
             <!-- Badges -->
             <div class="flex flex-wrap gap-2 justify-center mt-4">
-              @if (artisan()?.qrTraceId) {
+              @if (profile()?.qrTraceId) {
               <span
                 class="inline-flex items-center gap-1 bg-secondary/10 text-secondary text-[10px] font-bold px-2.5 py-1 rounded-full border border-secondary/20 uppercase tracking-wider">
                 <iconify-icon icon="lucide:shield" class="text-xs"></iconify-icon> QR Authenticated
               </span>
               }
-              @if (artisan()?.eligibleExport) {
+              @if (profile()?.eligibleExport) {
               <span
                 class="inline-flex items-center gap-1 bg-accent/10 text-accent text-[10px] font-bold px-2.5 py-1 rounded-full border border-accent/20 uppercase tracking-wider">
                 <iconify-icon icon="lucide:globe" class="text-xs"></iconify-icon> Export Eligible
@@ -94,39 +82,19 @@
             <div class="w-full mt-6 pt-6 border-t border-border/40 flex flex-col gap-3 text-left text-xs">
               <div class="flex justify-between items-center">
                 <span class="text-muted-foreground">Type</span>
-                <span class="font-semibold text-foreground">{{ artisan()?.independant ? 'Independent' : 'Cooperative Member' }}</span>
+                <span class="font-semibold text-foreground">{{ profile()?.independant ? 'Independent' : 'Cooperative Member' }}</span>
               </div>
               <div class="flex justify-between items-center">
                 <span class="text-muted-foreground">Nationality</span>
-                <span class="font-semibold text-foreground">{{ artisan()?.nationalite ?? '—' }}</span>
+                <span class="font-semibold text-foreground">{{ profile()?.nationalite ?? '—' }}</span>
               </div>
               <div class="flex justify-between items-center">
                 <span class="text-muted-foreground">Language</span>
-                <span class="font-semibold text-foreground">{{ artisan()?.languePreferee ?? '—' }}</span>
+                <span class="font-semibold text-foreground">{{ profile()?.languePreferee ?? '—' }}</span>
               </div>
               <div class="flex justify-between items-center">
                 <span class="text-muted-foreground">Member Since</span>
                 <span class="font-semibold text-foreground">{{ memberSince() }}</span>
-              </div>
-            <img [src]="profileImagePreview()" alt="Artisan Avatar"
-              class="w-24 h-24 rounded-full border-4 border-card shadow-lg object-cover">
-
-            <h2 class="text-xl font-heading font-bold text-foreground mt-3">{{ profile().workshop }}</h2>
-            <p class="text-xs text-secondary font-semibold">{{ profile().role }}</p>
-            <p class="text-xs text-muted-foreground mt-2 px-2">{{ profile().biography }}</p>
-
-            <div class="w-full mt-6 pt-6 border-t border-border/40 text-left text-xs space-y-3">
-              <div class="flex justify-between items-center">
-                <span class="text-muted-foreground">Location</span>
-                <span class="font-semibold text-foreground">{{ profile().location }}</span>
-              </div>
-              <div class="flex justify-between items-center">
-                <span class="text-muted-foreground">Contact</span>
-                <span class="font-semibold text-foreground">{{ profile().contact }}</span>
-              </div>
-              <div class="flex justify-between items-center">
-                <span class="text-muted-foreground">Category</span>
-                <span class="font-semibold text-foreground">{{ profile().category }}</span>
               </div>
             </div>
 
@@ -264,7 +232,7 @@
                 <span class="p-1.5 rounded-lg bg-secondary/10 text-secondary"><iconify-icon icon="lucide:layers"
                     class="text-base"></iconify-icon></span>
               </div>
-              <p class="text-lg font-bold text-foreground mt-2">{{ artisan()?.categorieArtisanat ?? '—' }}</p>
+              <p class="text-lg font-bold text-foreground mt-2">{{ profile()?.category ?? '—' }}</p>
               <p class="text-[10px] text-secondary font-medium mt-1">Your craft specialty</p>
               <p class="text-2xl font-bold text-foreground mt-2">{{ totalProducts() }}</p>
               <p class="text-[10px] text-secondary-foreground font-medium mt-1">Live product listings</p>
@@ -316,7 +284,7 @@
                 <span class="p-1.5 rounded-lg bg-primary/10 text-primary"><iconify-icon icon="lucide:phone"
                     class="text-base"></iconify-icon></span>
               </div>
-              <p class="text-lg font-bold text-foreground mt-2">{{ artisan()?.telephone ?? '—' }}</p>
+              <p class="text-lg font-bold text-foreground mt-2">{{ profile()?.phone ?? '—' }}</p>
               <p class="text-[10px] text-muted-foreground mt-1">Contact number</p>
             </div>
 
@@ -326,12 +294,12 @@
                 <span class="p-1.5 rounded-lg bg-yellow-500/10 text-yellow-500"><iconify-icon icon="lucide:qr-code"
                     class="text-base"></iconify-icon></span>
               </div>
-              <p class="text-sm font-bold text-foreground mt-2 truncate">{{ artisan()?.qrTraceId ?? '—' }}</p>
+              <p class="text-sm font-bold text-foreground mt-2 truncate">{{ profile()?.qrTraceId ?? '—' }}</p>
               <p class="text-[10px] text-muted-foreground mt-1">Traceability ID</p>
             </div>
           </div>
-
-          <!-- Chart -->
+            <div class="bg-card rounded-2xl border border-border/60 p-4 shadow-sm hover:shadow-md transition-all">
+              <div class="flex justify-between items-start">
                 <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Average Rating</span>
                 <span class="p-1.5 rounded-lg bg-yellow-500/10 text-yellow-500"><iconify-icon icon="lucide:star"
                     class="text-base"></iconify-icon></span>
@@ -339,15 +307,11 @@
               <p class="text-2xl font-bold text-foreground mt-2">{{ averageRating() }}</p>
               <p class="text-[10px] text-muted-foreground font-medium mt-1">Across all listed products</p>
             </div>
-          </div>
 
           <div class="bg-card rounded-2xl border border-border/80 p-6 shadow-sm">
             <div class="flex items-center justify-between border-b border-border/40 pb-4 mb-6">
               <div class="flex items-center gap-2">
                 <iconify-icon icon="lucide:chart-bar" class="text-secondary"></iconify-icon>
-                Sales Analytics &amp; Growth
-              </h3>
-            </div>
                 <h3 class="font-heading font-bold text-base text-foreground tracking-wide">Sales Analytics &amp; Growth</h3>
               </div>
               <div class="flex gap-2">
