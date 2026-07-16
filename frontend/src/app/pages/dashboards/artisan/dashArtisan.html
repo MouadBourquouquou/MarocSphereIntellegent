@@ -1,26 +1,27 @@
-<div data-page="artisan-dashboard">
-
+﻿<div data-page="artisan-dashboard">
   <div class="min-h-screen w-full bg-background flex flex-col relative font-sans text-foreground pb-12">
-    <!-- Top Navigation Bar -->
     <header
       class="sticky top-0 z-50 bg-card/90 backdrop-blur-md border-b border-border/60 px-6 py-4 flex items-center justify-between shadow-sm">
       <div class="flex items-center gap-3">
-        <a routerLink="/" class="flex items-center gap-3">
-        <div
-          class="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center text-secondary-foreground font-heading font-bold text-lg shadow-md shadow-secondary/20">
-          M
-        </div>
+        <a class="navbar-brand" routerLink="/">
+          <img src="/pics/LOGOPRINCIPALE.png" alt="MarocSphere" class="logo" />
+        </a>
         <div>
-          <span class="font-heading font-bold text-lg tracking-wider text-secondary">MarocSphere</span>
+          <span class="font-heading font-bold text-lg tracking-wider text-primary">MarocSphere</span>
           <p class="text-xs text-muted-foreground font-sans">Artisan Workspace &amp; Business Hub</p>
         </div>
         </a>
       </div>
 
-      <!-- Right Actions -->
+      <nav class="hidden md:flex items-center gap-1 bg-muted p-1 rounded-full border border-border/50">
+        <button
+          class="px-4 py-1.5 rounded-full text-sm font-medium bg-card text-foreground shadow-sm transition-all">Artisan
+          Dashboard</button>
+      </nav>
+
       <div class="flex items-center gap-4">
         <div class="flex items-center gap-2 bg-muted px-3 py-1.5 rounded-lg border border-border/50">
-          <span class="w-2.5 h-2.5 rounded-full bg-secondary animate-pulse"></span>
+          <span class="w-2.5 h-2.5 rounded-full bg-secondary-foreground animate-pulse"></span>
           <span class="text-xs font-semibold text-foreground">Workshop Live</span>
         </div>
         <div class="relative">
@@ -47,17 +48,22 @@
     }
 
     <!-- Main Content Layout -->
+        <button
+          class="relative w-9 h-9 rounded-full bg-muted flex items-center justify-center text-foreground hover:bg-border/30 transition-all">
+          <iconify-icon icon="lucide:bell" class="text-lg"></iconify-icon>
+          <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-primary rounded-full border-2 border-card"></span>
+        </button>
+        <img [src]="profile().avatar" alt="Artisan Avatar"
+          class="w-10 h-10 rounded-full border-2 border-secondary shadow-sm object-cover">
+      </div>
+    </header>
+
     <main class="max-w-7xl mx-auto px-4 md:px-6 py-8 w-full flex-grow grid grid-cols-1 lg:grid-cols-12 gap-8">
-
-      <!-- Left Sidebar: Artisan Details & Badges -->
       <aside class="col-span-1 lg:col-span-4 flex flex-col gap-6">
-
-        <!-- Artisan Profile Card -->
         <div class="bg-card rounded-2xl border border-border/80 shadow-md overflow-hidden relative">
           <div class="h-32 w-full bg-gradient-to-r from-secondary/80 to-accent/80 relative">
-            <img
-              src="https://uxmagic.blob.core.windows.net/public/agent-images/artisan-banner-1783967641773-ereo64iln1k.png"
-              alt="Artisan Workshop" class="w-full h-full object-cover opacity-60 mix-blend-multiply">
+            <img [src]="profileBannerPreview()" alt="Artisan Workshop Banner"
+              class="w-full h-full object-cover opacity-60 mix-blend-multiply">
             <div class="absolute inset-0 bg-gradient-to-t from-primary/50 to-transparent"></div>
           </div>
 
@@ -102,11 +108,108 @@
                 <span class="text-muted-foreground">Member Since</span>
                 <span class="font-semibold text-foreground">{{ memberSince() }}</span>
               </div>
+            <img [src]="profileImagePreview()" alt="Artisan Avatar"
+              class="w-24 h-24 rounded-full border-4 border-card shadow-lg object-cover">
+
+            <h2 class="text-xl font-heading font-bold text-foreground mt-3">{{ profile().workshop }}</h2>
+            <p class="text-xs text-secondary font-semibold">{{ profile().role }}</p>
+            <p class="text-xs text-muted-foreground mt-2 px-2">{{ profile().biography }}</p>
+
+            <div class="w-full mt-6 pt-6 border-t border-border/40 text-left text-xs space-y-3">
+              <div class="flex justify-between items-center">
+                <span class="text-muted-foreground">Location</span>
+                <span class="font-semibold text-foreground">{{ profile().location }}</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-muted-foreground">Contact</span>
+                <span class="font-semibold text-foreground">{{ profile().contact }}</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-muted-foreground">Category</span>
+                <span class="font-semibold text-foreground">{{ profile().category }}</span>
+              </div>
             </div>
+
+            <div class="w-full mt-6 grid grid-cols-1 gap-2">
+              <button *ngIf="!profileEdit()" type="button" (click)="enableProfileEdit()"
+                class="py-2.5 bg-secondary text-secondary-foreground rounded-xl font-semibold text-xs shadow-md shadow-secondary/10 hover:bg-secondary/95 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-1.5">
+                <iconify-icon icon="lucide:pencil" class="text-sm"></iconify-icon> Edit Profile
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="profileEdit()" class="bg-background/80 border-t border-border/40 p-6">
+            <h3 class="font-heading text-sm font-bold text-foreground mb-4">Edit Artisan Profile</h3>
+            <form (ngSubmit)="saveProfile()" class="space-y-4">
+              <div class="grid grid-cols-1 gap-4">
+                <div class="grid grid-cols-1 gap-3">
+                  <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Workshop Banner</label>
+                  <input type="file" accept="image/*" (change)="onProfileBannerChange($event)"
+                    class="w-full rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
+                </div>
+                <div class="grid grid-cols-1 gap-3">
+                  <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Profile Picture</label>
+                  <input type="file" accept="image/*" (change)="onProfileImageChange($event)"
+                    class="w-full rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
+                </div>
+              </div>
+
+              <div class="grid gap-4">
+                <div>
+                  <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Workshop Name</label>
+                  <input type="text" name="workshop" [(ngModel)]="profileForm.workshop"
+                    class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
+                </div>
+
+                <div class="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Category</label>
+                    <input type="text" name="category" [(ngModel)]="profileForm.category"
+                      class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
+                  </div>
+                  <div>
+                    <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Role</label>
+                    <input type="text" name="role" [(ngModel)]="profileForm.role"
+                      class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
+                  </div>
+                </div>
+
+                <div>
+                  <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Biography</label>
+                  <textarea name="biography" rows="4" [(ngModel)]="profileForm.biography"
+                    class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"></textarea>
+                </div>
+
+                <div class="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Contact Email</label>
+                    <input type="email" name="contact" [(ngModel)]="profileForm.contact"
+                      class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
+                  </div>
+                  <div>
+                    <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Phone</label>
+                    <input type="text" name="phone" [(ngModel)]="profileForm.phone"
+                      class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
+                  </div>
+                </div>
+
+                <div>
+                  <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Workshop Location</label>
+                  <input type="text" name="location" [(ngModel)]="profileForm.location"
+                    class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
+                </div>
+              </div>
+
+              <div class="flex flex-wrap gap-3 justify-end pt-2 border-t border-border/40">
+                <button type="button" (click)="cancelProfileEdit()"
+                  class="px-4 py-2.5 rounded-xl border border-border text-xs font-semibold text-foreground hover:bg-muted transition-all">Cancel</button>
+                <button type="submit"
+                  class="px-5 py-2.5 rounded-xl bg-secondary text-secondary-foreground text-xs font-semibold shadow-md shadow-secondary/15 hover:bg-secondary/95 transition-all">Save Changes</button>
+              </div>
+            </form>
           </div>
         </div>
 
-        <!-- Real-Time Alerts / Stock Alerts -->
         <div class="bg-card rounded-2xl border border-border/80 p-5 shadow-sm">
           <h3
             class="font-heading font-bold text-sm text-foreground tracking-wide border-b border-border/40 pb-3 mb-4 flex items-center gap-2">
@@ -119,25 +222,22 @@
                   class="text-base"></iconify-icon></span>
               <div>
                 <h4 class="text-xs font-bold text-foreground">Low Stock Alert</h4>
-                <p class="text-[10px] text-muted-foreground mt-0.5">Fez Blue Mosaic Tile (3 units left)</p>
+                <p class="text-[10px] text-muted-foreground mt-0.5">Fez Blue Mosaic Tile (4 units left)</p>
               </div>
             </div>
             <div class="p-3 rounded-xl bg-secondary/5 border border-secondary/10 flex items-center gap-3">
-              <span class="p-1.5 rounded-lg bg-secondary/10 text-secondary"><iconify-icon icon="lucide:clock"
-                  class="text-base"></iconify-icon></span>
+              <span class="p-1.5 rounded-lg text-secondary" style="background-color:#d9e8e1;"><iconify-icon icon="lucide:clock"
+                  class="text-base" style="color: #006233;"></iconify-icon></span>
               <div>
-                <h4 class="text-xs font-bold text-foreground">Pending Shipment</h4>
-                <p class="text-[10px] text-muted-foreground mt-0.5">Order #8932 is ready to ship to Paris</p>
+                <h4 class="text-xs font-bold text-foreground">Pending Confirmation</h4>
+                <p class="text-[10px] text-muted-foreground mt-0.5">Order #ORD-8932 and #ORD-8938 require confirmation.</p>
               </div>
             </div>
           </div>
         </div>
       </aside>
 
-      <!-- Right Content Area with Tabs -->
       <section class="col-span-1 lg:col-span-8 flex flex-col gap-6">
-
-        <!-- Dashboard Tabs -->
         <div class="bg-card rounded-2xl border border-border/80 p-1.5 shadow-sm flex overflow-x-auto gap-1">
           <button id="overview-tab" (click)="switchDashboardTab('overview')"
             class="dash-tab-btn flex-1 px-4 py-3 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2 whitespace-nowrap bg-secondary text-secondary-foreground shadow-sm">
@@ -154,18 +254,10 @@
             <iconify-icon icon="lucide:shopping-cart" class="text-lg"></iconify-icon>
             Orders
           </button>
-          <button id="messages-tab" (click)="switchDashboardTab('messages')"
-            class="dash-tab-btn flex-1 px-4 py-3 rounded-xl text-sm font-semibold text-muted-foreground hover:text-foreground transition-all flex items-center justify-center gap-2 whitespace-nowrap">
-            <iconify-icon icon="lucide:message-circle" class="text-lg"></iconify-icon>
-            Messages
-          </button>
         </div>
 
-        <!-- Tab Content: Business Stats -->
         <div id="overview-content" class="dash-tab-pane flex flex-col gap-6">
-
-          <!-- Stats Grid -->
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
             <div class="bg-card rounded-2xl border border-border/60 p-4 shadow-sm hover:shadow-md transition-all">
               <div class="flex justify-between items-start">
                 <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Category</span>
@@ -174,16 +266,48 @@
               </div>
               <p class="text-lg font-bold text-foreground mt-2">{{ artisan()?.categorieArtisanat ?? '—' }}</p>
               <p class="text-[10px] text-secondary font-medium mt-1">Your craft specialty</p>
+              <p class="text-2xl font-bold text-foreground mt-2">{{ totalProducts() }}</p>
+              <p class="text-[10px] text-secondary-foreground font-medium mt-1">Live product listings</p>
             </div>
 
             <div class="bg-card rounded-2xl border border-border/60 p-4 shadow-sm hover:shadow-md transition-all">
               <div class="flex justify-between items-start">
-                <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Email</span>
-                <span class="p-1.5 rounded-lg bg-accent/10 text-accent"><iconify-icon icon="lucide:mail"
+                <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Pending Orders</span>
+                <span class="p-1.5 rounded-lg bg-accent/10 text-accent"><iconify-icon icon="lucide:clock"
                     class="text-base"></iconify-icon></span>
               </div>
-              <p class="text-sm font-bold text-foreground mt-2 truncate">{{ artisan()?.email ?? '—' }}</p>
-              <p class="text-[10px] text-accent font-medium mt-1">Contact email</p>
+              <p class="text-2xl font-bold text-foreground mt-2">{{ pendingOrders() }}</p>
+              <p class="text-[10px] text-muted-foreground font-medium mt-1">Awaiting confirmation</p>
+            </div>
+
+            <div class="bg-card rounded-2xl border border-border/60 p-4 shadow-sm hover:shadow-md transition-all">
+              <div class="flex justify-between items-start">
+                <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Confirmed Orders</span>
+                <span class="p-1.5 rounded-lg bg-primary/10 text-primary"><iconify-icon icon="lucide:check-circle"
+                    class="text-base"></iconify-icon></span>
+              </div>
+              <p class="text-2xl font-bold text-foreground mt-2">{{ confirmedOrders() }}</p>
+              <p class="text-[10px] text-muted-foreground font-medium mt-1">Ready for dispatch</p>
+            </div>
+
+            <div class="bg-card rounded-2xl border border-border/60 p-4 shadow-sm hover:shadow-md transition-all">
+              <div class="flex justify-between items-start">
+                <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Completed Orders</span>
+                <span class="p-1.5 rounded-lg bg-secondary/10 text-secondary"><iconify-icon icon="lucide:package"
+                    class="text-base"></iconify-icon></span>
+              </div>
+              <p class="text-2xl font-bold text-foreground mt-2">{{ completedOrders() }}</p>
+              <p class="text-[10px] text-muted-foreground font-medium mt-1">Fulfilled successfully</p>
+            </div>
+
+            <div class="bg-card rounded-2xl border border-border/60 p-4 shadow-sm hover:shadow-md transition-all">
+              <div class="flex justify-between items-start">
+                <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Revenue</span>
+                <span class="p-1.5 rounded-lg bg-accent/10 text-accent"><iconify-icon icon="lucide:credit-card"
+                    class="text-base"></iconify-icon></span>
+              </div>
+              <p class="text-2xl font-bold text-foreground mt-2">{{ revenue() | currency:'MAD':'symbol':'1.0-0' }}</p>
+              <p class="text-[10px] text-accent font-medium mt-1" style="color:#C19344">Full marketplace sales</p>
             </div>
 
             <div class="bg-card rounded-2xl border border-border/60 p-4 shadow-sm hover:shadow-md transition-all">
@@ -208,52 +332,533 @@
           </div>
 
           <!-- Chart -->
+                <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Average Rating</span>
+                <span class="p-1.5 rounded-lg bg-yellow-500/10 text-yellow-500"><iconify-icon icon="lucide:star"
+                    class="text-base"></iconify-icon></span>
+              </div>
+              <p class="text-2xl font-bold text-foreground mt-2">{{ averageRating() }}</p>
+              <p class="text-[10px] text-muted-foreground font-medium mt-1">Across all listed products</p>
+            </div>
+          </div>
+
           <div class="bg-card rounded-2xl border border-border/80 p-6 shadow-sm">
             <div class="flex items-center justify-between border-b border-border/40 pb-4 mb-6">
-              <h3 class="font-heading font-bold text-base text-foreground tracking-wide flex items-center gap-2">
+              <div class="flex items-center gap-2">
                 <iconify-icon icon="lucide:chart-bar" class="text-secondary"></iconify-icon>
                 Sales Analytics &amp; Growth
               </h3>
             </div>
+                <h3 class="font-heading font-bold text-base text-foreground tracking-wide">Sales Analytics &amp; Growth</h3>
+              </div>
+              <div class="flex gap-2">
+                <button
+                  class="px-3 py-1 bg-muted border border-border/50 text-[11px] font-semibold rounded-lg hover:bg-border/20 transition-all">Weekly</button>
+                <button
+                  class="px-3 py-1 bg-secondary text-secondary-foreground text-[11px] font-semibold rounded-lg transition-all shadow-sm">Monthly</button>
+              </div>
+            </div>
+
             <div class="h-64 overflow-hidden relative">
               <canvas id="artisanSalesChart" height="180"></canvas>
             </div>
           </div>
         </div>
-
-        <!-- Tab Content: Product Management -->
         <div id="products-content" class="dash-tab-pane hidden flex flex-col gap-6">
           <div class="bg-card rounded-2xl border border-border/80 p-6 shadow-sm">
-            <div class="border-b border-border/40 pb-4 mb-6">
-              <h3 class="font-heading font-bold text-base text-foreground tracking-wide">Product Catalog</h3>
-              <p class="text-xs text-muted-foreground mt-0.5">Manage, add, and duplicate your handcrafted masterpieces.</p>
+            <div
+              class="flex flex-col gap-4 md:flex-row md:items-center justify-between border-b border-border/40 pb-4 mb-6">
+              <div>
+                <h3 class="font-heading font-bold text-base text-foreground tracking-wide">Product Catalog</h3>
+                <p class="text-xs text-muted-foreground mt-0.5">Manage, add, and update your handcrafted marketplace
+                  products.</p>
+              </div>
+              <div class="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto] md:grid-cols-[1.5fr_auto] w-full md:w-auto">
+                <div class="flex items-center gap-2">
+                  <input type="text" placeholder="Search products or categories..."
+                    [ngModel]="productSearch()"
+                    (ngModelChange)="productSearch.set($event)"
+                    class="w-full rounded-2xl border border-border bg-background px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
+                </div>
+                <div class="flex items-center gap-2">
+                  <select [ngModel]="productFilter()" (ngModelChange)="productFilter.set($event)"
+                    class="rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent">
+                    <option value="all">All products</option>
+                    <option value="available">In Stock</option>
+                    <option value="low-stock">Low Stock</option>
+                    <option value="out-of-stock">Out of Stock</option>
+                  </select>
+                </div>
+                <div class="flex items-center gap-2">
+                  <select [ngModel]="productSort()" (ngModelChange)="productSort.set($event)"
+                    class="rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent">
+                    <option value="newest">Most Popular</option>
+                    <option value="price-asc">Price: Low to High</option>
+                    <option value="price-desc">Price: High to Low</option>
+                  </select>
+                </div>
+              </div>
+              <button type="button" (click)="openProductModal('add')"
+                class="inline-flex items-center gap-1.5 rounded-xl bg-secondary text-secondary-foreground px-4 py-2 text-xs font-semibold shadow-md shadow-secondary/10 hover:bg-secondary/95 transition-all">
+                <iconify-icon icon="lucide:plus" class="text-xs"></iconify-icon>
+                Add Product
+              </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div *ngFor="let product of paginatedProducts()"
+                class="border border-border/60 rounded-xl overflow-hidden bg-muted/20 group hover:shadow-md transition-all">
+                <div class="h-40 bg-muted relative overflow-hidden">
+                  <img [src]="product.image" [alt]="product.name"
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                  <span
+                    class="absolute top-3 left-3 rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] bg-secondary/90 text-secondary-foreground"
+                    [ngClass]="{
+                      'bg-secondary/90 text-secondary-foreground': product.availability === 'In Stock',
+                      'bg-accent/90 text-card': product.availability === 'Low Stock',
+                      'bg-destructive/90 text-card': product.availability === 'Out of Stock'
+                    }">
+                    {{ product.availability }}
+                  </span>
+                </div>
+                <div class="p-4">
+                  <span class="text-[10px] uppercase font-bold tracking-wider text-accent">{{ product.category }}</span>
+                  <h4 class="font-heading font-bold text-sm text-foreground mt-1">{{ product.name }}</h4>
+                  <p class="text-[11px] text-muted-foreground mt-2 line-clamp-3">{{ product.description }}</p>
+                  <div class="grid grid-cols-2 gap-2 mt-4 text-[11px] text-muted-foreground">
+                    <span class="font-semibold text-foreground">{{ product.price | currency:'MAD':'symbol':'1.0-0' }}</span>
+                    <span class="font-semibold text-foreground">{{ product.stock }} pcs</span>
+                    <span class="col-span-2 text-[10px]">Rating {{ product.rating }} · {{ product.orders }} orders</span>
+                  </div>
+                  <div class="grid grid-cols-3 gap-2 mt-4">
+                    <button type="button" (click)="openProductModal('view', product)"
+                      class="rounded-full border border-border bg-card text-foreground px-2 py-2 text-[11px] font-semibold hover:bg-muted transition-all">View</button>
+                    <button type="button" (click)="openProductModal('edit', product)"
+                      class="rounded-full border border-border bg-card text-foreground px-2 py-2 text-[11px] font-semibold hover:bg-muted transition-all">Edit</button>
+                    <button type="button" (click)="confirmDeleteProduct(product.id)"
+                      class="rounded-full border border-destructive text-destructive bg-card px-2 py-2 text-[11px] font-semibold hover:bg-destructive/10 transition-all">Delete</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="paginatedProducts().length === 0"
+              class="rounded-3xl border border-border bg-muted/50 p-6 text-center text-sm text-muted-foreground">
+              No products match your current search or filter.
+            </div>
+
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mt-5">
+              <span class="text-xs text-muted-foreground">Showing {{ paginatedProducts().length }} of {{ filteredProducts().length }} products</span>
+              <div class="flex items-center gap-2">
+                <button type="button" (click)="prevProductPage()"
+                  [disabled]="currentProductPage() === 1"
+                  class="rounded-full border border-border bg-card px-3 py-2 text-[11px] font-semibold text-foreground hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-all">Previous</button>
+                <span class="text-xs text-muted-foreground">Page {{ currentProductPage() }} / {{ productPageCount() }}</span>
+                <button type="button" (click)="nextProductPage()"
+                  [disabled]="currentProductPage() === productPageCount()"
+                  class="rounded-full border border-border bg-card px-3 py-2 text-[11px] font-semibold text-foreground hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-all">Next</button>
+              </div>
             </div>
             <p class="text-sm text-muted-foreground">Products coming soon. Focus on your profile first!</p>
           </div>
         </div>
-
-        <!-- Tab Content: Orders -->
         <div id="orders-content" class="dash-tab-pane hidden flex flex-col gap-6">
           <div class="bg-card rounded-2xl border border-border/80 p-6 shadow-sm">
             <div class="border-b border-border/40 pb-4 mb-6">
-              <h3 class="font-heading font-bold text-base text-foreground tracking-wide">Orders &amp; Shipments</h3>
-              <p class="text-xs text-muted-foreground mt-0.5">Track secure escrow payments and dispatch artisan goods.</p>
+              <h3 class="font-heading font-bold text-base text-foreground tracking-wide">Orders &amp; Confirmations</h3>
+              <p class="text-xs text-muted-foreground mt-0.5">Track payments, confirm requests, and keep customers informed.</p>
+            </div>
+
+            <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-4">
+              <input type="text" placeholder="Search orders, customers, or IDs..."
+                [ngModel]="orderSearch()"
+                (ngModelChange)="orderSearch.set($event)"
+                class="w-full md:w-2/3 rounded-2xl border border-border bg-background px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
+              <select [ngModel]="orderFilter()" (ngModelChange)="orderFilter.set($event)"
+                class="w-full md:w-1/3 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent">
+                <option value="all">All statuses</option>
+                <option value="pending">Pending</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="completed">Completed</option>
+                <option value="rejected">Rejected</option>
+              </select>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr
+                    class="border-b border-border/60 text-xs font-bold text-muted-foreground uppercase tracking-wider bg-muted/40">
+                    <th class="py-3 px-4">Order ID</th>
+                    <th class="py-3 px-4">Customer</th>
+                    <th class="py-3 px-4">Products</th>
+                    <th class="py-3 px-4">Total</th>
+                    <th class="py-3 px-4">Status</th>
+                    <th class="py-3 px-4">Payment</th>
+                    <th class="py-3 px-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody class="text-xs divide-y divide-border/30">
+                  <tr *ngFor="let order of filteredOrders()">
+                    <td class="py-4 px-4 font-semibold text-foreground">{{ order.id }}</td>
+                    <td class="py-4 px-4">
+                      <div class="font-semibold">{{ order.customer }}</div>
+                      <div class="text-[10px] text-muted-foreground">{{ order.contact }}</div>
+                    </td>
+                    <td class="py-4 px-4">
+                      <div class="max-w-[220px] text-[11px] text-muted-foreground">
+                        <span *ngFor="let item of order.products; let last = last">
+                          {{ item.qty }}× {{ item.name }}<span *ngIf="!last">, </span>
+                        </span>
+                      </div>
+                    </td>
+                    <td class="py-4 px-4 font-semibold text-foreground">{{ order.total | currency:'MAD':'symbol':'1.0-0' }}</td>
+                    <td class="py-4 px-4">
+                      <span
+                        class="px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase"
+                        [ngClass]="{
+                          'bg-yellow-500/10 text-yellow-600': order.status === 'Pending',
+                          'bg-primary/10 text-primary': order.status === 'Confirmed',
+                          'bg-secondary/10 text-secondary': order.status === 'Completed',
+                          'bg-destructive/10 text-destructive': order.status === 'Rejected'
+                        }">
+                        {{ order.status }}
+                      </span>
+                    </td>
+                    <td class="py-4 px-4 font-semibold text-secondary-foreground">{{ order.paymentStatus }}</td>
+                    <td class="py-4 px-4 text-right">
+                      <div class="flex flex-wrap justify-end gap-2">
+                        <button *ngIf="order.status === 'Pending'" type="button" (click)="confirmOrder(order.id)"
+                          class="rounded-full bg-secondary text-secondary-foreground px-3 py-1.5 text-[11px] font-semibold hover:bg-secondary/95 transition-all">Confirm Order</button>
+                        <button *ngIf="order.status === 'Pending'" type="button" (click)="rejectOrder(order.id)"
+                          class="rounded-full border border-border bg-card text-foreground px-3 py-1.5 text-[11px] font-semibold hover:bg-destructive/10 hover:text-destructive transition-all">Reject</button>
+                        <button type="button" (click)="openOrderDetails(order)"
+                          class="rounded-full border border-border bg-card text-foreground px-3 py-1.5 text-[11px] font-semibold hover:bg-muted transition-all">Details</button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div *ngIf="filteredOrders().length === 0" class="py-8 text-center text-sm text-muted-foreground">
+                No orders match the selected filter.
+              </div>
             </div>
             <p class="text-sm text-muted-foreground">Orders coming soon.</p>
           </div>
         </div>
 
-        <!-- Tab Content: Messages -->
         <div id="messages-content" class="dash-tab-pane hidden flex flex-col gap-6">
-          <div class="bg-card rounded-2xl border border-border/80 p-6 shadow-sm">
-            <div class="border-b border-border/40 pb-4 mb-6">
-              <h3 class="font-heading font-bold text-base text-foreground tracking-wide">Messages</h3>
-              <p class="text-xs text-muted-foreground mt-0.5">Chat with your clients.</p>
+          <div
+            class="bg-card rounded-2xl border border-border/80 shadow-sm overflow-hidden flex flex-col md:flex-row h-[420px]">
+            <div class="w-full md:w-1/3 border-r border-border/60 flex flex-col bg-muted/10">
+              <div class="p-4 border-b border-border/60">
+                <input type="text" placeholder="Search clients..."
+                  class="w-full px-3 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-1 focus:ring-accent text-xs">
+              </div>
+              <div class="flex-grow overflow-y-auto">
+                <div class="p-3 bg-secondary/10 border-l-4 border-secondary flex gap-3 cursor-pointer">
+                  <img src="https://randomuser.me/api/portraits/men/12.jpg" alt="Client Youssef"
+                    class="w-10 h-10 rounded-full object-cover">
+                  <div class="flex-grow min-w-0">
+                    <div class="flex justify-between items-baseline">
+                      <h4 class="text-xs font-bold text-foreground truncate">Youssef Alami</h4>
+                      <span class="text-[9px] text-muted-foreground">12:30 PM</span>
+                    </div>
+                    <p class="text-[11px] text-muted-foreground truncate mt-0.5">Can we customize the brass lantern with a gold finish?</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex-grow flex flex-col h-full">
+              <div class="p-4 border-b border-border/60 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <img src="https://randomuser.me/api/portraits/men/12.jpg" alt="Client Youssef"
+                    class="w-9 h-9 rounded-full object-cover">
+                  <div>
+                    <h4 class="text-xs font-bold text-foreground">Youssef Alami</h4>
+                    <span class="text-[10px] text-secondary font-medium">Online</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex-grow p-4 overflow-y-auto flex flex-col gap-3 bg-muted/5">
+                <div class="self-start max-w-[80%] bg-muted/60 p-3 rounded-2xl text-xs text-foreground">
+                  Salam Alaykum Youssef! Yes, we can certainly apply a Sahara Gold premium finish to the brass lantern.
+                  It takes about 2 additional days for the artisan coating.
+                </div>
+                <div class="self-end max-w-[80%] bg-secondary text-secondary-foreground p-3 rounded-2xl text-xs">
+                  That sounds perfect! Please proceed with the gold finish. I will confirm the escrow payment now.
+                </div>
+              </div>
+
+              <div class="p-3 border-t border-border/60 flex gap-2">
+                <input type="text" placeholder="Type your message..."
+                  class="flex-grow px-4 py-2.5 rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-accent text-xs">
+                <button
+                  class="px-4 py-2.5 bg-secondary text-secondary-foreground rounded-xl font-semibold text-xs shadow-md shadow-secondary/10 hover:bg-secondary/95 transition-all">Send</button>
+              </div>
             </div>
             <p class="text-sm text-muted-foreground">Messages coming soon.</p>
           </div>
         </div>
       </section>
     </main>
+    <div *ngIf="showToast()"
+      class="fixed right-4 top-24 z-50 max-w-sm rounded-3xl px-5 py-4 shadow-xl transition-all duration-300"
+      [ngClass]="{
+        'bg-secondary text-secondary-foreground': toastType() === 'success',
+        'bg-destructive text-card': toastType() === 'error'
+      }">
+      <div class="flex items-center justify-between gap-4">
+        <div class="text-sm font-semibold">{{ toastMessage() }}</div>
+        <button type="button" (click)="showToast.set(false)"
+          class="text-[11px] uppercase tracking-[0.2em] opacity-80 hover:opacity-100">Close</button>
+      </div>
+    </div>
+
+    <ng-container *ngIf="productModalOpen()">
+      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+        <div class="relative w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-3xl bg-card shadow-2xl flex flex-col">
+          <div class="flex items-center justify-between p-5 border-b border-border/80">
+            <div>
+              <p class="text-[10px] text-muted-foreground uppercase tracking-[0.3em] mb-1">
+                {{ productModalMode() === 'add' ? 'Add Product' : productModalMode() === 'edit' ? 'Edit Product' : 'Product Details' }}
+              </p>
+              <h3 class="font-heading text-lg font-bold text-foreground">
+                {{ productModalMode() === 'view' ? selectedProduct()?.name : (productModalMode() === 'edit' ? 'Edit product details' : 'Create a new product') }}
+              </h3>
+            </div>
+            <button type="button" (click)="closeProductModal()"
+              class="rounded-full border border-border p-2 text-foreground hover:bg-muted transition-all">
+              <iconify-icon icon="lucide:x" class="text-lg"></iconify-icon>
+            </button>
+          </div>
+
+
+          <div class="flex-1 overflow-y-auto p-6">
+            <form
+              *ngIf="productModalMode() !== 'view'"
+              (ngSubmit)="saveProduct()"
+              class="max-w-xl mx-auto space-y-4">
+              <div class="grid gap-4 md:grid-cols-2">
+                <div>
+                  <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Product Name</label>
+                  <input type="text" name="name" [(ngModel)]="productForm.name"
+                    class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
+                </div>
+                <div>
+                  <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Category</label>
+                  <input type="text" name="category" [(ngModel)]="productForm.category"
+                    class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
+                </div>
+              </div>
+
+              <div class="grid gap-4 md:grid-cols-2">
+                <div>
+                  <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Price</label>
+                  <input type="number" name="price" [(ngModel)]="productForm.price"
+                    class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
+                </div>
+                <div>
+                  <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Stock</label>
+                  <input type="number" name="stock" [(ngModel)]="productForm.stock"
+                    class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
+                </div>
+              </div>
+
+              <div class="grid gap-4 md:grid-cols-2">
+                <div>
+                  <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Availability</label>
+                  <select name="availability" [(ngModel)]="productForm.availability"
+                    class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent">
+                    <option value="In Stock">In Stock</option>
+                    <option value="Low Stock">Low Stock</option>
+                    <option value="Out of Stock">Out of Stock</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Rating</label>
+                  <input type="number" step="0.1" min="0" max="5" name="rating" [(ngModel)]="productForm.rating"
+                    class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
+                </div>
+              </div>
+
+              <div>
+                <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Image URL</label>
+                <input type="text" name="image" [(ngModel)]="productForm.image"
+                  placeholder="Paste image URL or upload below"
+                  class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
+              </div>
+
+              <div>
+                <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Upload Image</label>
+                <input type="file" accept="image/*" (change)="onProductImageChange($event)"
+                  class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
+              </div>
+
+              <div>
+                <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Materials</label>
+                <input type="text" name="materials" [(ngModel)]="productForm.materials"
+                  class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
+              </div>
+
+              <div>
+                <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Process</label>
+                <textarea name="process" rows="3" [(ngModel)]="productForm.process"
+                  class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"></textarea>
+              </div>
+
+              <div>
+                <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Description</label>
+                <textarea name="description" rows="4" [(ngModel)]="productForm.description"
+                  class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"></textarea>
+              </div>
+
+              <div class="flex flex-wrap gap-3 justify-end pt-4 border-t border-border/40">
+                <button type="button" (click)="closeProductModal()"
+                  class="px-4 py-2.5 rounded-xl border border-border text-xs font-semibold text-foreground hover:bg-muted transition-all">Cancel</button>
+                <button type="submit"
+                  class="px-5 py-2.5 rounded-xl bg-secondary text-secondary-foreground text-xs font-semibold shadow-md shadow-secondary/15 hover:bg-secondary/95 transition-all">
+                  {{ productModalMode() === 'edit' ? 'Save Changes' : 'Add Product' }}
+                </button>
+              </div>
+            </form>
+
+            <div *ngIf="productModalMode() === 'view' && selectedProduct()" class="space-y-5">
+              <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                  <span class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Product Overview</span>
+                  <h4 class="mt-2 font-heading text-lg font-bold text-foreground">{{ selectedProduct()?.name }}</h4>
+                  <p class="text-[12px] text-muted-foreground mt-2">{{ selectedProduct()?.description }}</p>
+                </div>
+                <div class="rounded-3xl bg-muted/50 p-4 border border-border">
+                  <div class="flex items-center justify-between text-[11px] text-muted-foreground uppercase tracking-[0.25em] mb-3">
+                    <span>Price</span>
+                    <span>{{ selectedProduct()?.price | currency:'MAD':'symbol':'1.0-0' }}</span>
+                  </div>
+                  <div class="flex items-center justify-between text-[11px] text-muted-foreground uppercase tracking-[0.25em] mb-3">
+                    <span>Stock</span>
+                    <span>{{ selectedProduct()?.stock }} pcs</span>
+                  </div>
+                  <div class="flex items-center justify-between text-[11px] text-muted-foreground uppercase tracking-[0.25em] mb-3">
+                    <span>Rating</span>
+                    <span>{{ selectedProduct()?.rating }}</span>
+                  </div>
+                  <div class="flex items-center justify-between text-[11px] text-muted-foreground uppercase tracking-[0.25em]">
+                    <span>Orders</span>
+                    <span>{{ selectedProduct()?.orders }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div class="rounded-3xl bg-muted/50 p-4 border border-border">
+                  <h5 class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-2">Materials</h5>
+                  <p class="text-sm text-foreground">{{ selectedProduct()?.materials }}</p>
+                </div>
+                <div class="rounded-3xl bg-muted/50 p-4 border border-border">
+                  <h5 class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-2">Process</h5>
+                  <p class="text-sm text-foreground">{{ selectedProduct()?.process }}</p>
+                </div>
+              </div>
+              <div class="flex justify-end">
+                <button type="button" (click)="closeProductModal()"
+                  class="px-5 py-2.5 rounded-xl bg-secondary text-secondary-foreground text-xs font-semibold shadow-md shadow-secondary/15 hover:bg-secondary/95 transition-all">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+      <ng-container *ngIf="orderDetailOpen() && selectedOrder()">
+        <div class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+          <div class="w-full max-w-3xl rounded-3xl bg-card shadow-xl overflow-hidden">
+            <div class="flex items-center justify-between p-5 border-b border-border/80">
+              <div>
+                <p class="text-[10px] text-muted-foreground uppercase tracking-[0.3em]">Order Details</p>
+                <h3 class="font-heading font-bold text-lg text-foreground">{{ selectedOrder()?.id }}</h3>
+                <p class="text-[11px] text-muted-foreground mt-1">{{ selectedOrder()?.date }} · {{ selectedOrder()?.paymentMethod }}</p>
+              </div>
+              <button type="button" (click)="closeOrderDetails()"
+                class="rounded-full border border-border p-2 text-foreground hover:bg-muted transition-all">
+                <iconify-icon icon="lucide:x" class="text-lg"></iconify-icon>
+              </button>
+            </div>
+            <div class="p-6 grid gap-6 md:grid-cols-2">
+              <div class="space-y-4">
+                <div>
+                  <p class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-2">Customer</p>
+                  <p class="font-semibold text-foreground">{{ selectedOrder()?.customer }}</p>
+                  <p class="text-[11px] text-muted-foreground mt-1">{{ selectedOrder()?.contact }}</p>
+                </div>
+                <div>
+                  <p class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-2">Shipping Address</p>
+                  <p class="text-sm text-foreground">{{ selectedOrder()?.address }}</p>
+                </div>
+                <div>
+                  <p class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-2">Payment status</p>
+                  <p class="font-semibold text-secondary-foreground">{{ selectedOrder()?.paymentStatus }}</p>
+                </div>
+              </div>
+              <div class="space-y-4">
+                <div>
+                  <p class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-2">Order status</p>
+                  <span
+                    class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[10px] font-semibold uppercase"
+                    [ngClass]="{
+                      'bg-yellow-500/10 text-yellow-600': selectedOrder()?.status === 'Pending',
+                      'bg-primary/10 text-primary': selectedOrder()?.status === 'Confirmed',
+                      'bg-secondary/10 text-secondary': selectedOrder()?.status === 'Completed',
+                      'bg-destructive/10 text-destructive': selectedOrder()?.status === 'Rejected'
+                    }">
+                    {{ selectedOrder()?.status }}
+                  </span>
+                </div>
+                <div>
+                  <p class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-2">Order timeline</p>
+                  <ul class="text-sm text-foreground space-y-2">
+                    <li *ngFor="let step of selectedOrder()?.timeline">• {{ step }}</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="p-6 border-t border-border/80">
+              <div class="grid gap-4">
+                <div class="rounded-3xl bg-muted/50 p-4 border border-border">
+                  <h4 class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-3">Ordered items</h4>
+                  <div class="grid gap-3">
+                    <div *ngFor="let item of selectedOrder()?.products"
+                      class="flex justify-between items-center text-sm text-foreground">
+                      <span>{{ item.name }} × {{ item.qty }}</span>
+                      <span>{{ item.price * item.qty | currency:'MAD':'symbol':'1.0-0' }}</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="rounded-3xl bg-muted/50 p-4 border border-border flex items-center justify-between text-sm font-semibold text-foreground">
+                  <span>Total Amount</span>
+                  <span>{{ selectedOrder()?.total | currency:'MAD':'symbol':'1.0-0' }}</span>
+                </div>
+                <div>
+                  <p class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-2">Customer notes</p>
+                  <p class="text-sm text-foreground">{{ selectedOrder()?.notes }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+      <div *ngIf="confirmDeleteModal()" class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+        <div class="w-full max-w-lg rounded-3xl bg-card p-6 shadow-xl border border-border">
+          <h3 class="text-lg font-heading font-bold text-foreground">Confirm deletion</h3>
+          <p class="text-sm text-muted-foreground mt-2">This product will be removed from your catalog permanently. Are you sure?</p>
+          <div class="mt-6 flex flex-wrap gap-3 justify-end">
+            <button type="button" (click)="cancelDeleteProduct()"
+              class="px-4 py-2.5 rounded-xl border border-border text-xs font-semibold text-foreground hover:bg-muted transition-all">Cancel</button>
+            <button type="button" (click)="deleteProduct()"
+              class="px-4 py-2.5 rounded-xl bg-destructive text-card text-xs font-semibold hover:bg-destructive/90 transition-all">Delete product</button>
+          </div>
+        </div>
+      </div>
   </div>
 </div>
