@@ -206,6 +206,25 @@
             <div class="text-xl font-bold tracking-tight text-foreground">320</div>
             <p class="text-[10px] text-amber-600 font-semibold mt-1">98% Active Duty</p>
           </div>
+ 
+          
+          <div
+            class="bg-card p-4 rounded-xl border border-border/80 shadow-sm hover:shadow-md transition-all group hover:-translate-y-0.5 col-span-2 md:col-span-1"
+          >
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-semibold text-muted-foreground">Total Artisans</span>
+              <div
+                class="w-7 h-7 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-800"
+              >
+                <iconify-icon icon="lucide:credit-card" class="text-base"></iconify-icon>
+              </div>
+            </div>
+            <div class="text-xl font-bold tracking-tight text-foreground">MAD 480K</div>
+            <p class="text-[10px] text-emerald-600 font-semibold mt-1 flex items-center gap-1">
+              <span>95% Active Duty</span>
+            </p>
+          </div>
+
 
           <!-- KPI Card -->
           <div
@@ -220,7 +239,7 @@
               </div>
             </div>
             <div class="text-xl font-bold tracking-tight text-foreground">1,840</div>
-            <p class="text-[10px] text-emerald-600 font-semibold mt-1 flex items-center gap-1">
+            <p class="text-[10px] text-amber-600 font-semibold mt-1">
               <span>+8% peak season</span>
             </p>
           </div>
@@ -242,22 +261,7 @@
           </div>
 
           <!-- KPI Card -->
-          <div
-            class="bg-card p-4 rounded-xl border border-border/80 shadow-sm hover:shadow-md transition-all group hover:-translate-y-0.5 col-span-2 md:col-span-1"
-          >
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-semibold text-muted-foreground">Monthly Revenue</span>
-              <div
-                class="w-7 h-7 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-800"
-              >
-                <iconify-icon icon="lucide:credit-card" class="text-base"></iconify-icon>
-              </div>
-            </div>
-            <div class="text-xl font-bold tracking-tight text-foreground">MAD 480K</div>
-            <p class="text-[10px] text-emerald-600 font-semibold mt-1 flex items-center gap-1">
-              <span>+15.2% YoY growth</span>
-            </p>
-          </div>
+          
         </section>
 
         <!-- TAB 1: USER MANAGEMENT (DEFAULT) -->
@@ -388,17 +392,6 @@
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h2 class="text-xl font-heading font-bold text-foreground">Certified Local Guides</h2>
-              <p class="text-xs text-muted-foreground">
-                Approve new certifications, view availability, and moderate ratings.
-              </p>
-            </div>
-            <div class="flex items-center gap-2">
-              <span
-                class="text-xs bg-amber-100 text-amber-800 font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5"
-              >
-                <iconify-icon icon="lucide:circle-alert" class="text-sm"></iconify-icon>
-                <span>3 Pending Approvals</span>
-              </span>
             </div>
           </div>
 
@@ -418,8 +411,8 @@
                 />
                 <div>
                   <span
-                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 mb-1.5"
-                    >Pending Review</span
+                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 mb-1.5"
+                    >Certified</span
                   >
                   <h3 class="font-bold text-foreground">Rachid Ait Benhaddou</h3>
                   <p class="text-xs text-muted-foreground">Fes &amp; Meknes Specialist</p>
@@ -430,7 +423,13 @@
               >
                 <div class="flex justify-between">
                   <span>Languages:</span
-                  ><strong class="text-foreground">Arabic, French, Spanish</strong>
+                  ><strong class="text-foreground">Arabic, French, English, German</strong>
+                </div>
+                <div class="flex justify-between">
+                  <span>Rating:</span><strong class="text-foreground">4.9 ★ (140 reviews)</strong>
+                </div>
+                <div class="flex justify-between">
+                  <span>Reservations:</span><strong class="text-foreground">24 Completed</strong>
                 </div>
                 <div class="flex justify-between">
                   <span>Years Exp:</span><strong class="text-foreground">8 years</strong>
@@ -439,22 +438,6 @@
                   <span>Credentials:</span
                   ><strong class="text-primary underline cursor-pointer">rachid-license.pdf</strong>
                 </div>
-              </div>
-              <div class="mt-5 flex gap-2">
-                <button
-                  (click)="
-                    showNotification('Rachid Ait Benhaddou has been approved as certified guide')
-                  "
-                  class="flex-1 py-2 bg-secondary text-secondary-foreground text-xs font-bold rounded-lg hover:bg-secondary/90 transition-all"
-                >
-                  Approve
-                </button>
-                <button
-                  (click)="showNotification('Certification application rejected', 'error')"
-                  class="px-3 py-2 border border-border text-muted-foreground text-xs font-bold rounded-lg hover:bg-muted transition-all"
-                >
-                  Reject
-                </button>
               </div>
             </div>
 
@@ -490,14 +473,13 @@
                 <div class="flex justify-between">
                   <span>Reservations:</span><strong class="text-foreground">24 Completed</strong>
                 </div>
-              </div>
-              <div class="mt-5 flex gap-2">
-                <button
-                  (click)="showNotification('Opening Layla\'s reservation calendar')"
-                  class="flex-1 py-2 bg-muted text-foreground text-xs font-bold rounded-lg hover:bg-muted/80 transition-all"
-                >
-                  View Availability
-                </button>
+                <div class="flex justify-between">
+                  <span>Years Exp:</span><strong class="text-foreground">8 years</strong>
+                </div>
+                <div class="flex justify-between">
+                  <span>Credentials:</span
+                  ><strong class="text-primary underline cursor-pointer">rachid-license.pdf</strong>
+                </div>
               </div>
             </div>
 
@@ -525,22 +507,21 @@
               >
                 <div class="flex justify-between">
                   <span>Languages:</span
-                  ><strong class="text-foreground">Arabic, French, Berber, English</strong>
+                  ><strong class="text-foreground">Arabic, French, English, German</strong>
                 </div>
                 <div class="flex justify-between">
-                  <span>Rating:</span><strong class="text-foreground">5.0 ★ (98 reviews)</strong>
+                  <span>Rating:</span><strong class="text-foreground">4.9 ★ (140 reviews)</strong>
                 </div>
                 <div class="flex justify-between">
-                  <span>Reservations:</span><strong class="text-foreground">42 Completed</strong>
+                  <span>Reservations:</span><strong class="text-foreground">24 Completed</strong>
                 </div>
-              </div>
-              <div class="mt-5 flex gap-2">
-                <button
-                  (click)="showNotification('Opening Idris\'s reservation calendar')"
-                  class="flex-1 py-2 bg-muted text-foreground text-xs font-bold rounded-lg hover:bg-muted/80 transition-all"
-                >
-                  View Availability
-                </button>
+                <div class="flex justify-between">
+                  <span>Years Exp:</span><strong class="text-foreground">8 years</strong>
+                </div>
+                <div class="flex justify-between">
+                  <span>Credentials:</span
+                  ><strong class="text-primary underline cursor-pointer">rachid-license.pdf</strong>
+                </div>
               </div>
             </div>
           </div>
