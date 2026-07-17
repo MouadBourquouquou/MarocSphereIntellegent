@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
 
 @Service
 @Primary
@@ -59,6 +60,22 @@ public class ClientServiceImpl implements ClientService {
                 .build();
         Client saved = clientRepo.save(client);
         return toResponseDTO(saved);
+    }
+
+    @Override
+    public List<ClientResponseDTO> getAll() {
+        return clientRepo.findAll().stream()
+                .map(this::toResponseDTO)
+                .toList();
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long id) {
+        if (!clientRepo.existsById(id)) {
+            throw new RuntimeException("Client non trouvé avec l'id : " + id);
+        }
+        clientRepo.deleteById(id);
     }
 
     @Override

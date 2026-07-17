@@ -7,6 +7,7 @@ import ma.marocsphere.entity.DMC;
 import ma.marocsphere.repository.DMCRepo;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import java.util.List;
 
 @Service
 @Primary
@@ -20,6 +21,21 @@ public class DMCServiceImpl implements DMCService {
         DMC dmc = dmcRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("DMC non trouvé avec l'id : " + id));
         return toResponseDTO(dmc);
+    }
+
+    @Override
+    public List<DMCResponseDTO> getAll() {
+        return dmcRepo.findAll().stream()
+                .map(this::toResponseDTO)
+                .toList();
+    }
+
+    @Override
+    public void delete(Long id) {
+        if (!dmcRepo.existsById(id)) {
+            throw new RuntimeException("DMC non trouvé avec l'id : " + id);
+        }
+        dmcRepo.deleteById(id);
     }
 
     @Override

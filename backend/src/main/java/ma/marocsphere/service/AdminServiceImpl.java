@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
 
 @Service
 @Primary
@@ -24,6 +25,22 @@ public class AdminServiceImpl implements AdminService {
         Admin admin = adminRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Admin non trouvé avec l'id : " + id));
         return toResponseDTO(admin);
+    }
+
+    @Override
+    public List<AdminResponseDTO> getAll() {
+        return adminRepo.findAll().stream()
+                .map(this::toResponseDTO)
+                .toList();
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long id) {
+        if (!adminRepo.existsById(id)) {
+            throw new RuntimeException("Admin non trouvé avec l'id : " + id);
+        }
+        adminRepo.deleteById(id);
     }
 
     @Override

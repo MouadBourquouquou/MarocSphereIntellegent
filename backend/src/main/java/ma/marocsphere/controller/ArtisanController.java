@@ -22,6 +22,12 @@ public class ArtisanController {
         this.artisanService = artisanService;
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        artisanService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/me")
     public ResponseEntity<ArtisanResponseDTO> getMe() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

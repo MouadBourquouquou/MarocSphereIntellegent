@@ -33,14 +33,17 @@ export class login {
     this.authService.login(this.form.value).subscribe({
       next: (response: any) => {
         this.isLoading.set(false);
-        const role: string = response?.role ?? '';
+        // Read role from the response directly; tap() in AuthService stores it too
+        const raw: string = response?.role ?? this.authService.currentUser()?.role ?? '';
+        const role = raw.toUpperCase().replace('ROLE_', '');
         const dashboardRoutes: Record<string, string> = {
-          CLIENT: '/dashboard-client',
+          CLIENT:  '/dashboard-client',
           ARTISAN: '/dashboard-artisan',
-          GUIDE: '/dashboard-guide',
-          ADMIN: '/dashboard-client',
+          GUIDE:   '/dashboard-guide',
+          ADMIN:   '/admin',
+          DMC:     '/dashboard-dmc',
         };
-        const destination = dashboardRoutes[role.toUpperCase()] ?? '/dashboard-client';
+        const destination = dashboardRoutes[role] ?? '/landing';
         this.router.navigate([destination]);
       },
       error: (err) => {

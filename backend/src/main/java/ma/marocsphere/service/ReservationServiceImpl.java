@@ -11,7 +11,7 @@ import ma.marocsphere.repository.GuideRepo;
 import ma.marocsphere.repository.ReservationRepo;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
@@ -22,6 +22,21 @@ public class ReservationServiceImpl implements ReservationService {
     private final ReservationRepo reservationRepo;
     private final ClientRepo clientRepo;
     private final GuideRepo guideRepo;
+
+    @Override
+    public List<ReservationResponseDTO> getAll() {
+        return reservationRepo.findAll().stream()
+                .map(this::toResponseDTO)
+                .toList();
+    }
+
+    @Override
+    public void delete(Long id) {
+        if (!reservationRepo.existsById(id)) {
+            throw new RuntimeException("Réservation non trouvée avec l'id : " + id);
+        }
+        reservationRepo.deleteById(id);
+    }
 
     @Override
     public ReservationResponseDTO getById(Long id) {

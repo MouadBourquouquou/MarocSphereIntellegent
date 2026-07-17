@@ -12,4 +12,5 @@ public interface ArtisanService {
     List<ArtisanResponseDTO> getAll();
     ArtisanResponseDTO create(ArtisanCreationDTO dto);
     ArtisanResponseDTO update(Long id, ArtisanUpdateDTO dto);
+    void delete(Long id);
 }

@@ -54,6 +54,15 @@ public class ArtisanServiceImpl implements ArtisanService {
 
     @Override
     @Transactional
+    public void delete(Long id) {
+        if (!artisanRepo.existsById(id)) {
+            throw new RuntimeException("Artisan non trouvé avec l'id : " + id);
+        }
+        artisanRepo.deleteById(id);
+    }
+
+    @Override
+    @Transactional
     public ArtisanResponseDTO create(ArtisanCreationDTO dto) {
         if (artisanRepo.existsByEmail(dto.getEmail())) {
             throw new RuntimeException("Un artisan avec cet email existe déjà : " + dto.getEmail());

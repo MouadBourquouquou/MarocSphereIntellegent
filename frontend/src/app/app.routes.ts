@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
+import { adminGuard } from './guards/admin.guard';
+import { clientGuard } from './guards/client.guard';
 
 export const routes: Routes = [
   {
@@ -26,22 +28,21 @@ export const routes: Routes = [
 
   {
     path: 'dashboard-client',
-    canActivate: [authGuard],
+    canActivate: [clientGuard],
     loadComponent: () =>
       import('./pages/dashboards/client/home/dashClient').then((m) => m.DashboardClient),
   },
 
   {
     path: 'marketplace',
-    canActivate: [authGuard],
+    canActivate: [clientGuard],
     loadComponent: () =>
       import('./pages/dashboards/client/Artisan & Guides Marketplace/marketplace').then((m) => m.marketplace),
   },
 
-
   {
     path: 'client-profile',
-    canActivate: [authGuard],
+    canActivate: [clientGuard],
     loadComponent: () =>
       import('./pages/profiles/client/profileClient').then((m) => m.profileClient),
   },
@@ -73,6 +74,7 @@ export const routes: Routes = [
 
   {
     path: 'admin',
+    canActivate: [adminGuard],
     loadComponent: () =>
       import('./pages/admin/admin').then((m) => m.admin),
   },

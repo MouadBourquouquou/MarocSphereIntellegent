@@ -12,4 +12,5 @@ public interface GuideService {
     List<GuideResponseDTO> getAll();
     GuideResponseDTO create(GuideCreationDTO dto);
     GuideResponseDTO update(Long id, GuideUpdateDTO dto);
+    void delete(Long id);
 }
