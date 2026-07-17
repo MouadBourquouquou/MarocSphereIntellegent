@@ -30,7 +30,7 @@
             <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-primary rounded-full border-2 border-card"></span>
           </button>
         </div>
-        <img [src]="profile().avatar" [alt]="displayName()"
+        <img [src]="avatar()" [alt]="displayName()"
           class="w-10 h-10 rounded-full border-2 border-secondary shadow-sm">
         <button type="button" (click)="logout()"
           class="text-xs text-muted-foreground hover:text-primary">Déconnexion</button>
@@ -46,23 +46,21 @@
     </div>
     }
 
+    @if (!isLoading()) {
     <main class="max-w-7xl mx-auto px-4 md:px-6 py-8 w-full flex-grow grid grid-cols-1 lg:grid-cols-12 gap-8">
       <aside class="col-span-1 lg:col-span-4 flex flex-col gap-6">
         <div class="bg-card rounded-2xl border border-border/80 shadow-md overflow-hidden relative">
           <div class="h-32 w-full bg-gradient-to-r from-secondary/80 to-accent/80 relative">
-            <img [src]="profileBannerPreview()" alt="Artisan Workshop Banner"
-              class="w-full h-full object-cover opacity-60 mix-blend-multiply">
             <div class="absolute inset-0 bg-gradient-to-t from-primary/50 to-transparent"></div>
           </div>
 
           <div class="px-6 pb-6 relative -mt-12 flex flex-col items-center text-center">
-            <img [src]="profile().avatar" [alt]="displayName()"
+            <img [src]="avatar()" [alt]="displayName()"
               class="w-24 h-24 rounded-full border-4 border-card shadow-lg object-cover">
 
             <h2 class="text-xl font-heading font-bold text-foreground mt-3">{{ displayName() }}</h2>
             <p class="text-xs text-secondary font-semibold">{{ profile()?.category ?? 'Artisan' }}</p>
 
-            <!-- Badges -->
             <div class="flex flex-wrap gap-2 justify-center mt-4">
               @if (profile()?.qrTraceId) {
               <span
@@ -78,7 +76,6 @@
               }
             </div>
 
-            <!-- Artisan Stats list -->
             <div class="w-full mt-6 pt-6 border-t border-border/40 flex flex-col gap-3 text-left text-xs">
               <div class="flex justify-between items-center">
                 <span class="text-muted-foreground">Type</span>
@@ -99,29 +96,19 @@
             </div>
 
             <div class="w-full mt-6 grid grid-cols-1 gap-2">
-              <button *ngIf="!profileEdit()" type="button" (click)="enableProfileEdit()"
+              @if (!profileEdit()) {
+              <button type="button" (click)="enableProfileEdit()"
                 class="py-2.5 bg-secondary text-secondary-foreground rounded-xl font-semibold text-xs shadow-md shadow-secondary/10 hover:bg-secondary/95 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-1.5">
                 <iconify-icon icon="lucide:pencil" class="text-sm"></iconify-icon> Edit Profile
               </button>
+              }
             </div>
           </div>
 
-          <div *ngIf="profileEdit()" class="bg-background/80 border-t border-border/40 p-6">
+          @if (profileEdit()) {
+          <div class="bg-background/80 border-t border-border/40 p-6">
             <h3 class="font-heading text-sm font-bold text-foreground mb-4">Edit Artisan Profile</h3>
             <form (ngSubmit)="saveProfile()" class="space-y-4">
-              <div class="grid grid-cols-1 gap-4">
-                <div class="grid grid-cols-1 gap-3">
-                  <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Workshop Banner</label>
-                  <input type="file" accept="image/*" (change)="onProfileBannerChange($event)"
-                    class="w-full rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
-                </div>
-                <div class="grid grid-cols-1 gap-3">
-                  <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Profile Picture</label>
-                  <input type="file" accept="image/*" (change)="onProfileImageChange($event)"
-                    class="w-full rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
-                </div>
-              </div>
-
               <div class="grid gap-4">
                 <div>
                   <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Workshop Name</label>
@@ -176,6 +163,7 @@
               </div>
             </form>
           </div>
+          }
         </div>
 
         <div class="bg-card rounded-2xl border border-border/80 p-5 shadow-sm">
@@ -185,22 +173,33 @@
             Stock &amp; Process Alerts
           </h3>
           <div class="flex flex-col gap-3">
-            <div class="p-3 rounded-xl bg-primary/5 border border-primary/10 flex items-center gap-3">
-              <span class="p-1.5 rounded-lg bg-primary/10 text-primary"><iconify-icon icon="lucide:circle-alert"
-                  class="text-base"></iconify-icon></span>
-              <div>
-                <h4 class="text-xs font-bold text-foreground">Low Stock Alert</h4>
-                <p class="text-[10px] text-muted-foreground mt-0.5">Fez Blue Mosaic Tile (4 units left)</p>
+            @for (product of products(); track product.id) {
+              @if (product.stock > 0 && product.stock <= 5) {
+              <div class="p-3 rounded-xl bg-primary/5 border border-primary/10 flex items-center gap-3">
+                <span class="p-1.5 rounded-lg bg-primary/10 text-primary"><iconify-icon icon="lucide:circle-alert"
+                    class="text-base"></iconify-icon></span>
+                <div>
+                  <h4 class="text-xs font-bold text-foreground">Low Stock Alert</h4>
+                  <p class="text-[10px] text-muted-foreground mt-0.5">{{ product.name }} ({{ product.stock }} units left)</p>
+                </div>
               </div>
-            </div>
-            <div class="p-3 rounded-xl bg-secondary/5 border border-secondary/10 flex items-center gap-3">
-              <span class="p-1.5 rounded-lg text-secondary" style="background-color:#d9e8e1;"><iconify-icon icon="lucide:clock"
-                  class="text-base" style="color: #006233;"></iconify-icon></span>
-              <div>
-                <h4 class="text-xs font-bold text-foreground">Pending Confirmation</h4>
-                <p class="text-[10px] text-muted-foreground mt-0.5">Order #ORD-8932 and #ORD-8938 require confirmation.</p>
+              }
+            }
+            @for (order of orders(); track order.id) {
+              @if (order.status === 'Pending') {
+              <div class="p-3 rounded-xl bg-secondary/5 border border-secondary/10 flex items-center gap-3">
+                <span class="p-1.5 rounded-lg text-secondary" style="background-color:#d9e8e1;"><iconify-icon icon="lucide:clock"
+                    class="text-base" style="color: #006233;"></iconify-icon></span>
+                <div>
+                  <h4 class="text-xs font-bold text-foreground">Pending Confirmation</h4>
+                  <p class="text-[10px] text-muted-foreground mt-0.5">Order #{{ order.id }} requires confirmation.</p>
+                </div>
               </div>
-            </div>
+              }
+            }
+            @if (products().length === 0 && orders().length === 0) {
+            <p class="text-xs text-muted-foreground">No alerts at the moment.</p>
+            }
           </div>
         </div>
       </aside>
@@ -224,6 +223,7 @@
           </button>
         </div>
 
+        <!-- OVERVIEW TAB -->
         <div id="overview-content" class="dash-tab-pane flex flex-col gap-6">
           <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
             <div class="bg-card rounded-2xl border border-border/60 p-4 shadow-sm hover:shadow-md transition-all">
@@ -298,15 +298,15 @@
               <p class="text-[10px] text-muted-foreground mt-1">Traceability ID</p>
             </div>
           </div>
-            <div class="bg-card rounded-2xl border border-border/60 p-4 shadow-sm hover:shadow-md transition-all">
-              <div class="flex justify-between items-start">
-                <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Average Rating</span>
-                <span class="p-1.5 rounded-lg bg-yellow-500/10 text-yellow-500"><iconify-icon icon="lucide:star"
-                    class="text-base"></iconify-icon></span>
-              </div>
-              <p class="text-2xl font-bold text-foreground mt-2">{{ averageRating() }}</p>
-              <p class="text-[10px] text-muted-foreground font-medium mt-1">Across all listed products</p>
+          <div class="bg-card rounded-2xl border border-border/60 p-4 shadow-sm hover:shadow-md transition-all">
+            <div class="flex justify-between items-start">
+              <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Average Rating</span>
+              <span class="p-1.5 rounded-lg bg-yellow-500/10 text-yellow-500"><iconify-icon icon="lucide:star"
+                  class="text-base"></iconify-icon></span>
             </div>
+            <p class="text-2xl font-bold text-foreground mt-2">{{ averageRating() }}</p>
+            <p class="text-[10px] text-muted-foreground font-medium mt-1">Across all listed products</p>
+          </div>
 
           <div class="bg-card rounded-2xl border border-border/80 p-6 shadow-sm">
             <div class="flex items-center justify-between border-b border-border/40 pb-4 mb-6">
@@ -327,6 +327,8 @@
             </div>
           </div>
         </div>
+
+        <!-- PRODUCTS TAB -->
         <div id="products-content" class="dash-tab-pane hidden flex flex-col gap-6">
           <div class="bg-card rounded-2xl border border-border/80 p-6 shadow-sm">
             <div
@@ -369,18 +371,15 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div *ngFor="let product of paginatedProducts()"
+              @for (product of paginatedProducts(); track product.id) {
+              <div
                 class="border border-border/60 rounded-xl overflow-hidden bg-muted/20 group hover:shadow-md transition-all">
                 <div class="h-40 bg-muted relative overflow-hidden">
                   <img [src]="product.image" [alt]="product.name"
                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                   <span
-                    class="absolute top-3 left-3 rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] bg-secondary/90 text-secondary-foreground"
-                    [ngClass]="{
-                      'bg-secondary/90 text-secondary-foreground': product.availability === 'In Stock',
-                      'bg-accent/90 text-card': product.availability === 'Low Stock',
-                      'bg-destructive/90 text-card': product.availability === 'Out of Stock'
-                    }">
+                    class="absolute top-3 left-3 rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.18em]"
+                    [class]="product.availability === 'In Stock' ? 'bg-secondary/90 text-secondary-foreground' : product.availability === 'Low Stock' ? 'bg-accent/90 text-card' : 'bg-destructive/90 text-card'">
                     {{ product.availability }}
                   </span>
                 </div>
@@ -403,12 +402,15 @@
                   </div>
                 </div>
               </div>
+              }
             </div>
 
-            <div *ngIf="paginatedProducts().length === 0"
+            @if (paginatedProducts().length === 0) {
+            <div
               class="rounded-3xl border border-border bg-muted/50 p-6 text-center text-sm text-muted-foreground">
               No products match your current search or filter.
             </div>
+            }
 
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mt-5">
               <span class="text-xs text-muted-foreground">Showing {{ paginatedProducts().length }} of {{ filteredProducts().length }} products</span>
@@ -422,9 +424,10 @@
                   class="rounded-full border border-border bg-card px-3 py-2 text-[11px] font-semibold text-foreground hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-all">Next</button>
               </div>
             </div>
-            <p class="text-sm text-muted-foreground">Products coming soon. Focus on your profile first!</p>
           </div>
         </div>
+
+        <!-- ORDERS TAB -->
         <div id="orders-content" class="dash-tab-pane hidden flex flex-col gap-6">
           <div class="bg-card rounded-2xl border border-border/80 p-6 shadow-sm">
             <div class="border-b border-border/40 pb-4 mb-6">
@@ -462,54 +465,55 @@
                   </tr>
                 </thead>
                 <tbody class="text-xs divide-y divide-border/30">
-                  <tr *ngFor="let order of filteredOrders()">
-                    <td class="py-4 px-4 font-semibold text-foreground">{{ order.id }}</td>
+                  @for (order of filteredOrders(); track order.id) {
+                  <tr>
+                    <td class="py-4 px-4 font-semibold text-foreground">#{{ order.id }}</td>
                     <td class="py-4 px-4">
                       <div class="font-semibold">{{ order.customer }}</div>
                       <div class="text-[10px] text-muted-foreground">{{ order.contact }}</div>
                     </td>
                     <td class="py-4 px-4">
                       <div class="max-w-[220px] text-[11px] text-muted-foreground">
-                        <span *ngFor="let item of order.products; let last = last">
-                          {{ item.qty }}× {{ item.name }}<span *ngIf="!last">, </span>
-                        </span>
+                        @for (item of order.products; track $index) {
+                          {{ item.qty }}× {{ item.name }}@if (!$last) {, }
+                        }
                       </div>
                     </td>
                     <td class="py-4 px-4 font-semibold text-foreground">{{ order.total | currency:'MAD':'symbol':'1.0-0' }}</td>
                     <td class="py-4 px-4">
                       <span
                         class="px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase"
-                        [ngClass]="{
-                          'bg-yellow-500/10 text-yellow-600': order.status === 'Pending',
-                          'bg-primary/10 text-primary': order.status === 'Confirmed',
-                          'bg-secondary/10 text-secondary': order.status === 'Completed',
-                          'bg-destructive/10 text-destructive': order.status === 'Rejected'
-                        }">
+                        [class]="order.status === 'Pending' ? 'bg-yellow-500/10 text-yellow-600' : order.status === 'Confirmed' ? 'bg-primary/10 text-primary' : order.status === 'Completed' ? 'bg-secondary/10 text-secondary' : 'bg-destructive/10 text-destructive'">
                         {{ order.status }}
                       </span>
                     </td>
                     <td class="py-4 px-4 font-semibold text-secondary-foreground">{{ order.paymentStatus }}</td>
                     <td class="py-4 px-4 text-right">
                       <div class="flex flex-wrap justify-end gap-2">
-                        <button *ngIf="order.status === 'Pending'" type="button" (click)="confirmOrder(order.id)"
+                        @if (order.status === 'Pending') {
+                        <button type="button" (click)="confirmOrder(order.id)"
                           class="rounded-full bg-secondary text-secondary-foreground px-3 py-1.5 text-[11px] font-semibold hover:bg-secondary/95 transition-all">Confirm Order</button>
-                        <button *ngIf="order.status === 'Pending'" type="button" (click)="rejectOrder(order.id)"
+                        <button type="button" (click)="rejectOrder(order.id)"
                           class="rounded-full border border-border bg-card text-foreground px-3 py-1.5 text-[11px] font-semibold hover:bg-destructive/10 hover:text-destructive transition-all">Reject</button>
+                        }
                         <button type="button" (click)="openOrderDetails(order)"
                           class="rounded-full border border-border bg-card text-foreground px-3 py-1.5 text-[11px] font-semibold hover:bg-muted transition-all">Details</button>
                       </div>
                     </td>
                   </tr>
+                  }
                 </tbody>
               </table>
-              <div *ngIf="filteredOrders().length === 0" class="py-8 text-center text-sm text-muted-foreground">
+              @if (filteredOrders().length === 0) {
+              <div class="py-8 text-center text-sm text-muted-foreground">
                 No orders match the selected filter.
               </div>
+              }
             </div>
-            <p class="text-sm text-muted-foreground">Orders coming soon.</p>
           </div>
         </div>
 
+        <!-- MESSAGES TAB -->
         <div id="messages-content" class="dash-tab-pane hidden flex flex-col gap-6">
           <div
             class="bg-card rounded-2xl border border-border/80 shadow-sm overflow-hidden flex flex-col md:flex-row h-[420px]">
@@ -562,267 +566,271 @@
                   class="px-4 py-2.5 bg-secondary text-secondary-foreground rounded-xl font-semibold text-xs shadow-md shadow-secondary/10 hover:bg-secondary/95 transition-all">Send</button>
               </div>
             </div>
-            <p class="text-sm text-muted-foreground">Messages coming soon.</p>
           </div>
         </div>
       </section>
     </main>
-    <div *ngIf="showToast()"
+    }
+
+    <!-- TOAST -->
+    @if (showToast()) {
+    <div
       class="fixed right-4 top-24 z-50 max-w-sm rounded-3xl px-5 py-4 shadow-xl transition-all duration-300"
-      [ngClass]="{
-        'bg-secondary text-secondary-foreground': toastType() === 'success',
-        'bg-destructive text-card': toastType() === 'error'
-      }">
+      [class]="toastType() === 'success' ? 'bg-secondary text-secondary-foreground' : 'bg-destructive text-card'">
       <div class="flex items-center justify-between gap-4">
         <div class="text-sm font-semibold">{{ toastMessage() }}</div>
         <button type="button" (click)="showToast.set(false)"
           class="text-[11px] uppercase tracking-[0.2em] opacity-80 hover:opacity-100">Close</button>
       </div>
     </div>
+    }
 
-    <ng-container *ngIf="productModalOpen()">
-      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-        <div class="relative w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-3xl bg-card shadow-2xl flex flex-col">
-          <div class="flex items-center justify-between p-5 border-b border-border/80">
-            <div>
-              <p class="text-[10px] text-muted-foreground uppercase tracking-[0.3em] mb-1">
-                {{ productModalMode() === 'add' ? 'Add Product' : productModalMode() === 'edit' ? 'Edit Product' : 'Product Details' }}
-              </p>
-              <h3 class="font-heading text-lg font-bold text-foreground">
-                {{ productModalMode() === 'view' ? selectedProduct()?.name : (productModalMode() === 'edit' ? 'Edit product details' : 'Create a new product') }}
-              </h3>
-            </div>
-            <button type="button" (click)="closeProductModal()"
-              class="rounded-full border border-border p-2 text-foreground hover:bg-muted transition-all">
-              <iconify-icon icon="lucide:x" class="text-lg"></iconify-icon>
-            </button>
+    <!-- PRODUCT MODAL -->
+    @if (productModalOpen()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      <div class="relative w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-3xl bg-card shadow-2xl flex flex-col">
+        <div class="flex items-center justify-between p-5 border-b border-border/80">
+          <div>
+            <p class="text-[10px] text-muted-foreground uppercase tracking-[0.3em] mb-1">
+              {{ productModalMode() === 'add' ? 'Add Product' : productModalMode() === 'edit' ? 'Edit Product' : 'Product Details' }}
+            </p>
+            <h3 class="font-heading text-lg font-bold text-foreground">
+              {{ productModalMode() === 'view' ? selectedProduct()?.name : (productModalMode() === 'edit' ? 'Edit product details' : 'Create a new product') }}
+            </h3>
           </div>
-
-
-          <div class="flex-1 overflow-y-auto p-6">
-            <form
-              *ngIf="productModalMode() !== 'view'"
-              (ngSubmit)="saveProduct()"
-              class="max-w-xl mx-auto space-y-4">
-              <div class="grid gap-4 md:grid-cols-2">
-                <div>
-                  <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Product Name</label>
-                  <input type="text" name="name" [(ngModel)]="productForm.name"
-                    class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
-                </div>
-                <div>
-                  <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Category</label>
-                  <input type="text" name="category" [(ngModel)]="productForm.category"
-                    class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
-                </div>
-              </div>
-
-              <div class="grid gap-4 md:grid-cols-2">
-                <div>
-                  <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Price</label>
-                  <input type="number" name="price" [(ngModel)]="productForm.price"
-                    class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
-                </div>
-                <div>
-                  <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Stock</label>
-                  <input type="number" name="stock" [(ngModel)]="productForm.stock"
-                    class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
-                </div>
-              </div>
-
-              <div class="grid gap-4 md:grid-cols-2">
-                <div>
-                  <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Availability</label>
-                  <select name="availability" [(ngModel)]="productForm.availability"
-                    class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent">
-                    <option value="In Stock">In Stock</option>
-                    <option value="Low Stock">Low Stock</option>
-                    <option value="Out of Stock">Out of Stock</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Rating</label>
-                  <input type="number" step="0.1" min="0" max="5" name="rating" [(ngModel)]="productForm.rating"
-                    class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
-                </div>
-              </div>
-
-              <div>
-                <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Image URL</label>
-                <input type="text" name="image" [(ngModel)]="productForm.image"
-                  placeholder="Paste image URL or upload below"
-                  class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
-              </div>
-
-              <div>
-                <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Upload Image</label>
-                <input type="file" accept="image/*" (change)="onProductImageChange($event)"
-                  class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
-              </div>
-
-              <div>
-                <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Materials</label>
-                <input type="text" name="materials" [(ngModel)]="productForm.materials"
-                  class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
-              </div>
-
-              <div>
-                <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Process</label>
-                <textarea name="process" rows="3" [(ngModel)]="productForm.process"
-                  class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"></textarea>
-              </div>
-
-              <div>
-                <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Description</label>
-                <textarea name="description" rows="4" [(ngModel)]="productForm.description"
-                  class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"></textarea>
-              </div>
-
-              <div class="flex flex-wrap gap-3 justify-end pt-4 border-t border-border/40">
-                <button type="button" (click)="closeProductModal()"
-                  class="px-4 py-2.5 rounded-xl border border-border text-xs font-semibold text-foreground hover:bg-muted transition-all">Cancel</button>
-                <button type="submit"
-                  class="px-5 py-2.5 rounded-xl bg-secondary text-secondary-foreground text-xs font-semibold shadow-md shadow-secondary/15 hover:bg-secondary/95 transition-all">
-                  {{ productModalMode() === 'edit' ? 'Save Changes' : 'Add Product' }}
-                </button>
-              </div>
-            </form>
-
-            <div *ngIf="productModalMode() === 'view' && selectedProduct()" class="space-y-5">
-              <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div>
-                  <span class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Product Overview</span>
-                  <h4 class="mt-2 font-heading text-lg font-bold text-foreground">{{ selectedProduct()?.name }}</h4>
-                  <p class="text-[12px] text-muted-foreground mt-2">{{ selectedProduct()?.description }}</p>
-                </div>
-                <div class="rounded-3xl bg-muted/50 p-4 border border-border">
-                  <div class="flex items-center justify-between text-[11px] text-muted-foreground uppercase tracking-[0.25em] mb-3">
-                    <span>Price</span>
-                    <span>{{ selectedProduct()?.price | currency:'MAD':'symbol':'1.0-0' }}</span>
-                  </div>
-                  <div class="flex items-center justify-between text-[11px] text-muted-foreground uppercase tracking-[0.25em] mb-3">
-                    <span>Stock</span>
-                    <span>{{ selectedProduct()?.stock }} pcs</span>
-                  </div>
-                  <div class="flex items-center justify-between text-[11px] text-muted-foreground uppercase tracking-[0.25em] mb-3">
-                    <span>Rating</span>
-                    <span>{{ selectedProduct()?.rating }}</span>
-                  </div>
-                  <div class="flex items-center justify-between text-[11px] text-muted-foreground uppercase tracking-[0.25em]">
-                    <span>Orders</span>
-                    <span>{{ selectedProduct()?.orders }}</span>
-                  </div>
-                </div>
-              </div>
-              <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div class="rounded-3xl bg-muted/50 p-4 border border-border">
-                  <h5 class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-2">Materials</h5>
-                  <p class="text-sm text-foreground">{{ selectedProduct()?.materials }}</p>
-                </div>
-                <div class="rounded-3xl bg-muted/50 p-4 border border-border">
-                  <h5 class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-2">Process</h5>
-                  <p class="text-sm text-foreground">{{ selectedProduct()?.process }}</p>
-                </div>
-              </div>
-              <div class="flex justify-end">
-                <button type="button" (click)="closeProductModal()"
-                  class="px-5 py-2.5 rounded-xl bg-secondary text-secondary-foreground text-xs font-semibold shadow-md shadow-secondary/15 hover:bg-secondary/95 transition-all">Close</button>
-              </div>
-            </div>
-          </div>
+          <button type="button" (click)="closeProductModal()"
+            class="rounded-full border border-border p-2 text-foreground hover:bg-muted transition-all">
+            <iconify-icon icon="lucide:x" class="text-lg"></iconify-icon>
+          </button>
         </div>
-      </div>
-    </ng-container>
 
-      <ng-container *ngIf="orderDetailOpen() && selectedOrder()">
-        <div class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-          <div class="w-full max-w-3xl rounded-3xl bg-card shadow-xl overflow-hidden">
-            <div class="flex items-center justify-between p-5 border-b border-border/80">
+        <div class="flex-1 overflow-y-auto p-6">
+          @if (productModalMode() !== 'view') {
+          <form (ngSubmit)="saveProduct()" class="max-w-xl mx-auto space-y-4">
+            <div class="grid gap-4 md:grid-cols-2">
               <div>
-                <p class="text-[10px] text-muted-foreground uppercase tracking-[0.3em]">Order Details</p>
-                <h3 class="font-heading font-bold text-lg text-foreground">{{ selectedOrder()?.id }}</h3>
-                <p class="text-[11px] text-muted-foreground mt-1">{{ selectedOrder()?.date }} · {{ selectedOrder()?.paymentMethod }}</p>
+                <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Product Name</label>
+                <input type="text" name="name" [(ngModel)]="productForm.name"
+                  class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
               </div>
-              <button type="button" (click)="closeOrderDetails()"
-                class="rounded-full border border-border p-2 text-foreground hover:bg-muted transition-all">
-                <iconify-icon icon="lucide:x" class="text-lg"></iconify-icon>
+              <div>
+                <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Category</label>
+                <input type="text" name="category" [(ngModel)]="productForm.category"
+                  class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
+              </div>
+            </div>
+
+            <div class="grid gap-4 md:grid-cols-2">
+              <div>
+                <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Price (MAD)</label>
+                <input type="number" name="price" [(ngModel)]="productForm.price"
+                  class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
+              </div>
+              <div>
+                <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Stock</label>
+                <input type="number" name="stock" [(ngModel)]="productForm.stock"
+                  class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
+              </div>
+            </div>
+
+            <div class="grid gap-4 md:grid-cols-2">
+              <div>
+                <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Availability</label>
+                <select name="availability" [(ngModel)]="productForm.availability"
+                  class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent">
+                  <option value="In Stock">In Stock</option>
+                  <option value="Low Stock">Low Stock</option>
+                  <option value="Out of Stock">Out of Stock</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Rating</label>
+                <input type="number" step="0.1" min="0" max="5" name="rating" [(ngModel)]="productForm.rating"
+                  class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
+              </div>
+            </div>
+
+            <div>
+              <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Image URL</label>
+              <input type="text" name="image" [(ngModel)]="productForm.image"
+                placeholder="Paste image URL or upload below"
+                class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
+            </div>
+
+            <div>
+              <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Upload Image</label>
+              <input type="file" accept="image/*" (change)="onProductImageChange($event)"
+                class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
+            </div>
+
+            <div>
+              <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Materials</label>
+              <input type="text" name="materials" [(ngModel)]="productForm.materials"
+                class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
+            </div>
+
+            <div>
+              <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Process</label>
+              <textarea name="process" rows="3" [(ngModel)]="productForm.process"
+                class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"></textarea>
+            </div>
+
+            <div>
+              <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Description</label>
+              <textarea name="description" rows="4" [(ngModel)]="productForm.description"
+                class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"></textarea>
+            </div>
+
+            <div class="flex flex-wrap gap-3 justify-end pt-4 border-t border-border/40">
+              <button type="button" (click)="closeProductModal()"
+                class="px-4 py-2.5 rounded-xl border border-border text-xs font-semibold text-foreground hover:bg-muted transition-all">Cancel</button>
+              <button type="submit"
+                class="px-5 py-2.5 rounded-xl bg-secondary text-secondary-foreground text-xs font-semibold shadow-md shadow-secondary/15 hover:bg-secondary/95 transition-all">
+                {{ productModalMode() === 'edit' ? 'Save Changes' : 'Add Product' }}
               </button>
             </div>
-            <div class="p-6 grid gap-6 md:grid-cols-2">
-              <div class="space-y-4">
-                <div>
-                  <p class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-2">Customer</p>
-                  <p class="font-semibold text-foreground">{{ selectedOrder()?.customer }}</p>
-                  <p class="text-[11px] text-muted-foreground mt-1">{{ selectedOrder()?.contact }}</p>
-                </div>
-                <div>
-                  <p class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-2">Shipping Address</p>
-                  <p class="text-sm text-foreground">{{ selectedOrder()?.address }}</p>
-                </div>
-                <div>
-                  <p class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-2">Payment status</p>
-                  <p class="font-semibold text-secondary-foreground">{{ selectedOrder()?.paymentStatus }}</p>
-                </div>
+          </form>
+          }
+
+          @if (productModalMode() === 'view' && selectedProduct()) {
+          <div class="space-y-5">
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <span class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Product Overview</span>
+                <h4 class="mt-2 font-heading text-lg font-bold text-foreground">{{ selectedProduct()?.name }}</h4>
+                <p class="text-[12px] text-muted-foreground mt-2">{{ selectedProduct()?.description }}</p>
               </div>
-              <div class="space-y-4">
-                <div>
-                  <p class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-2">Order status</p>
-                  <span
-                    class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[10px] font-semibold uppercase"
-                    [ngClass]="{
-                      'bg-yellow-500/10 text-yellow-600': selectedOrder()?.status === 'Pending',
-                      'bg-primary/10 text-primary': selectedOrder()?.status === 'Confirmed',
-                      'bg-secondary/10 text-secondary': selectedOrder()?.status === 'Completed',
-                      'bg-destructive/10 text-destructive': selectedOrder()?.status === 'Rejected'
-                    }">
-                    {{ selectedOrder()?.status }}
-                  </span>
+              <div class="rounded-3xl bg-muted/50 p-4 border border-border">
+                <div class="flex items-center justify-between text-[11px] text-muted-foreground uppercase tracking-[0.25em] mb-3">
+                  <span>Price</span>
+                  <span>{{ selectedProduct()?.price | currency:'MAD':'symbol':'1.0-0' }}</span>
                 </div>
-                <div>
-                  <p class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-2">Order timeline</p>
-                  <ul class="text-sm text-foreground space-y-2">
-                    <li *ngFor="let step of selectedOrder()?.timeline">• {{ step }}</li>
-                  </ul>
+                <div class="flex items-center justify-between text-[11px] text-muted-foreground uppercase tracking-[0.25em] mb-3">
+                  <span>Stock</span>
+                  <span>{{ selectedProduct()?.stock }} pcs</span>
+                </div>
+                <div class="flex items-center justify-between text-[11px] text-muted-foreground uppercase tracking-[0.25em] mb-3">
+                  <span>Rating</span>
+                  <span>{{ selectedProduct()?.rating }}</span>
+                </div>
+                <div class="flex items-center justify-between text-[11px] text-muted-foreground uppercase tracking-[0.25em]">
+                  <span>Orders</span>
+                  <span>{{ selectedProduct()?.orders }}</span>
                 </div>
               </div>
             </div>
-            <div class="p-6 border-t border-border/80">
-              <div class="grid gap-4">
-                <div class="rounded-3xl bg-muted/50 p-4 border border-border">
-                  <h4 class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-3">Ordered items</h4>
-                  <div class="grid gap-3">
-                    <div *ngFor="let item of selectedOrder()?.products"
-                      class="flex justify-between items-center text-sm text-foreground">
-                      <span>{{ item.name }} × {{ item.qty }}</span>
-                      <span>{{ item.price * item.qty | currency:'MAD':'symbol':'1.0-0' }}</span>
-                    </div>
-                  </div>
-                </div>
-                <div class="rounded-3xl bg-muted/50 p-4 border border-border flex items-center justify-between text-sm font-semibold text-foreground">
-                  <span>Total Amount</span>
-                  <span>{{ selectedOrder()?.total | currency:'MAD':'symbol':'1.0-0' }}</span>
-                </div>
-                <div>
-                  <p class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-2">Customer notes</p>
-                  <p class="text-sm text-foreground">{{ selectedOrder()?.notes }}</p>
-                </div>
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div class="rounded-3xl bg-muted/50 p-4 border border-border">
+                <h5 class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-2">Materials</h5>
+                <p class="text-sm text-foreground">{{ selectedProduct()?.materials }}</p>
               </div>
+              <div class="rounded-3xl bg-muted/50 p-4 border border-border">
+                <h5 class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-2">Process</h5>
+                <p class="text-sm text-foreground">{{ selectedProduct()?.process }}</p>
+              </div>
+            </div>
+            <div class="flex justify-end">
+              <button type="button" (click)="closeProductModal()"
+                class="px-5 py-2.5 rounded-xl bg-secondary text-secondary-foreground text-xs font-semibold shadow-md shadow-secondary/15 hover:bg-secondary/95 transition-all">Close</button>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- ORDER DETAIL MODAL -->
+    @if (orderDetailOpen() && selectedOrder()) {
+    <div class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+      <div class="w-full max-w-3xl rounded-3xl bg-card shadow-xl overflow-hidden">
+        <div class="flex items-center justify-between p-5 border-b border-border/80">
+          <div>
+            <p class="text-[10px] text-muted-foreground uppercase tracking-[0.3em]">Order Details</p>
+            <h3 class="font-heading font-bold text-lg text-foreground">#{{ selectedOrder()?.id }}</h3>
+            <p class="text-[11px] text-muted-foreground mt-1">{{ selectedOrder()?.date }} · {{ selectedOrder()?.paymentMethod }}</p>
+          </div>
+          <button type="button" (click)="closeOrderDetails()"
+            class="rounded-full border border-border p-2 text-foreground hover:bg-muted transition-all">
+            <iconify-icon icon="lucide:x" class="text-lg"></iconify-icon>
+          </button>
+        </div>
+        <div class="p-6 grid gap-6 md:grid-cols-2">
+          <div class="space-y-4">
+            <div>
+              <p class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-2">Customer</p>
+              <p class="font-semibold text-foreground">{{ selectedOrder()?.customer }}</p>
+              <p class="text-[11px] text-muted-foreground mt-1">{{ selectedOrder()?.contact }}</p>
+            </div>
+            <div>
+              <p class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-2">Shipping Address</p>
+              <p class="text-sm text-foreground">{{ selectedOrder()?.address }}</p>
+            </div>
+            <div>
+              <p class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-2">Payment status</p>
+              <p class="font-semibold text-secondary-foreground">{{ selectedOrder()?.paymentStatus }}</p>
+            </div>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <p class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-2">Order status</p>
+              <span
+                class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[10px] font-semibold uppercase"
+                [class]="selectedOrder()?.status === 'Pending' ? 'bg-yellow-500/10 text-yellow-600' : selectedOrder()?.status === 'Confirmed' ? 'bg-primary/10 text-primary' : selectedOrder()?.status === 'Completed' ? 'bg-secondary/10 text-secondary' : 'bg-destructive/10 text-destructive'">
+                {{ selectedOrder()?.status }}
+              </span>
+            </div>
+            <div>
+              <p class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-2">Order timeline</p>
+              <ul class="text-sm text-foreground space-y-2">
+                @for (step of selectedOrder()?.timeline; track $index) {
+                <li>• {{ step }}</li>
+                }
+              </ul>
             </div>
           </div>
         </div>
-      </ng-container>
-
-      <div *ngIf="confirmDeleteModal()" class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-        <div class="w-full max-w-lg rounded-3xl bg-card p-6 shadow-xl border border-border">
-          <h3 class="text-lg font-heading font-bold text-foreground">Confirm deletion</h3>
-          <p class="text-sm text-muted-foreground mt-2">This product will be removed from your catalog permanently. Are you sure?</p>
-          <div class="mt-6 flex flex-wrap gap-3 justify-end">
-            <button type="button" (click)="cancelDeleteProduct()"
-              class="px-4 py-2.5 rounded-xl border border-border text-xs font-semibold text-foreground hover:bg-muted transition-all">Cancel</button>
-            <button type="button" (click)="deleteProduct()"
-              class="px-4 py-2.5 rounded-xl bg-destructive text-card text-xs font-semibold hover:bg-destructive/90 transition-all">Delete product</button>
+        <div class="p-6 border-t border-border/80">
+          <div class="grid gap-4">
+            <div class="rounded-3xl bg-muted/50 p-4 border border-border">
+              <h4 class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-3">Ordered items</h4>
+              <div class="grid gap-3">
+                @for (item of selectedOrder()?.products; track $index) {
+                <div class="flex justify-between items-center text-sm text-foreground">
+                  <span>{{ item.name }} × {{ item.qty }}</span>
+                  <span>{{ item.price * item.qty | currency:'MAD':'symbol':'1.0-0' }}</span>
+                </div>
+                }
+              </div>
+            </div>
+            <div class="rounded-3xl bg-muted/50 p-4 border border-border flex items-center justify-between text-sm font-semibold text-foreground">
+              <span>Total Amount</span>
+              <span>{{ selectedOrder()?.total | currency:'MAD':'symbol':'1.0-0' }}</span>
+            </div>
+            <div>
+              <p class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-2">Customer notes</p>
+              <p class="text-sm text-foreground">{{ selectedOrder()?.notes }}</p>
+            </div>
           </div>
         </div>
       </div>
+    </div>
+    }
+
+    <!-- DELETE CONFIRM MODAL -->
+    @if (confirmDeleteModal()) {
+    <div class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+      <div class="w-full max-w-lg rounded-3xl bg-card p-6 shadow-xl border border-border">
+        <h3 class="text-lg font-heading font-bold text-foreground">Confirm deletion</h3>
+        <p class="text-sm text-muted-foreground mt-2">This product will be removed from your catalog permanently. Are you sure?</p>
+        <div class="mt-6 flex flex-wrap gap-3 justify-end">
+          <button type="button" (click)="cancelDeleteProduct()"
+            class="px-4 py-2.5 rounded-xl border border-border text-xs font-semibold text-foreground hover:bg-muted transition-all">Cancel</button>
+          <button type="button" (click)="deleteProduct()"
+            class="px-4 py-2.5 rounded-xl bg-destructive text-card text-xs font-semibold hover:bg-destructive/90 transition-all">Delete product</button>
+        </div>
+      </div>
+    </div>
+    }
   </div>
 </div>

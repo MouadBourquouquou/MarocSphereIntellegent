@@ -53,6 +53,8 @@ export interface Artisan {
   eligibleExport: boolean;
   independant: boolean;
   cooperativeId: number | null;
+  avatarUrl: string | null;
+  bannerUrl: string | null;
   dateCreation: string;
 }
 
@@ -73,4 +75,62 @@ export interface ChatMessage {
 export interface ChatMessageRequest {
   clientId: number;
   contenu: string;
+}
+
+export interface Produit {
+  id: number;
+  nom: string;
+  description: string;
+  categorie: string;
+  prix: number;
+  stock: number;
+  disponibilite: string;
+  note: number;
+  nbCommandes: number;
+  imageUrl: string;
+  materiels: string;
+  processFabrication: string;
+  artisanId: number;
+  dateCreation: string;
+}
+
+export interface ProduitCreationRequest {
+  nom: string;
+  description: string;
+  categorie: string;
+  prix: number;
+  stock: number;
+  disponibilite: string;
+  note: number;
+  imageUrl: string;
+  materiels: string;
+  processFabrication: string;
+}
+
+export interface CommandeItem {
+  id: number;
+  quantite: number;
+  prixUnitaire: number;
+  produitId: number;
+  produitNom: string;
+}
+
+export interface Commande {
+  id: number;
+  statut: string;
+  montantTotal: number;
+  adresseLivraison: string;
+  methodePaiement: string;
+  statutPaiement: string;
+  notes: string;
+  dateCommande: string;
+  clientId: number;
+  clientNom: string;
+  clientPrenom: string;
+  clientEmail: string;
+  items: CommandeItem[];
+}
+
+export interface CommandeUpdateRequest {
+  statut: string;
 }

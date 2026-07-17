@@ -6,16 +6,22 @@
   CUSTOM_ELEMENTS_SCHEMA,
   signal,
   computed,
+  OnInit,
   AfterViewInit,
   OnDestroy,
+  inject,
 } from '@angular/core';
 import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { Chart, registerables } from 'chart.js';
+import { ArtisanService } from '../../../services/artisan.service';
+import { AuthService } from '../../../services/auth.service';
+import { Artisan, Produit, Commande } from '../../../models/api.models';
+import { avatarUrl } from '../../../utils/display.utils';
 
 interface ArtisanProfile {
-  id: string;
+  id: number;
   name: string;
   role: string;
   workshop: string;
@@ -24,17 +30,16 @@ interface ArtisanProfile {
   contact: string;
   phone: string;
   location: string;
-  avatar: string;
-  banner: string;
   independant?: boolean;
   nationalite?: string;
   languePreferee?: string;
   qrTraceId?: string;
   eligibleExport?: boolean;
+  dateCreation?: string;
 }
 
 interface Product {
-  id: string;
+  id: number;
   name: string;
   description: string;
   category: string;
@@ -70,7 +75,7 @@ interface OrderItem {
 }
 
 interface Order {
-  id: string;
+  id: number;
   customer: string;
   contact: string;
   products: OrderItem[];
@@ -92,40 +97,43 @@ interface Order {
   styleUrls: ['./dashArtisan.css'],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class dashboardArtisan implements AfterViewInit, OnDestroy {
+export class dashboardArtisan implements OnInit, AfterViewInit, OnDestroy {
+  private artisanService = inject(ArtisanService);
+  private authService = inject(AuthService);
+
   showAllServices = signal(false);
   profileEdit = signal(false);
   profile = signal<ArtisanProfile>({
-    id: 'artisan-001',
-    name: 'Alami Zellige Workshop',
-    role: 'Master Ceramic & Clay Artisan',
-    workshop: 'Sidi Ghanem Studio',
-    category: 'Zellige & Ceramic',
-    biography:
-      'Preserving the authentic 12th-century Moorish zellige art with hand-cut geometric tiles in the heart of Marrakech.',
-    contact: 'contact@alamizellige.com',
-    phone: '+212 6 12 34 56 78',
-    location: 'Sidi Ghanem, Marrakech',
-    avatar: 'https://randomuser.me/api/portraits/men/12.jpg',
-    banner:
-      'https://uxmagic.blob.core.windows.net/public/agent-images/artisan-banner-1783967641773-ereo64iln1k.png',
+    id: 0,
+    name: '',
+    role: '',
+    workshop: '',
+    category: '',
+    biography: '',
+    contact: '',
+    phone: '',
+    location: '',
     independant: true,
-    nationalite: 'Moroccan',
-    languePreferee: 'Arabic',
-    qrTraceId: 'QR-ART-2024-001',
-    eligibleExport: true,
+    nationalite: '',
+    languePreferee: '',
+    qrTraceId: '',
+    eligibleExport: false,
   });
 
   profileForm!: ArtisanProfile;
   productForm!: ProductForm;
-  profileImagePreview = signal(this.profile().avatar);
-  profileBannerPreview = signal(this.profile().banner);
+  avatar = computed(() => avatarUrl(this.displayName()));
 
-  isLoading = signal(false);
+  isLoading = signal(true);
   errorMessage = signal('');
-  displayName = computed(() => this.profile().name);
-  memberSince = computed(() => 'Jan 2024');
-  logout = (): void => {};
+  displayName = computed(() => this.profile().name || 'Artisan');
+  memberSince = computed(() => {
+    const d = this.profile().dateCreation;
+    if (!d) return '—';
+    const date = new Date(d);
+    return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+  });
+  logout = (): void => this.authService.logout();
 
   toastMessage = signal('');
   toastType = signal<'success' | 'error'>('success');
@@ -134,8 +142,8 @@ export class dashboardArtisan implements AfterViewInit, OnDestroy {
 
   productModalOpen = signal(false);
   productModalMode = signal<'add' | 'edit' | 'view'>('add');
-  editingProductId = signal<string | null>(null);
-  productToDeleteId = signal<string | null>(null);
+  editingProductId = signal<number | null>(null);
+  productToDeleteId = signal<number | null>(null);
   confirmDeleteModal = signal(false);
 
   productSearch = signal('');
@@ -150,104 +158,8 @@ export class dashboardArtisan implements AfterViewInit, OnDestroy {
   orderSearch = signal('');
   orderFilter = signal<'all' | 'pending' | 'confirmed' | 'rejected' | 'completed'>('all');
 
-  products = signal<Product[]>([
-    {
-      id: 'prod-1',
-      name: 'Handcrafted Fez Brass Lantern',
-      description:
-        'Elegant brass lantern with traditional Moroccan filigree work and hand-finished glass panels.',
-      category: 'Metalwork',
-      price: 2450,
-      stock: 12,
-      availability: 'In Stock',
-      rating: 4.9,
-      orders: 28,
-      image:
-        'https://uxmagic.blob.core.windows.net/public/project-documents/6a538432fd3ef5a9b6ba05a9/amiraamiiraa390_gmail.com/1783967042114-0bb39d13-Screenshot%202026-07-13%20192247.png',
-      materials: 'Brass, Glass',
-      process:
-        'Hand-cut brass panels soldered with traditional Moroccan geometry and polished by hand.',
-    },
-    {
-      id: 'prod-2',
-      name: 'Fez Blue Geometric Zellige Tile Set',
-      description:
-        '12-piece, hand-painted zellige tile set with bold blue accents for statement walls or floors.',
-      category: 'Ceramics',
-      price: 1200,
-      stock: 4,
-      availability: 'Low Stock',
-      rating: 4.8,
-      orders: 17,
-      image:
-        'https://uxmagic.blob.core.windows.net/public/agent-images/artisan-banner-1783967641773-ereo64iln1k.png',
-      materials: 'Ceramic, Glaze',
-      process:
-        'Traditional kiln-fired zellige assembled and glazed in small batches for authentic texture.',
-    },
-    {
-      id: 'prod-3',
-      name: 'Hand-stitched Leather Travel Journal',
-      description:
-        'Premium leather journal finished with hand-stitched pages and embossed Moroccan motifs.',
-      category: 'Leatherwork',
-      price: 980,
-      stock: 0,
-      availability: 'Out of Stock',
-      rating: 4.7,
-      orders: 12,
-      image:
-        'https://uxmagic.blob.core.windows.net/public/project-documents/6a538432fd3ef5a9b6ba05a9/amiraamiiraa390_gmail.com/1783967042114-0bb39d13-Screenshot%202026-07-13%20192247.png',
-      materials: 'Leather, Cotton',
-      process:
-        'Stitched by hand with vegetable-tanned leather and natural thread for an heirloom finish.',
-    },
-  ]);
-
-  orders = signal<Order[]>([
-    {
-      id: 'ORD-8932',
-      customer: 'Sophia Laurent',
-      contact: 'sophia.laurent@example.com',
-      products: [{ name: 'Handcrafted Fez Brass Lantern', qty: 1, price: 2450 }],
-      total: 2450,
-      date: 'Jul 10, 2026',
-      paymentStatus: 'Escrow Held',
-      status: 'Pending',
-      address: '42 Rue de Boucher, Paris, France',
-      paymentMethod: 'Escrow Payment',
-      notes: 'Please package with extra padding for shipping.',
-      timeline: ['Order placed', 'Awaiting confirmation'],
-    },
-    {
-      id: 'ORD-8935',
-      customer: 'Marcus Vance',
-      contact: 'marcus.vance@example.com',
-      products: [{ name: 'Fez Blue Geometric Zellige Tile Set', qty: 2, price: 1200 }],
-      total: 2400,
-      date: 'Jul 7, 2026',
-      paymentStatus: 'Released',
-      status: 'Completed',
-      address: '55 Hudson St, New York, USA',
-      paymentMethod: 'Credit Card',
-      notes: 'Customer requested express delivery.',
-      timeline: ['Order placed', 'Confirmed', 'Shipped', 'Delivered'],
-    },
-    {
-      id: 'ORD-8938',
-      customer: 'Amina Hassan',
-      contact: 'amina.hassan@example.com',
-      products: [{ name: 'Hand-stitched Leather Travel Journal', qty: 3, price: 980 }],
-      total: 2940,
-      date: 'Jul 12, 2026',
-      paymentStatus: 'Escrow Held',
-      status: 'Pending',
-      address: '18 Atlas Street, Casablanca, Morocco',
-      paymentMethod: 'Escrow Payment',
-      notes: 'Gift wrap the journal set if possible.',
-      timeline: ['Order placed', 'Awaiting confirmation'],
-    },
-  ]);
+  products = signal<Product[]>([]);
+  orders = signal<Order[]>([]);
 
   filteredProducts = computed(() => {
     const query = this.productSearch().trim().toLowerCase();
@@ -271,24 +183,15 @@ export class dashboardArtisan implements AfterViewInit, OnDestroy {
     });
 
     return filtered.sort((a, b) => {
-      if (sort === 'price-asc') {
-        return a.price - b.price;
-      }
-      if (sort === 'price-desc') {
-        return b.price - a.price;
-      }
+      if (sort === 'price-asc') return a.price - b.price;
+      if (sort === 'price-desc') return b.price - a.price;
       return b.orders - a.orders;
     });
   });
 
-  productPageCount = computed(() => {
-    return Math.max(1, Math.ceil(this.filteredProducts().length / this.pageSize));
-  });
+  productPageCount = computed(() => Math.max(1, Math.ceil(this.filteredProducts().length / this.pageSize)));
 
-  currentProductPage = computed(() => {
-    const page = this.currentPage();
-    return Math.min(page, this.productPageCount());
-  });
+  currentProductPage = computed(() => Math.min(this.currentPage(), this.productPageCount()));
 
   paginatedProducts = computed(() => {
     const page = this.currentProductPage();
@@ -303,37 +206,26 @@ export class dashboardArtisan implements AfterViewInit, OnDestroy {
     return this.orders().filter((order) => {
       const queryMatch =
         !query ||
-        [order.id, order.customer, order.contact, order.paymentMethod, order.address]
+        [order.id.toString(), order.customer, order.contact, order.paymentMethod, order.address]
           .join(' ')
           .toLowerCase()
           .includes(query);
       const filterMatch = filter === 'all' || order.status.toLowerCase() === filter;
-
       return queryMatch && filterMatch;
     });
   });
 
   totalProducts = computed(() => this.products().length);
-  pendingOrders = computed(
-    () => this.orders().filter((order) => order.status === 'Pending').length,
-  );
-  confirmedOrders = computed(
-    () => this.orders().filter((order) => order.status === 'Confirmed').length,
-  );
-  completedOrders = computed(
-    () => this.orders().filter((order) => order.status === 'Completed').length,
-  );
-  revenue = computed(() => this.orders().reduce((sum, order) => sum + order.total, 0));
+  pendingOrders = computed(() => this.orders().filter((o) => o.status === 'Pending').length);
+  confirmedOrders = computed(() => this.orders().filter((o) => o.status === 'Confirmed').length);
+  completedOrders = computed(() => this.orders().filter((o) => o.status === 'Completed').length);
+  revenue = computed(() => this.orders().reduce((sum, o) => sum + o.total, 0));
   averageRating = computed(() => {
-    const products = this.products();
-    if (!products.length) {
-      return '0.0';
-    }
-    return (products.reduce((sum, product) => sum + product.rating, 0) / products.length)
-      .toFixed(1)
-      .toString();
+    const p = this.products();
+    if (!p.length) return '0.0';
+    return (p.reduce((sum, item) => sum + item.rating, 0) / p.length).toFixed(1);
   });
-  customerCount = computed(() => new Set(this.orders().map((order) => order.customer)).size);
+  customerCount = computed(() => new Set(this.orders().map((o) => o.customer)).size);
 
   private isBrowser: boolean;
   private cleanupFns: Array<() => void> = [];
@@ -347,232 +239,215 @@ export class dashboardArtisan implements AfterViewInit, OnDestroy {
     this.isBrowser = isPlatformBrowser(platformId);
     this.profileForm = { ...this.profile() };
     this.productForm = {
-      id: '',
-      name: '',
-      description: '',
-      category: '',
-      price: '',
-      stock: '',
-      availability: 'In Stock',
-      rating: '4.9',
-      orders: '0',
-      image: '',
-      materials: '',
-      process: '',
+      id: '', name: '', description: '', category: '', price: '', stock: '1',
+      availability: 'In Stock', rating: '4.9', orders: '0', image: '', materials: '', process: '',
     };
   }
 
-  // ==========================
-  // Lifecycle
-  // ==========================
+  ngOnInit(): void {
+    this.loadProfile();
+  }
+
   ngAfterViewInit(): void {
     if (!this.isBrowser) return;
-
     this.setupSmoothScroll();
     this.setupFormPreventDefault();
-    this.initArtisanSalesChart();
   }
 
   ngOnDestroy(): void {
     this.cleanupFns.forEach((fn) => fn());
     this.cleanupFns = [];
-
-    if (this.chartTimeoutId !== null) {
-      clearTimeout(this.chartTimeoutId);
-    }
-
-    if (this.toastTimeout !== null) {
-      clearTimeout(this.toastTimeout);
-    }
-
+    if (this.chartTimeoutId !== null) clearTimeout(this.chartTimeoutId);
+    if (this.toastTimeout !== null) clearTimeout(this.toastTimeout);
     this.chart?.destroy();
   }
 
-  // ==========================
-  // Smooth Scroll
-  // ==========================
-  private setupSmoothScroll(): void {
-    const anchors = this.elRef.nativeElement.querySelectorAll<HTMLAnchorElement>('a[href^="#"]');
-
-    anchors.forEach((anchor) => {
-      const onClick = (event: Event): void => {
-        const href = anchor.getAttribute('href');
-
-        if (!href) return;
-
-        const target = this.elRef.nativeElement.querySelector<HTMLElement>(href);
-
-        if (target) {
-          event.preventDefault();
-          target.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start',
-          });
-        }
-      };
-
-      anchor.addEventListener('click', onClick);
-      this.cleanupFns.push(() => anchor.removeEventListener('click', onClick));
+  private loadProfile(): void {
+    this.isLoading.set(true);
+    this.artisanService.getMe().subscribe({
+      next: (artisan) => {
+        const p: ArtisanProfile = {
+          id: artisan.id,
+          name: `${artisan.prenom} ${artisan.nom}`,
+          role: artisan.categorieArtisanat || 'Artisan',
+          workshop: `${artisan.prenom}'s Workshop`,
+          category: artisan.categorieArtisanat || 'Artisanat',
+          biography: '',
+          contact: artisan.email,
+          phone: artisan.telephone || '',
+          location: artisan.nationalite || '',
+          independant: artisan.independant,
+          nationalite: artisan.nationalite,
+          languePreferee: artisan.languePreferee,
+          qrTraceId: artisan.qrTraceId,
+          eligibleExport: artisan.eligibleExport,
+          dateCreation: artisan.dateCreation,
+        } as ArtisanProfile;
+        this.profile.set(p);
+        this.profileForm = { ...p };
+        this.isLoading.set(false);
+        this.loadProducts(artisan.id);
+        this.loadOrders(artisan.id);
+        this.initArtisanSalesChart();
+      },
+      error: (err) => {
+        this.errorMessage.set('Impossible de charger votre profil artisan.');
+        this.isLoading.set(false);
+        console.error('Failed to load artisan profile', err);
+      },
     });
   }
 
-  // ==========================
-  // Prevent Form Submit
-  // ==========================
-  private setupFormPreventDefault(): void {
-    const forms = this.elRef.nativeElement.querySelectorAll<HTMLFormElement>('form');
-
-    forms.forEach((form) => {
-      const onSubmit = (event: Event): void => {
-        event.preventDefault();
-      };
-
-      form.addEventListener('submit', onSubmit);
-
-      this.cleanupFns.push(() => form.removeEventListener('submit', onSubmit));
+  private loadProducts(artisanId: number): void {
+    this.artisanService.getProduitsByArtisan(artisanId).subscribe({
+      next: (produits) => {
+        const mapped: Product[] = produits.map((p) => ({
+          id: p.id,
+          name: p.nom,
+          description: p.description || '',
+          category: p.categorie || '',
+          price: p.prix,
+          stock: p.stock,
+          availability: p.disponibilite as 'In Stock' | 'Low Stock' | 'Out of Stock',
+          rating: p.note,
+          orders: p.nbCommandes,
+          image: p.imageUrl || 'https://uxmagic.blob.core.windows.net/public/project-documents/placeholder-artisan.png',
+          materials: p.materiels || '',
+          process: p.processFabrication || '',
+        }));
+        this.products.set(mapped);
+      },
+      error: (err) => console.error('Failed to load products', err),
     });
   }
 
-  // ==========================
-  // Chart.js
-  // ==========================
+  private loadOrders(artisanId: number): void {
+    this.artisanService.getCommandesByArtisan(artisanId).subscribe({
+      next: (commandes) => {
+        const mapped: Order[] = commandes.map((c) => ({
+          id: c.id,
+          customer: `${c.clientPrenom} ${c.clientNom}`,
+          contact: c.clientEmail,
+          products: c.items.map((i) => ({ name: i.produitNom, qty: i.quantite, price: i.prixUnitaire })),
+          total: c.montantTotal,
+          date: c.dateCommande ? new Date(c.dateCommande).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '',
+          paymentStatus: c.statutPaiement || '',
+          status: c.statut as 'Pending' | 'Confirmed' | 'Completed' | 'Rejected',
+          address: c.adresseLivraison || '',
+          paymentMethod: c.methodePaiement || '',
+          notes: c.notes || '',
+          timeline: [c.statut === 'Pending' ? 'Order placed' : c.statut],
+        }));
+        this.orders.set(mapped);
+      },
+      error: (err) => console.error('Failed to load orders', err),
+    });
+  }
+
   private initArtisanSalesChart(): void {
     this.chartTimeoutId = setTimeout(() => {
-      const canvas =
-        this.elRef.nativeElement.querySelector<HTMLCanvasElement>('#artisanSalesChart');
-
+      const canvas = this.elRef.nativeElement.querySelector<HTMLCanvasElement>('#artisanSalesChart');
       if (!canvas) return;
-
       Chart.register(...registerables);
-
       this.chart = new Chart(canvas, {
         type: 'line',
         data: {
           labels: ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
-          datasets: [
-            {
-              label: 'Revenue (MAD)',
-              data: [32000, 45000, 41000, 58000, 62000, 68400],
-              borderColor: '#006233',
-              backgroundColor: 'rgba(0, 98, 51, 0.05)',
-              borderWidth: 3,
-              fill: true,
-              tension: 0.4,
-            },
-          ],
+          datasets: [{
+            label: 'Revenue (MAD)',
+            data: [32000, 45000, 41000, 58000, 62000, 68400],
+            borderColor: '#006233',
+            backgroundColor: 'rgba(0, 98, 51, 0.05)',
+            borderWidth: 3, fill: true, tension: 0.4,
+          }],
         },
         options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              display: false,
-            },
-          },
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
           scales: {
-            y: {
-              grid: {
-                color: 'rgba(234, 223, 201, 0.2)',
-              },
-            },
-            x: {
-              grid: {
-                display: false,
-              },
-            },
+            y: { grid: { color: 'rgba(234, 223, 201, 0.2)' } },
+            x: { grid: { display: false } },
           },
         },
       });
     }, 100);
   }
 
+  private setupSmoothScroll(): void {
+    const anchors = this.elRef.nativeElement.querySelectorAll<HTMLAnchorElement>('a[href^="#"]');
+    anchors.forEach((anchor) => {
+      const onClick = (event: Event): void => {
+        const href = anchor.getAttribute('href');
+        if (!href) return;
+        const target = this.elRef.nativeElement.querySelector<HTMLElement>(href);
+        if (target) { event.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+      };
+      anchor.addEventListener('click', onClick);
+      this.cleanupFns.push(() => anchor.removeEventListener('click', onClick));
+    });
+  }
+
+  private setupFormPreventDefault(): void {
+    const forms = this.elRef.nativeElement.querySelectorAll<HTMLFormElement>('form');
+    forms.forEach((form) => {
+      const onSubmit = (event: Event): void => { event.preventDefault(); };
+      form.addEventListener('submit', onSubmit);
+      this.cleanupFns.push(() => form.removeEventListener('submit', onSubmit));
+    });
+  }
+
   switchDashboardTab(tabId: string): void {
     if (!this.isBrowser) return;
-
     const root = this.elRef.nativeElement;
-
     root.querySelectorAll<HTMLElement>('.dash-tab-btn').forEach((btn) => {
       btn.classList.remove('bg-secondary', 'text-secondary-foreground', 'shadow-sm');
-
       btn.classList.add('text-muted-foreground', 'hover:text-foreground');
     });
-
     const activeBtn = root.querySelector<HTMLElement>(`#${tabId}-tab`);
-
     activeBtn?.classList.remove('text-muted-foreground', 'hover:text-foreground');
-
     activeBtn?.classList.add('bg-secondary', 'text-secondary-foreground', 'shadow-sm');
-
-    root.querySelectorAll<HTMLElement>('.dash-tab-pane').forEach((pane) => {
-      pane.classList.add('hidden');
-    });
-
+    root.querySelectorAll<HTMLElement>('.dash-tab-pane').forEach((pane) => pane.classList.add('hidden'));
     root.querySelector<HTMLElement>(`#${tabId}-content`)?.classList.remove('hidden');
   }
 
   enableProfileEdit(): void {
     this.profileForm = { ...this.profile() };
-    this.profileImagePreview.set(this.profile().avatar);
-    this.profileBannerPreview.set(this.profile().banner);
     this.profileEdit.set(true);
   }
 
   saveProfile(): void {
-    this.profile.set({ ...this.profileForm });
-    this.profileImagePreview.set(this.profileForm.avatar);
-    this.profileBannerPreview.set(this.profileForm.banner);
-    this.profileEdit.set(false);
-    this.showToastNotification('Your artisan profile was updated successfully.', 'success');
+    const artisanId = this.profile().id;
+    this.artisanService.updateProfile(artisanId, {
+      nom: this.profileForm.name.split(' ').slice(-1)[0] || this.profileForm.name,
+      prenom: this.profileForm.name.split(' ').slice(0, -1).join(' ') || '',
+      telephone: this.profileForm.phone,
+      categorieArtisanat: this.profileForm.category,
+    } as Partial<Artisan>).subscribe({
+      next: (updated) => {
+        const p = { ...this.profile() };
+        p.name = `${updated.prenom} ${updated.nom}`;
+        p.category = updated.categorieArtisanat || p.category;
+        p.phone = updated.telephone || p.phone;
+        this.profile.set(p);
+        this.profileForm = { ...p };
+        this.profileEdit.set(false);
+        this.showToastNotification('Votre profil a été mis à jour avec succès.', 'success');
+      },
+      error: () => this.showToastNotification('Erreur lors de la mise à jour du profil.', 'error'),
+    });
   }
 
   cancelProfileEdit(): void {
     this.profileForm = { ...this.profile() };
-    this.profileImagePreview.set(this.profile().avatar);
-    this.profileBannerPreview.set(this.profile().banner);
     this.profileEdit.set(false);
   }
 
-  onProfileImageChange(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === 'string') {
-        this.profileImagePreview.set(reader.result);
-        this.profileForm.avatar = reader.result;
-      }
-    };
-    reader.readAsDataURL(file);
-  }
-
-  onProfileBannerChange(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === 'string') {
-        this.profileBannerPreview.set(reader.result);
-        this.profileForm.banner = reader.result;
-      }
-    };
-    reader.readAsDataURL(file);
-  }
-
   private showToastNotification(message: string, type: 'success' | 'error'): void {
-    if (this.toastTimeout) {
-      clearTimeout(this.toastTimeout);
-    }
-
+    if (this.toastTimeout) clearTimeout(this.toastTimeout);
     this.toastMessage.set(message);
     this.toastType.set(type);
     this.showToast.set(true);
-    this.toastTimeout = setTimeout(() => {
-      this.showToast.set(false);
-    }, 3200);
+    this.toastTimeout = setTimeout(() => this.showToast.set(false), 3200);
   }
 
   openProductModal(mode: 'add' | 'edit' | 'view', product?: Product): void {
@@ -582,36 +457,17 @@ export class dashboardArtisan implements AfterViewInit, OnDestroy {
 
     if (product) {
       this.productForm = {
-        id: product.id,
-        name: product.name,
-        description: product.description,
-        category: product.category,
-        price: product.price.toString(),
-        stock: product.stock.toString(),
-        availability: product.availability,
-        rating: product.rating.toString(),
-        orders: product.orders.toString(),
-        image: product.image,
-        materials: product.materials,
-        process: product.process,
+        id: product.id.toString(), name: product.name, description: product.description,
+        category: product.category, price: product.price.toString(), stock: product.stock.toString(),
+        availability: product.availability, rating: product.rating.toString(), orders: product.orders.toString(),
+        image: product.image, materials: product.materials, process: product.process,
       };
     } else {
       this.productForm = {
-        id: '',
-        name: '',
-        description: '',
-        category: '',
-        price: '',
-        stock: '1',
-        availability: 'In Stock',
-        rating: '4.9',
-        orders: '0',
-        image: '',
-        materials: '',
-        process: '',
+        id: '', name: '', description: '', category: '', price: '', stock: '1',
+        availability: 'In Stock', rating: '4.9', orders: '0', image: '', materials: '', process: '',
       };
     }
-
     this.productModalOpen.set(true);
   }
 
@@ -623,55 +479,59 @@ export class dashboardArtisan implements AfterViewInit, OnDestroy {
 
   saveProduct(): void {
     if (!this.productForm.name.trim() || !this.productForm.category.trim()) {
-      this.showToastNotification('Please enter a product name and category.', 'error');
+      this.showToastNotification('Veuillez entrer un nom et une catégorie de produit.', 'error');
       return;
     }
 
-    const price = Number(this.productForm.price) || 0;
-    const stock = Number(this.productForm.stock) || 0;
-    const rating = Number(this.productForm.rating) || 0;
-    const orders = Number(this.productForm.orders) || 0;
-    const product: Product = {
-      id: this.productForm.id || `prod-${Date.now()}`,
-      name: this.productForm.name.trim(),
+    const data = {
+      nom: this.productForm.name.trim(),
       description: this.productForm.description.trim(),
-      category: this.productForm.category.trim(),
-      price,
-      stock,
-      availability: this.productForm.availability,
-      rating,
-      orders,
-      image:
-        this.productForm.image ||
-        'https://uxmagic.blob.core.windows.net/public/project-documents/placeholder-artisan.png',
-      materials: this.productForm.materials.trim(),
-      process: this.productForm.process.trim(),
+      categorie: this.productForm.category.trim(),
+      prix: Number(this.productForm.price) || 0,
+      stock: Number(this.productForm.stock) || 0,
+      disponibilite: this.productForm.availability,
+      note: Number(this.productForm.rating) || 0,
+      imageUrl: this.productForm.image || 'https://uxmagic.blob.core.windows.net/public/project-documents/placeholder-artisan.png',
+      materiels: this.productForm.materials.trim(),
+      processFabrication: this.productForm.process.trim(),
     };
 
     if (this.productModalMode() === 'edit' && this.editingProductId()) {
-      this.products.update((list) => list.map((item) => (item.id === product.id ? product : item)));
-      this.showToastNotification('Product updated successfully.', 'success');
+      this.artisanService.updateProduit(this.editingProductId()!, data).subscribe({
+        next: () => {
+          this.loadProducts(this.profile().id);
+          this.showToastNotification('Produit mis à jour avec succès.', 'success');
+        },
+        error: () => this.showToastNotification('Erreur lors de la mise à jour du produit.', 'error'),
+      });
     } else {
-      this.products.update((list) => [product, ...list]);
-      this.showToastNotification('Product added to your catalog.', 'success');
+      this.artisanService.createProduit(this.profile().id, data).subscribe({
+        next: () => {
+          this.loadProducts(this.profile().id);
+          this.showToastNotification('Produit ajouté à votre catalogue.', 'success');
+        },
+        error: () => this.showToastNotification("Erreur lors de l'ajout du produit.", 'error'),
+      });
     }
-
     this.closeProductModal();
   }
 
-  confirmDeleteProduct(productId: string): void {
+  confirmDeleteProduct(productId: number): void {
     this.productToDeleteId.set(productId);
     this.confirmDeleteModal.set(true);
   }
 
   deleteProduct(): void {
     const productId = this.productToDeleteId();
-    if (!productId) {
-      return;
-    }
+    if (!productId) return;
 
-    this.products.update((list) => list.filter((product) => product.id !== productId));
-    this.showToastNotification('Product removed from your catalog.', 'success');
+    this.artisanService.deleteProduit(productId).subscribe({
+      next: () => {
+        this.products.update((list) => list.filter((p) => p.id !== productId));
+        this.showToastNotification('Produit supprimé de votre catalogue.', 'success');
+      },
+      error: () => this.showToastNotification('Erreur lors de la suppression du produit.', 'error'),
+    });
     this.confirmDeleteModal.set(false);
     this.productToDeleteId.set(null);
   }
@@ -685,26 +545,19 @@ export class dashboardArtisan implements AfterViewInit, OnDestroy {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
-
     const reader = new FileReader();
     reader.onload = () => {
-      if (typeof reader.result === 'string') {
-        this.productForm.image = reader.result;
-      }
+      if (typeof reader.result === 'string') this.productForm.image = reader.result;
     };
     reader.readAsDataURL(file);
   }
 
   prevProductPage(): void {
-    if (this.currentPage() > 1) {
-      this.currentPage.update((page) => page - 1);
-    }
+    if (this.currentPage() > 1) this.currentPage.update((p) => p - 1);
   }
 
   nextProductPage(): void {
-    if (this.currentPage() < this.productPageCount()) {
-      this.currentPage.update((page) => page + 1);
-    }
+    if (this.currentPage() < this.productPageCount()) this.currentPage.update((p) => p + 1);
   }
 
   openOrderDetails(order: Order): void {
@@ -717,51 +570,37 @@ export class dashboardArtisan implements AfterViewInit, OnDestroy {
     this.selectedOrder.set(null);
   }
 
-  confirmOrder(orderId: string): void {
-    this.orders.update((list) =>
-      list.map((order) => {
-        if (order.id !== orderId) {
-          return order;
-        }
-
-        const updated = {
-          ...order,
-          status: 'Confirmed' as const,
-          paymentStatus: 'Escrow Held',
-          timeline: [...order.timeline, 'Confirmed by artisan'],
-        };
-
-        if (this.selectedOrder()?.id === orderId) {
-          this.selectedOrder.set(updated);
-        }
-
-        return updated;
-      }),
-    );
-    this.showToastNotification('Order confirmed and moved to Confirmed Orders.', 'success');
+  confirmOrder(orderId: number): void {
+    this.artisanService.updateCommandeStatut(orderId, { statut: 'Confirmed' }).subscribe({
+      next: () => {
+        this.orders.update((list) =>
+          list.map((o) => {
+            if (o.id !== orderId) return o;
+            const updated = { ...o, status: 'Confirmed' as const, paymentStatus: 'Escrow Held', timeline: [...o.timeline, 'Confirmed by artisan'] };
+            if (this.selectedOrder()?.id === orderId) this.selectedOrder.set(updated);
+            return updated;
+          }),
+        );
+        this.showToastNotification('Commande confirmée.', 'success');
+      },
+      error: () => this.showToastNotification('Erreur lors de la confirmation.', 'error'),
+    });
   }
 
-  rejectOrder(orderId: string): void {
-    this.orders.update((list) =>
-      list.map((order) => {
-        if (order.id !== orderId) {
-          return order;
-        }
-
-        const updated = {
-          ...order,
-          status: 'Rejected' as const,
-          paymentStatus: 'Refund Pending',
-          timeline: [...order.timeline, 'Order rejected by artisan'],
-        };
-
-        if (this.selectedOrder()?.id === orderId) {
-          this.selectedOrder.set(updated);
-        }
-
-        return updated;
-      }),
-    );
-    this.showToastNotification('Order rejected and customer notified.', 'success');
+  rejectOrder(orderId: number): void {
+    this.artisanService.updateCommandeStatut(orderId, { statut: 'Rejected' }).subscribe({
+      next: () => {
+        this.orders.update((list) =>
+          list.map((o) => {
+            if (o.id !== orderId) return o;
+            const updated = { ...o, status: 'Rejected' as const, paymentStatus: 'Refund Pending', timeline: [...o.timeline, 'Order rejected by artisan'] };
+            if (this.selectedOrder()?.id === orderId) this.selectedOrder.set(updated);
+            return updated;
+          }),
+        );
+        this.showToastNotification('Commande rejetée.', 'success');
+      },
+      error: () => this.showToastNotification('Erreur lors du rejet.', 'error'),
+    });
   }
 }

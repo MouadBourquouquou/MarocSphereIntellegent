@@ -18,4 +18,6 @@ public class ArtisanUpdateDTO {
     private String categorieArtisanat;
     private Boolean eligibleExport;
     private Boolean independant;
+    private String avatarUrl;
+    private String bannerUrl;
 }

@@ -24,5 +24,7 @@ public class ArtisanResponseDTO {
     private Boolean eligibleExport;
     private Boolean independant;
     private Long cooperativeId; // null si indépendant
+    private String avatarUrl;
+    private String bannerUrl;
     private LocalDateTime dateCreation;
 }

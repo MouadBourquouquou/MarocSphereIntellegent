@@ -95,6 +95,8 @@ public class ArtisanServiceImpl implements ArtisanService {
         if (dto.getCategorieArtisanat() != null) artisan.setCategorieArtisanat(dto.getCategorieArtisanat());
         if (dto.getEligibleExport() != null) artisan.setEligibleExport(dto.getEligibleExport());
         if (dto.getIndependant() != null) artisan.setIndependant(dto.getIndependant());
+        if (dto.getAvatarUrl() != null) artisan.setAvatarUrl(dto.getAvatarUrl());
+        if (dto.getBannerUrl() != null) artisan.setBannerUrl(dto.getBannerUrl());
         Artisan saved = artisanRepo.save(artisan);
         return toResponseDTO(saved);
     }
@@ -114,6 +116,8 @@ public class ArtisanServiceImpl implements ArtisanService {
                 .eligibleExport(artisan.getEligibleExport())
                 .independant(artisan.getIndependant())
                 .cooperativeId(cooperativeId)
+                .avatarUrl(artisan.getAvatarUrl())
+                .bannerUrl(artisan.getBannerUrl())
                 .dateCreation(artisan.getDateCreation())
                 .build();
     }

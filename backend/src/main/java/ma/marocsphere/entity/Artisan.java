@@ -22,10 +22,20 @@ public class Artisan extends Utilisateur {
     private Boolean eligibleExport;
     private Boolean independant;
 
+    @Column(columnDefinition = "TEXT")
+    private String avatarUrl;
+
+    @Column(columnDefinition = "TEXT")
+    private String bannerUrl;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cooperative_id")
     @ToString.Exclude
     private Cooperative cooperative;
+
+    @OneToMany(mappedBy = "artisan", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private List<Produit> produits = new ArrayList<>();
 
     @OneToMany(mappedBy = "artisan", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
