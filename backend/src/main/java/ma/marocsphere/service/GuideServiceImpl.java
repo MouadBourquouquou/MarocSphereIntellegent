@@ -51,6 +51,15 @@ public class GuideServiceImpl implements GuideService {
 
     @Override
     @Transactional
+    public void delete(Long id) {
+        if (!guideRepo.existsById(id)) {
+            throw new RuntimeException("Guide non trouvé avec l'id : " + id);
+        }
+        guideRepo.deleteById(id);
+    }
+
+    @Override
+    @Transactional
     public GuideResponseDTO create(GuideCreationDTO dto) {
         if (guideRepo.existsByEmail(dto.getEmail())) {
             throw new RuntimeException("Un guide avec cet email existe déjà : " + dto.getEmail());

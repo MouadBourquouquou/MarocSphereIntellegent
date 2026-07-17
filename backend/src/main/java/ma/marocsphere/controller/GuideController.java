@@ -26,6 +26,12 @@ public class GuideController {
         return ResponseEntity.ok(guideService.getAll());
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        guideService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/me")
     public ResponseEntity<GuideResponseDTO> getMe() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();

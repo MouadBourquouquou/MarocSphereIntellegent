@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/admins")
@@ -19,15 +19,24 @@ public class AdminController {
         this.adminService = adminService;
     }
 
+    @GetMapping
+    public ResponseEntity<List<AdminResponseDTO>> getAll() {
+        return ResponseEntity.ok(adminService.getAll());
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<AdminResponseDTO> getById(@PathVariable Long id) {
-        AdminResponseDTO response = adminService.getById(id);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(adminService.getById(id));
     }
 
     @PostMapping
     public ResponseEntity<AdminResponseDTO> create(@RequestBody AdminCreationDTO dto) {
-        AdminResponseDTO response = adminService.create(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(adminService.create(dto));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        adminService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

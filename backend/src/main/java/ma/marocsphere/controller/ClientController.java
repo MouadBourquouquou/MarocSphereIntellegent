@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/clients")
@@ -32,9 +33,26 @@ public class ClientController {
         this.reservationService = reservationService;
     }
 
+    @GetMapping
+    public ResponseEntity<List<ClientResponseDTO>> getAll() {
+        return ResponseEntity.ok(clientService.getAll());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        clientService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/me")
-    public ResponseEntity<ClientResponseDTO> getMe() {
+    public ResponseEntity<?> getMe() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean isClient = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_CLIENT"));
+        if (!isClient) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", "Accès réservé aux clients."));
+        }
         ClientResponseDTO response = clientService.getByEmail(auth.getName());
         return ResponseEntity.ok(response);
     }

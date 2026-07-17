@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/reservations")
@@ -19,15 +19,24 @@ public class ReservationController {
         this.reservationService = reservationService;
     }
 
+    @GetMapping
+    public ResponseEntity<List<ReservationResponseDTO>> getAll() {
+        return ResponseEntity.ok(reservationService.getAll());
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ReservationResponseDTO> getById(@PathVariable Long id) {
-        ReservationResponseDTO response = reservationService.getById(id);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(reservationService.getById(id));
     }
 
     @PostMapping
     public ResponseEntity<ReservationResponseDTO> create(@RequestBody ReservationCreationDTO dto) {
-        ReservationResponseDTO response = reservationService.create(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(reservationService.create(dto));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        reservationService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
