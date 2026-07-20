@@ -1,375 +1,272 @@
-<div data-page="multi-role-authentication">
-  <div class="min-h-screen w-full bg-background flex flex-col relative text-foreground font-sans">
-    <div class="flex-1 grid grid-cols-1 lg:grid-cols-2">
-      <section
-        class="relative border-r border-border bg-gradient-to-br from-primary via-primary to-secondary-foreground text-primary-foreground overflow-hidden"
-      >
-        <div
-          class="absolute inset-0 bg-gradient-to-br from-primary via-primary to-secondary-foreground opacity-95"
-        ></div>
-        <div class="relative z-10 h-full px-8 lg:px-12 py-10 flex flex-col justify-between">
-          <div>
-            <div class="flex items-center gap-3">
-              <!-- LOGO -->
-              <a class="navbar-brand" routerLink="/">
-                <img src="/pics/LOGOBLANC.png" alt="MarocSphere" class="logo" />
-              </a>
-              <div>
-                <h1 class="text-xl font-heading font-bold tracking-wide">MarocSphere</h1>
-                <p class="text-xs text-primary-foreground/80">Premium Moroccan tourism ecosystem</p>
-              </div>
-            </div>
-            <div class="mt-16 max-w-xl">
-              <span
-                class="inline-flex px-3 py-1 rounded-full bg-card/10 border border-primary-foreground/20 text-xs font-semibold"
-                >Sign-Up</span
-              >
-              <h2 class="text-4xl lg:text-5xl font-heading font-bold leading-tight mt-5">
-                One secure entry point for clients, guides, artisans, and DMC partners.
-              </h2>
-              <p class="text-primary-foreground/80 mt-5 text-base">
-                Sign in to manage trips, reservations, products, availability, and analytics, or
-                create a new account through a guided multi-step onboarding flow tailored to your
-                role.
-              </p>
-            </div>
-            <div class="grid grid-cols-2 gap-4 mt-10 max-w-xl">
-              <div
-                class="p-4 rounded-2xl bg-card/10 border border-primary-foreground/20 backdrop-blur-sm"
-              >
-                <p class="text-xs text-primary-foreground/70">AI Itineraries</p>
-                <p class="text-lg font-heading font-bold mt-2">Budget-aware trip planning</p>
-              </div>
-              <div
-                class="p-4 rounded-2xl bg-card/10 border border-primary-foreground/20 backdrop-blur-sm"
-              >
-                <p class="text-xs text-primary-foreground/70">Reservations</p>
-                <p class="text-lg font-heading font-bold mt-2">Secure booking workflows</p>
-              </div>
-              <div
-                class="p-4 rounded-2xl bg-card/10 border border-primary-foreground/20 backdrop-blur-sm"
-              >
-                <p class="text-xs text-primary-foreground/70">Guide Agenda</p>
-                <p class="text-lg font-heading font-bold mt-2">Availability and booking control</p>
-              </div>
-              <div
-                class="p-4 rounded-2xl bg-card/10 border border-primary-foreground/20 backdrop-blur-sm"
-              >
-                <p class="text-xs text-primary-foreground/70">Commerce</p>
-                <p class="text-lg font-heading font-bold mt-2">Artisan products and traceability</p>
-              </div>
-            </div>
+<div data-page="multi-role-authentication" class="signup-page-wrapper">
+
+  <!-- Decorative blob shapes -->
+  <div class="blob blob-top-left"></div>
+  <div class="blob blob-bottom-right"></div>
+
+  <!-- Centered card -->
+  <div class="signup-card">
+
+    <!-- Left: Form panel -->
+    <div class="form-panel">
+
+      <!-- Logo -->
+      <div class="logo-area">
+        <a routerLink="/">
+          <img src="/pics/LOGOPRINCIPALE.png" alt="MarocSphere" class="signup-logo" />
+        </a>
+      </div>
+
+      <h1 class="signup-title">Create account</h1>
+      <p class="signup-subtitle">Join the Moroccan tourism ecosystem</p>
+
+      <!-- Error / Success messages -->
+      @if (errorMessage()) {
+        <div class="error-banner">{{ errorMessage() }}</div>
+      }
+      @if (successMessage()) {
+        <div class="success-banner">{{ successMessage() }}</div>
+      }
+
+      <!-- Role selector -->
+      <div class="role-selector">
+        @for (role of roles; track role) {
+          <button
+            type="button"
+            (click)="selectRole(role)"
+            class="role-btn"
+            [class.role-btn-active]="selectedRole() === role"
+          >
+            @if (role === 'CLIENT') {
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M3 21a9 9 0 0 1 18 0"/></svg>
+            } @else {
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17.2l-6.2 4.1 2.4-7.4L2 9.4h7.6z"/></svg>
+            }
+            {{ role === 'CLIENT' ? 'Client' : 'Artisan' }}
+          </button>
+        }
+      </div>
+
+      <!-- Registration form -->
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="signup-form">
+
+        <!-- Row 1: First name + Last name -->
+        <div class="form-row-two">
+          <div class="input-group">
+            <input
+              type="text"
+              formControlName="prenom"
+              placeholder="First name"
+              class="signup-input"
+            />
+            <span class="input-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M3 21a9 9 0 0 1 18 0"/></svg>
+            </span>
+          </div>
+          <div class="input-group">
+            <input
+              type="text"
+              formControlName="nom"
+              placeholder="Last name"
+              class="signup-input"
+            />
           </div>
         </div>
-      </section>
-      <section class="bg-background px-6 lg:px-10 py-8 flex items-center justify-center">
-        <div
-          class="w-full max-w-2xl bg-card border border-border rounded-[2rem] shadow-md overflow-hidden"
-        >
-          <div class="p-6 border-b border-border bg-muted/40">
-            <div class="flex items-center justify-between gap-4">
-              <div>
-                <p class="text-sm font-semibold text-primary">Authentication</p>
-                <h3 class="text-3xl font-heading font-bold mt-2">Create your account</h3>
-              </div>
-              <div
-                class="hidden md:flex items-center gap-2 bg-background border border-border rounded-xl p-1"
-              >
-                <button
-                  class="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold"
-                >
-                  SignUp
-                </button>
-                <a routerLink="/login">
-                  <button class="px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground">
-                    Login
-                  </button>
-                </a>
-              </div>
-            </div>
+
+        <!-- Email -->
+        <div class="input-group">
+          <input
+            type="email"
+            formControlName="email"
+            placeholder="Email address"
+            class="signup-input"
+            autocomplete="email"
+          />
+          <span class="input-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          </span>
+        </div>
+
+        <!-- Password -->
+        <div class="input-group">
+          <input
+            type="password"
+            formControlName="password"
+            placeholder="Password (min. 6 characters)"
+            class="signup-input"
+            autocomplete="new-password"
+          />
+          <span class="input-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </span>
+        </div>
+
+        <!-- Row 2: Phone + Nationality -->
+        <div class="form-row-two">
+          <div class="input-group">
+            <input
+              type="tel"
+              formControlName="telephone"
+              placeholder="Phone"
+              class="signup-input"
+            />
+            <span class="input-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72c.13 1 .38 1.98.74 2.91a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.13 6.13l1.21-1.21a2 2 0 0 1 2.11-.45c.93.36 1.91.61 2.91.74a2 2 0 0 1 1.72 2.03z"/></svg>
+            </span>
           </div>
+          <div class="input-group">
+            <input
+              type="text"
+              formControlName="nationalite"
+              placeholder="Nationality"
+              class="signup-input"
+            />
+          </div>
+        </div>
 
-          <!-- Error / Success messages -->
-          @if (errorMessage()) {
-            <div class="mx-6 mt-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
-              {{ errorMessage() }}
-            </div>
-          }
-          @if (successMessage()) {
-            <div class="mx-6 mt-4 p-3 rounded-xl bg-green-50 border border-green-200 text-green-700 text-sm">
-              {{ successMessage() }}
-            </div>
-          }
+        <!-- Language preference -->
+        <div class="lang-section">
+          <p class="field-label">Preferred language</p>
+          <div class="lang-pills">
+            @for (lang of languages; track lang) {
+              <button
+                type="button"
+                (click)="selectLanguage(lang)"
+                class="lang-pill"
+                [class.lang-pill-active]="selectedLanguage() === lang"
+              >{{ lang }}</button>
+            }
+          </div>
+        </div>
 
-          <!-- Role Selection -->
-          <div class="px-6 pt-6 pb-2">
-            <p class="text-sm font-semibold text-primary">Select your role</p>
-            <div class="mt-2 grid grid-cols-2 gap-3">
-              @for (role of roles; track role) {
+        <!-- CLIENT-specific: Tier -->
+        @if (selectedRole() === 'CLIENT') {
+          <div class="role-section">
+            <p class="field-label">Subscription tier</p>
+            <div class="tier-pills">
+              @for (tier of tierOptions; track tier) {
                 <button
                   type="button"
-                  (click)="selectRole(role)"
-                  class="px-4 py-3 rounded-2xl font-semibold text-sm transition-colors"
-                  [class]="selectedRole() === role
-                    ? 'border border-primary bg-primary/5 shadow-sm text-foreground'
-                    : 'bg-muted text-foreground font-medium'"
-                >
-                  {{ role }}
-                </button>
+                  (click)="form.patchValue({ tierAbonnement: tier })"
+                  class="tier-pill"
+                  [class.tier-pill-active]="form.get('tierAbonnement')!.value === tier"
+                >{{ tier }}</button>
               }
             </div>
           </div>
+        }
 
-          <!-- Registration Form -->
-          <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-4 lg:p-8 space-y-6">
+        <!-- ARTISAN-specific fields -->
+        @if (selectedRole() === 'ARTISAN') {
+          <div class="role-section">
 
-            <!-- ── Common fields ── -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div class="space-y-4">
-                <div>
-                  <label class="text-sm font-medium">Prénom</label>
-                  <input
-                    type="text"
-                    formControlName="prenom"
-                    placeholder="Yasmine"
-                    class="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm"
-                  />
-                </div>
-                <div>
-                  <label class="text-sm font-medium">Nom</label>
-                  <input
-                    type="text"
-                    formControlName="nom"
-                    placeholder="Bensaid"
-                    class="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm"
-                  />
-                </div>
-                <div>
-                  <label class="text-sm font-medium">Email address</label>
-                  <input
-                    type="email"
-                    formControlName="email"
-                    placeholder="yasmine@marocsphere.com"
-                    class="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm"
-                  />
-                </div>
-                <div>
-                  <label class="text-sm font-medium">Password</label>
-                  <input
-                    type="password"
-                    formControlName="password"
-                    placeholder="Min 6 characters"
-                    class="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm"
-                  />
-                </div>
-              </div>
-              <div class="space-y-4">
-                <div>
-                  <label class="text-sm font-medium">Téléphone</label>
-                  <input
-                    type="tel"
-                    formControlName="telephone"
-                    placeholder="+212 6XX XX XX XX"
-                    class="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm"
-                  />
-                </div>
-                <div>
-                  <label class="text-sm font-medium">Nationality</label>
-                  <input
-                    type="text"
-                    formControlName="nationalite"
-                    class="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm"
-                  />
-                </div>
-                <div>
-                  <label class="text-sm font-medium">Preferred language</label>
-                  <div class="mt-2 grid grid-cols-2 gap-3">
-                    @for (lang of languages; track lang) {
-                      <button
-                        type="button"
-                        (click)="selectLanguage(lang)"
-                        class="px-4 py-3 rounded-xl font-medium text-sm transition-colors"
-                        [class]="selectedLanguage() === lang
-                          ? 'bg-secondary text-secondary-foreground font-semibold'
-                          : 'bg-muted text-foreground'"
-                      >
-                        {{ lang }}
-                      </button>
-                    }
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- ── CLIENT-specific fields ── -->
-            @if (selectedRole() === 'CLIENT') {
-              <div class="border-t border-border pt-5">
-                <p class="text-sm font-semibold text-primary mb-4">Informations client</p>
-                <div>
-                  <label class="text-sm font-medium">Tier d'abonnement</label>
-                  <div class="mt-2 grid grid-cols-3 gap-3">
-                    @for (tier of tierOptions; track tier) {
-                      <button
-                        type="button"
-                        (click)="form.patchValue({ tierAbonnement: tier })"
-                        class="px-4 py-3 rounded-xl font-medium text-sm transition-colors"
-                        [class]="form.get('tierAbonnement')!.value === tier
-                          ? 'border border-primary bg-primary/5 shadow-sm text-foreground font-semibold'
-                          : 'bg-muted text-foreground'"
-                      >
-                        {{ tier }}
-                      </button>
-                    }
-                  </div>
-                </div>
-              </div>
-            }
-
-            <!-- ── ARTISAN-specific fields ── -->
-            @if (selectedRole() === 'ARTISAN') {
-              <div class="border-t border-border pt-5">
-                <p class="text-sm font-semibold text-primary mb-4">Informations artisan</p>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-
-                  <!-- Catégorie -->
-                  <div class="lg:col-span-2">
-                    <label class="text-sm font-medium">Catégorie d'artisanat <span class="text-red-500">*</span></label>
-                    <select
-                      formControlName="categorieArtisanat"
-                      class="mt-2 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm"
-                    >
-                      <option value="" disabled>Choisir une catégorie...</option>
-                      @for (cat of categorieOptions; track cat) {
-                        <option [value]="cat">{{ cat }}</option>
-                      }
-                    </select>
-                  </div>
-
-                  <!-- Eligible export -->
-                  <div>
-                    <label class="text-sm font-medium block mb-2">Éligible à l'export</label>
-                    <div class="flex gap-3">
-                      <button
-                        type="button"
-                        (click)="form.patchValue({ eligibleExport: true })"
-                        class="flex-1 px-4 py-3 rounded-xl font-medium text-sm transition-colors"
-                        [class]="form.get('eligibleExport')!.value === true
-                          ? 'border border-primary bg-primary/5 shadow-sm text-foreground font-semibold'
-                          : 'bg-muted text-foreground'"
-                      >
-                        Oui
-                      </button>
-                      <button
-                        type="button"
-                        (click)="form.patchValue({ eligibleExport: false })"
-                        class="flex-1 px-4 py-3 rounded-xl font-medium text-sm transition-colors"
-                        [class]="form.get('eligibleExport')!.value === false
-                          ? 'border border-primary bg-primary/5 shadow-sm text-foreground font-semibold'
-                          : 'bg-muted text-foreground'"
-                      >
-                        Non
-                      </button>
-                    </div>
-                  </div>
-
-                  <!-- Indépendant -->
-                  <div>
-                    <label class="text-sm font-medium block mb-2">Statut</label>
-                    <div class="flex gap-3">
-                      <button
-                        type="button"
-                        (click)="form.patchValue({ independant: true, cooperativeId: null })"
-                        class="flex-1 px-4 py-3 rounded-xl font-medium text-sm transition-colors"
-                        [class]="form.get('independant')!.value === true
-                          ? 'border border-primary bg-primary/5 shadow-sm text-foreground font-semibold'
-                          : 'bg-muted text-foreground'"
-                      >
-                        Indépendant
-                      </button>
-                      <button
-                        type="button"
-                        (click)="form.patchValue({ independant: false })"
-                        class="flex-1 px-4 py-3 rounded-xl font-medium text-sm transition-colors"
-                        [class]="form.get('independant')!.value === false
-                          ? 'border border-primary bg-primary/5 shadow-sm text-foreground font-semibold'
-                          : 'bg-muted text-foreground'"
-                      >
-                        En coopérative
-                      </button>
-                    </div>
-                  </div>
-
-                  <!-- Cooperative name — visible seulement si pas indépendant -->
-                  @if (!isIndependant) {
-                    <div class="lg:col-span-2">
-                      <label class="text-sm font-medium">Nom de la coopérative</label>
-                      <div class="relative mt-2">
-                        <input
-                          type="text"
-                          formControlName="cooperativeNom"
-                          placeholder="Ex: Coopérative Tissage Fès"
-                          class="w-full rounded-xl border px-4 py-3 text-sm pr-10"
-                          [class]="cooperativeCheckStatus() === 'found'
-                            ? 'border-green-400 bg-green-50'
-                            : cooperativeCheckStatus() === 'not-found'
-                              ? 'border-red-400 bg-red-50'
-                              : 'border-input bg-background'"
-                        />
-                        <!-- Spinner while checking -->
-                        @if (cooperativeCheckStatus() === 'checking') {
-                          <span class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs animate-pulse">
-                            ⏳
-                          </span>
-                        }
-                        <!-- Found checkmark -->
-                        @if (cooperativeCheckStatus() === 'found') {
-                          <span class="absolute right-3 top-1/2 -translate-y-1/2 text-green-500 text-base">✓</span>
-                        }
-                        <!-- Not found cross -->
-                        @if (cooperativeCheckStatus() === 'not-found') {
-                          <span class="absolute right-3 top-1/2 -translate-y-1/2 text-red-500 text-base">✗</span>
-                        }
-                      </div>
-                      <!-- Feedback messages -->
-                      @if (cooperativeCheckStatus() === 'found') {
-                        <p class="mt-1 text-xs text-green-600">
-                          Coopérative trouvée : <strong>{{ cooperativeFoundName() }}</strong>
-                        </p>
-                      }
-                      @if (cooperativeCheckStatus() === 'not-found') {
-                        <p class="mt-1 text-xs text-red-500">
-                          Aucune coopérative trouvée avec ce nom. Vérifiez l'orthographe.
-                        </p>
-                      }
-                      @if (cooperativeCheckStatus() === 'idle') {
-                        <p class="mt-1 text-xs text-muted-foreground">
-                          Saisissez le nom exact de votre coopérative.
-                        </p>
-                      }
-                    </div>
-                  }
-
-                </div>
-              </div>
-            }
-
-            <!-- Submit -->
-            <div class="flex items-center justify-end pt-2">
-              <button
-                type="submit"
-                [disabled]="isLoading()"
-                class="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-semibold shadow-md disabled:opacity-50"
-              >
-                @if (isLoading()) {
-                  Création en cours...
-                } @else {
-                  Créer mon compte
+            <!-- Category -->
+            <div class="input-group">
+              <select formControlName="categorieArtisanat" class="signup-select">
+                <option value="" disabled>Craft category *</option>
+                @for (cat of categorieOptions; track cat) {
+                  <option [value]="cat">{{ cat }}</option>
                 }
-              </button>
+              </select>
             </div>
-          </form>
-        </div>
-      </section>
+
+            <!-- Eligible for export + Independent -->
+            <div class="form-row-two" style="margin-top: 12px;">
+              <div>
+                <p class="field-label">Export eligible</p>
+                <div class="toggle-group">
+                  <button type="button"
+                    (click)="form.patchValue({ eligibleExport: true })"
+                    class="toggle-btn"
+                    [class.toggle-btn-active]="form.get('eligibleExport')!.value === true">Yes</button>
+                  <button type="button"
+                    (click)="form.patchValue({ eligibleExport: false })"
+                    class="toggle-btn"
+                    [class.toggle-btn-active]="form.get('eligibleExport')!.value === false">No</button>
+                </div>
+              </div>
+              <div>
+                <p class="field-label">Status</p>
+                <div class="toggle-group">
+                  <button type="button"
+                    (click)="form.patchValue({ independant: true, cooperativeId: null })"
+                    class="toggle-btn"
+                    [class.toggle-btn-active]="form.get('independant')!.value === true">Independent</button>
+                  <button type="button"
+                    (click)="form.patchValue({ independant: false })"
+                    class="toggle-btn"
+                    [class.toggle-btn-active]="form.get('independant')!.value === false">Cooperative</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Cooperative name -->
+            @if (!isIndependant) {
+              <div class="input-group" style="margin-top: 12px;">
+                <input
+                  type="text"
+                  formControlName="cooperativeNom"
+                  placeholder="Cooperative name"
+                  class="signup-input"
+                  [class.input-found]="cooperativeCheckStatus() === 'found'"
+                  [class.input-error]="cooperativeCheckStatus() === 'not-found'"
+                />
+                <span class="input-icon">
+                  @if (cooperativeCheckStatus() === 'checking') {
+                    <span class="status-checking">⏳</span>
+                  }
+                  @if (cooperativeCheckStatus() === 'found') {
+                    <span class="status-found">✓</span>
+                  }
+                  @if (cooperativeCheckStatus() === 'not-found') {
+                    <span class="status-notfound">✗</span>
+                  }
+                </span>
+              </div>
+              @if (cooperativeCheckStatus() === 'found') {
+                <p class="hint-found">Found: <strong>{{ cooperativeFoundName() }}</strong></p>
+              }
+              @if (cooperativeCheckStatus() === 'not-found') {
+                <p class="hint-error">No cooperative found with this name.</p>
+              }
+            }
+
+          </div>
+        }
+
+        <!-- Submit -->
+        <button
+          type="submit"
+          [disabled]="isLoading()"
+          class="signup-btn"
+        >
+          @if (isLoading()) {
+            Creating account...
+          } @else {
+            Create account &nbsp;→
+          }
+        </button>
+
+      </form>
+
+      <!-- Login link -->
+      <p class="login-prompt">
+        Already have an account?&nbsp;
+        <a routerLink="/login" class="login-link">Log in</a>
+      </p>
+
     </div>
+
+    <!-- Right: Moroccan photo -->
+    <div class="photo-panel">
+      <img
+        src="/images/marrakech2.png"
+        alt="Morocco"
+        class="signup-photo"
+      />
+      <div class="photo-caption">One platform.
+Four account types.</div>
+    </div>
+
   </div>
 </div>

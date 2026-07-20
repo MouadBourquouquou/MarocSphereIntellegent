@@ -1,0 +1,274 @@
+/* =====================================================
+   Login Page — New Design
+   ===================================================== */
+
+/* Page wrapper: full viewport, centered, br.png background */
+.login-page-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: url('/images/br.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  overflow: hidden;
+  font-family: 'Outfit', sans-serif;
+}
+
+/* Overlay to keep the card readable */
+.login-page-wrapper::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(245, 232, 218, 0.55);
+  z-index: 0;
+}
+
+/* ── Decorative blobs — hidden (background image used instead) ── */
+.blob { display: none; }
+
+/* ── Main card ── */
+.login-card {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: min(900px, 95vw);
+  min-height: 500px;
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 24px 60px -12px rgba(100, 40, 20, 0.18);
+  overflow: hidden;
+}
+
+/* ── Left: form panel ── */
+.form-panel {
+  flex: 0 0 46%;
+  padding: 52px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: #ffffff;
+}
+
+/* Logo */
+.logo-area {
+  margin-bottom: 28px;
+}
+
+.login-logo {
+  height: 56px;
+  width: auto;
+  object-fit: contain;
+}
+
+/* Title */
+.welcome-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1614;
+  margin: 0 0 32px 0;
+  line-height: 1.2;
+  font-family: 'Outfit', sans-serif;
+}
+
+/* Error banner */
+.error-banner {
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  font-size: 0.875rem;
+}
+
+/* Form */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Input group — underline style */
+.input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.login-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1.5px solid #c8b9ae;
+  border-radius: 0;
+  padding: 10px 40px 10px 4px;
+  font-size: 0.925rem;
+  color: #2e2a25;
+  font-family: 'Outfit', sans-serif;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.login-input::placeholder {
+  color: #9e9085;
+}
+
+.login-input:focus {
+  border-bottom-color: #9d3e26;
+}
+
+.input-icon {
+  position: absolute;
+  right: 6px;
+  color: #9e9085;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+
+/* Remember me + Forgot password row */
+.form-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: -4px;
+}
+
+.remember-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  color: #5c5852;
+  cursor: pointer;
+  user-select: none;
+}
+
+.remember-checkbox {
+  width: 15px;
+  height: 15px;
+  accent-color: #9d3e26;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+.forgot-link {
+  font-size: 0.875rem;
+  color: #9d3e26;
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity 0.15s ease;
+}
+
+.forgot-link:hover {
+  opacity: 0.75;
+  text-decoration: underline;
+}
+
+/* Login button */
+.login-btn {
+  width: 100%;
+  padding: 13px 24px;
+  background-color: #9d3e26;
+  color: #ffffff;
+  border: none;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: 'Outfit', sans-serif;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  margin-top: 4px;
+}
+
+.login-btn:hover:not(:disabled) {
+  background-color: #872f1a;
+  transform: translateY(-1px);
+}
+
+.login-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.login-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Sign-up prompt */
+.signup-prompt {
+  margin-top: 20px;
+  font-size: 0.875rem;
+  color: #6b6762;
+  text-align: center;
+}
+
+.signup-link {
+  color: #9d3e26;
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+
+.signup-link:hover {
+  text-decoration: underline;
+  opacity: 0.8;
+}
+
+/* ── Right: photo panel ── */
+.photo-panel {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  border-radius: 0 24px 24px 0;
+}
+
+.riad-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Caption overlay */
+.photo-caption {
+  position: absolute;
+  bottom: 28px;
+  left: 28px;
+  right: 28px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.45);
+  font-family: 'Outfit', sans-serif;
+}
+
+/* ── Responsive ── */
+@media (max-width: 680px) {
+  .photo-panel {
+    display: none;
+  }
+
+  .form-panel {
+    flex: 1;
+    padding: 40px 32px;
+  }
+
+  .login-card {
+    border-radius: 20px;
+  }
+
+  .blob-top-left {
+    width: 240px;
+    height: 220px;
+  }
+
+  .blob-bottom-right {
+    width: 260px;
+    height: 240px;
+  }
+}
