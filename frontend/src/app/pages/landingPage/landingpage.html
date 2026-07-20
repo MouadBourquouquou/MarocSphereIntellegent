@@ -3,7 +3,7 @@
   <div class="fine-grain-overlay"></div>
 
   <div
-    class="min-h-screen w-full bg-background flex flex-col relative text-foreground font-sans zellige-pattern"
+    class="min-h-screen w-full bg-background flex flex-col relative text-foreground font-sans"
   >
     <header class="hero-nav absolute inset-x-0 top-0 z-50">
       <div class="max-w-7xl mx-auto px-6 flex items-center justify-between gap-4 transition-all duration-300">
@@ -18,22 +18,22 @@
         <nav class="hidden md:flex items-center gap-1.5 bg-card/65 backdrop-blur-sm border border-border/40 rounded-full px-2 py-1.5 shadow-sm transition-all duration-300 hover:border-border/80">
           <a
             href="#blogs"
-            class="px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-primary hover:bg-background/95 transition-all duration-300 hover-underline"
+            class="px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-primary hover:bg-background/95 transition-all duration-300 "
             >Blogs</a
           >
           <a
             href="#services"
-            class="px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-primary hover:bg-background/95 transition-all duration-300 hover-underline"
+            class="px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-primary hover:bg-background/95 transition-all duration-300 "
             >Our services</a
           >
           <a
             href="#experiences"
-            class="px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-primary hover:bg-background/95 transition-all duration-300 hover-underline"
+            class="px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-primary hover:bg-background/95 transition-all duration-300 "
             >Experiences</a
           >
           <a
             href="#reviews"
-            class="px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-primary hover:bg-background/95 transition-all duration-300 hover-underline"
+            class="px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-primary hover:bg-background/95 transition-all duration-300 "
             >Reviews</a
           >
         </nav>
@@ -54,255 +54,228 @@
       </div>
     </header>
         <main class="flex-1">
-          <section class="hero-landing border-b border-border relative overflow-hidden">
-            <!-- Background Decorative Stars -->
-            <div class="absolute top-10 left-10 w-32 h-32 opacity-10 bg-no-repeat bg-contain zellige-pattern pointer-events-none"></div>
-            <div class="absolute bottom-10 right-10 w-48 h-48 opacity-10 bg-no-repeat bg-contain zellige-pattern pointer-events-none"></div>
+          <section class="hero-landing" aria-label="Hero">
 
-            <div
-              class="hero-landing-inner max-w-7xl mx-auto px-6 py-16 lg:py-24 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
-            >
-              <!-- LEFT COLUMN -->
-              <div class="hero-copy flex flex-col justify-center">
-                <!-- Eyebrow Badge -->
-                <div class="hero-eyebrow self-start inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#FFFDF8] border border-[#2E2A25]/10 shadow-sm text-xs font-semibold text-[#1E5B44] mb-8">
-                  <span>1st AI-powered Moroccan travel planning platform</span>
-                </div>
-                
-                <!-- H1 -->
-                <h1 class="hero-title text-6xl lg:text-6.5xl leading-tight font-heading font-bold text-[#2E2A25] tracking-tight mb-4" aria-label="Discover Morocco Beyond the Map">
-                  <span class="hero-title__line hero-title__line--primary" aria-hidden="true">Discover Morocco</span>
-                  <span class="hero-title__line hero-title__line--accent" aria-hidden="true">Beyond the Map</span>
+            <!-- Full-bleed Koutoubia Tower background image -->
+            <div class="hero-bg" aria-hidden="true">
+              <img
+                src="/images/morocco-minaret-hero.png"
+                alt=""
+                class="hero-bg__img"
+              />
+              <!-- Cinematic warm color grade overlay -->
+              <div class="hero-bg__grade"></div>
+              <!-- Left-to-right gradient for text readability -->
+              <div class="hero-bg__fade"></div>
+              <!-- Subtle bottom vignette -->
+              <div class="hero-bg__vignette"></div>
+            </div>
+
+            <!-- Floating particles -->
+            <div class="hero-particles" aria-hidden="true">
+              <span class="hero-particle" style="--px:8%;--py:22%;--pd:3.2s;--ps:4px;--po:0.35"></span>
+              <span class="hero-particle" style="--px:14%;--py:68%;--pd:4.1s;--ps:3px;--po:0.25"></span>
+              <span class="hero-particle" style="--px:22%;--py:40%;--pd:2.8s;--ps:5px;--po:0.30"></span>
+              <span class="hero-particle" style="--px:6%;--py:82%;--pd:3.6s;--ps:3px;--po:0.20"></span>
+              <span class="hero-particle" style="--px:32%;--py:15%;--pd:2.4s;--ps:4px;--po:0.28"></span>
+            </div>
+
+            <!-- Content: left-aligned, over the image -->
+            <div class="hero-inner">
+              <div class="hero-copy">
+
+                <p class="hero-eyebrow">AI-Powered Moroccan Travel</p>
+
+                <h1 class="hero-title" aria-label="Discover Morocco Beyond the Map">
+                  Discover<br>
+                  <span class="hero-title__line2">Morocco</span><br>
+                  <span class="hero-title__accent">Beyond the Map</span>
                 </h1>
-                
-                <!-- Sub line -->
-                <p class="hero-description text-base lg:text-lg text-[#2E2A25]/60 max-w-xl leading-relaxed mb-8">
-                  AI-crafted journeys through hidden souks, desert camps, and mountain villages.
+
+                <p class="hero-description">
+                  AI-crafted journeys through hidden souks, desert&nbsp;camps,
+                  and mountain villages — curated for the curious traveller.
                 </p>
-                
-                <!-- CTAs -->
-                <div class="hero-actions flex flex-wrap gap-4 mb-6">
-                  <a href="#" class="hero-primary-action inline-flex items-center justify-center px-8 py-3.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#B03A22] text-[#F6F1E8] transition-all duration-300">
-                    Start Your Journey
+
+                <div class="hero-actions">
+                  <a href="#" class="hero-cta-primary">
+                    <span>Start Your Journey</span>
+                    <iconify-icon icon="lucide:arrow-right" aria-hidden="true"></iconify-icon>
                   </a>
-                  <a href="#" class="hero-secondary-action inline-flex items-center justify-center px-8 py-3.5 rounded-full text-xs font-bold uppercase tracking-wider bg-white text-[#2E2A25] border border-[#2E2A25]/20 transition-all duration-300">
-                    Let's Collaborate
+                  <a href="#" class="hero-cta-secondary">
+                    <span>Let's Collaborate</span>
                   </a>
                 </div>
 
-                <!-- Trust Row -->
-                <p class="hero-proof text-sm font-semibold text-[#2E2A25]/50">
-                  ★ 4.9 · 320+ certified guides · 12k AI itineraries
-                </p>
-              </div>
-              
-              <!-- RIGHT COLUMN: Slideshow Frame -->
-              <div class="relative w-full aspect-[16/10] rounded-2xl shadow-lg overflow-hidden group hero-slideshow-frame">
-                   
-                <!-- Crossfading Images -->
-                @for (slide of heroSlides; track slide; let i = $index) {
-                  <div 
-                    class="absolute inset-0 transition-opacity duration-1000 ease-in-out"
-                    [class.opacity-100]="activeSlideIndex() === i"
-                    [class.opacity-0]="activeSlideIndex() !== i"
-                    [class.z-10]="activeSlideIndex() === i"
-                    [class.z-0]="activeSlideIndex() !== i"
-                  >
-                    <img
-                      [src]="slide"
-                      alt="Moroccan Landscape"
-                      class="w-full h-full object-cover origin-center"
-                      [class.animate-ken-burns-slide]="activeSlideIndex() === i"
-                    />
-                  </div>
-                }
-
-                <!-- Instagram-style Progress Segments -->
-                <div class="absolute bottom-4 left-6 right-6 z-30 flex gap-2">
-                  @for (slide of heroSlides; track slide; let i = $index) {
-                    <div class="flex-1 h-1 bg-white/30 rounded-full overflow-hidden">
-                      <div 
-                        class="h-full bg-[#B03A22] rounded-full"
-                        [class.w-full]="activeSlideIndex() > i"
-                        [class.w-0]="activeSlideIndex() < i"
-                        [class.animate-progress-fill]="activeSlideIndex() === i"
-                      ></div>
-                    </div>
-                  }
+                <div class="hero-proof">
+                  <span class="hero-proof__stars" aria-hidden="true">★★★★★</span>
+                  <span class="hero-proof__text">4.9 · 320+ certified guides · 12k AI itineraries</span>
                 </div>
 
-                <!-- Floating Card 1: AI Planner Focus -->
-                <div class="hero-info-card absolute bottom-5 left-5 z-20 w-[280px] rounded-2xl bg-[#F6F1E8]/95 border border-[#2E2A25]/10 p-4 shadow-xl backdrop-blur-md">
-                  <div class="flex items-center justify-between">
-                    <div>
-                      <p class="text-[10px] uppercase tracking-wider text-[#2E2A25]/60 font-bold">
-                        AI Planner Focus
-                      </p>
-                      <p class="text-base font-heading font-bold text-[#2E2A25] mt-0.5">
-                        7-Day Morocco Escape
-                      </p>
-                    </div>
-                    <!-- Static READY Badge -->
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1E5B44]/10 text-[#B03A22] text-[10px] font-bold uppercase tracking-wider">
-                      <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#1E5B44]"></span>
-                      Ready
-                    </span>
-                  </div>
-                  <p class="text-xs text-[#2E2A25]/70 mt-2 leading-relaxed">
-                    Budget-aware itinerary with riads, guides, artisan stops, and route planning.
-                  </p>
-                </div>
-
-                <!-- Floating Card 2: Live Navigation -->
-                <div class="hero-info-card absolute bottom-24 right-5 z-20 w-[260px] rounded-2xl bg-[#F6F1E8]/95 border border-[#2E2A25]/10 p-4 shadow-xl backdrop-blur-md">
-                  <p class="text-[10px] uppercase tracking-wider text-[#2E2A25]/60 font-bold">
-                    Live Navigation
-                  </p>
-                  <div class="mt-1.5 flex items-center gap-1.5 text-xs font-semibold text-[#2E2A25]">
-                    <iconify-icon icon="lucide:map-pin" class="text-[#1E5B44] text-sm"></iconify-icon>
-                    <span>Bahia Palace, certified guide, zellige</span>
-                  </div>
-                  <p class="text-xs text-[#2E2A25]/70 mt-2 leading-relaxed">
-                    Interactive map with route guidance and category markers.
-                  </p>
-                </div>
               </div>
             </div>
-            
-            <!--  Stats Section --> 
-            <div class="hero-stats max-w-7xl mx-auto px-6 pb-16 reveal-on-scroll">
-              <div #statsSection class="grid grid-cols-2 md:grid-cols-4 gap-6">
-                <div
-                  class="p-6 rounded-2xl bg-card border border-border/40 shadow-sm text-center hover:shadow-md transition-all duration-300"
-                >
-                  <p class="text-xs uppercase tracking-wider text-muted-foreground font-bold">
-                    Certified Guides
-                  </p>
-                  <p class="text-4xl font-heading font-bold text-primary mt-2">
-                    {{ statsGuides() }}+
-                  </p>
-                </div>
-                <div
-                  class="p-6 rounded-2xl bg-card border border-border/40 shadow-sm text-center hover:shadow-md transition-all duration-300"
-                >
-                  <p class="text-xs uppercase tracking-wider text-muted-foreground font-bold">Local Artisans</p>
-                  <p
-                    class="text-4xl font-heading font-bold text-secondary mt-2"
-                  >
-                    {{ statsArtisans() }}+
-                  </p>
-                </div>
-                <div
-                  class="p-6 rounded-2xl bg-card border border-border/40 shadow-sm text-center hover:shadow-md transition-all duration-300"
-                >
-                  <p class="text-xs uppercase tracking-wider text-muted-foreground font-bold">Cities Covered</p>
-                  <p class="text-4xl font-heading font-bold text-primary mt-2">
-                    {{ statsCities() }}
-                  </p>
-                </div>
-                <div
-                  class="p-6 rounded-2xl bg-card border border-border/40 shadow-sm text-center hover:shadow-md transition-all duration-300"
-                >
-                  <p class="text-xs uppercase tracking-wider text-muted-foreground font-bold">AI Itineraries</p>
-                  <p
-                    class="text-4xl font-heading font-bold text-secondary mt-2"
-                  >
-                    {{ statsItineraries() }}k
-                  </p>
-                </div>
+
+            <!-- Scroll hint -->
+            <div class="hero-scroll" aria-hidden="true">
+              <span class="hero-scroll__line"></span>
+            </div>
+
+          </section>
+
+          <!-- ─── Statistics — own section, clean white background, never overlapping hero ─── -->
+          <section class="trust-stats" #statsSection>
+            <div class="trust-stats__inner">
+              <div class="trust-stats__item">
+                <span class="trust-stats__value">4.9</span>
+                <span class="trust-stats__label">★★★★★&nbsp; Platform rating</span>
+              </div>
+              <div class="trust-stats__divider"></div>
+              <div class="trust-stats__item">
+                <span class="trust-stats__value">{{ statsGuides() }}+</span>
+                <span class="trust-stats__label">Certified guides</span>
+              </div>
+              <div class="trust-stats__divider"></div>
+              <div class="trust-stats__item">
+                <span class="trust-stats__value">{{ statsArtisans() }}+</span>
+                <span class="trust-stats__label">Local artisans</span>
+              </div>
+              <div class="trust-stats__divider"></div>
+              <div class="trust-stats__item">
+                <span class="trust-stats__value">{{ statsCities() }}</span>
+                <span class="trust-stats__label">Cities covered</span>
+              </div>
+              <div class="trust-stats__divider"></div>
+              <div class="trust-stats__item">
+                <span class="trust-stats__value">{{ statsItineraries() }}K</span>
+                <span class="trust-stats__label">AI itineraries</span>
               </div>
             </div>
           </section>
 
-          <!-- Latest Blogs Section -->
-          <section class="py-20 border-b border-border bg-background relative" id="blogs">
-            <div class="absolute top-1/2 left-0 w-24 h-48 opacity-5 bg-no-repeat bg-contain zellige-pattern pointer-events-none"></div>
+          <!-- Featured Experiences — Premium Editorial Showcase -->
+          <section class="editorial-section py-28 relative" id="experiences">
+            <div class="max-w-7xl mx-auto px-6">
 
-            <div class="max-w-7xl mx-auto px-6 space-y-10 reveal-on-scroll">
-              <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div>
-                  <p class="text-xs uppercase tracking-wider font-bold text-primary">Latest Blogs</p>
-                  <h3 class="text-3xl lg:text-4xl font-heading font-bold mt-2">
-                    Stories shaping modern Moroccan tourism
+              <!-- Two-Column Layout -->
+              <div class="editorial-layout">
+
+                <!-- LEFT: Content Column (40%) -->
+                <div class="editorial-content">
+
+                  <p class="editorial-content__eyebrow">Featured Experiences</p>
+
+                  <h3 class="editorial-content__title">
+                    Signature journeys <br>
+                    <span class="editorial-content__title-accent">across Morocco</span>
                   </h3>
+
+                  <p class="editorial-content__desc">
+                    Curated travel experiences that connect you with the soul of Morocco —
+                    from desert horizons to medina sunsets.
+                  </p>
+
+                  <!-- Destination Title (animated) -->
+                  <div class="editorial-exp-info">
+                    <h4 class="editorial-exp-info__title">{{ selectedExperience.title }}</h4>
+
+                    <!-- Rating inline -->
+                    <div class="editorial-exp-info__rating">
+                      @for (star of [1,2,3,4,5]; track star) {
+                        <iconify-icon icon="lucide:star" class="editorial-exp-info__star"></iconify-icon>
+                      }
+                      <span class="editorial-exp-info__rating-value">{{ selectedExperience.rating }}</span>
+                    </div>
+
+                    <p class="editorial-exp-info__desc">{{ selectedExperience.description }}</p>
+
+                    <!-- Price integrated naturally -->
+                    <div class="editorial-exp-info__price">
+                      <span class="editorial-exp-info__price-from">From</span>
+                      <span class="editorial-exp-info__price-value">{{ selectedExperience.price }}</span>
+                    </div>
+
+                    <!-- Duration • Location -->
+                    <div class="editorial-exp-info__meta">
+                      <span>{{ selectedExperience.duration }}</span>
+                      <span class="editorial-exp-info__meta-dot"></span>
+                      <span>{{ selectedExperience.location }}</span>
+                    </div>
+                  </div>
+
+                  <!-- Travel Statistic -->
+                  <div class="editorial-stat">
+                    <span class="editorial-stat__number">500+</span>
+                    <span class="editorial-stat__label">Curated Experiences Across Morocco</span>
+                  </div>
+
+                  <!-- CTAs -->
+                  <div class="editorial-ctas">
+                    <button class="editorial-ctas__primary">
+                      <span>Reserve Your Journey</span>
+                      <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+                    </button>
+                    <a href="#" class="editorial-ctas__secondary">
+                      View all experiences
+                      <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+                    </a>
+                  </div>
+
                 </div>
-                
-                <!-- Category Filters -->
-                <div class="flex flex-wrap gap-2 text-xs">
-                  <button
-                    (click)="setBlogCategory('All')"
-                    [class.bg-primary]="selectedBlogCategory() === 'All'"
-                    [class.text-primary-foreground]="selectedBlogCategory() === 'All'"
-                    [class.bg-card]="selectedBlogCategory() !== 'All'"
-                    class="px-4 py-2 rounded-full border border-border/80 font-bold uppercase tracking-wider cursor-pointer transition-all duration-300 hover:scale-105 active:scale-95"
-                  >All</button>
-                  @for (cat of ['Tourism', 'Culture', 'Moroccan Heritage']; track cat) {
+
+                <!-- RIGHT: Cinematic Image (60%) -->
+                <div class="editorial-image">
+                  <div class="editorial-image__frame">
+                    <img
+                      [src]="selectedExperience.image"
+                      [alt]="selectedExperience.title"
+                      class="editorial-image__img"
+                    >
+                    <div class="editorial-image__gradient"></div>
+
+                    <!-- Cinematic overlay text -->
+                    <div class="editorial-image__overlay">
+                      <span class="editorial-image__subtitle">{{ selectedExperience.subtitle }}</span>
+                      <h3 class="editorial-image__dest-title">{{ selectedExperience.location }}</h3>
+                      <div class="editorial-image__overlay-rating">
+                        <iconify-icon icon="lucide:star"></iconify-icon>
+                        <span>{{ selectedExperience.rating }}</span>
+                      </div>
+                    </div>
+
+                    <!-- Wishlist -->
                     <button
-                      (click)="setBlogCategory(cat)"
-                      [class.bg-primary]="selectedBlogCategory() === cat"
-                      [class.text-primary-foreground]="selectedBlogCategory() === cat"
-                      [class.bg-card]="selectedBlogCategory() !== cat"
-                      class="px-4 py-2 rounded-full border border-border/80 font-bold uppercase tracking-wider cursor-pointer transition-all duration-300 hover:scale-105 active:scale-95"
-                    >{{ cat }}</button>
-                  }
+                      (click)="toggleWishlist(selectedExperienceId())"
+                      class="editorial-image__wishlist"
+                    >
+                      <iconify-icon
+                        [icon]="wishlist()[selectedExperienceId()] ? 'mdi:heart' : 'mdi:heart-outline'"
+                        [class.text-primary]="wishlist()[selectedExperienceId()]"
+                        class="text-xl transition-all duration-300"
+                        [class.scale-125]="wishlist()[selectedExperienceId()]"
+                      ></iconify-icon>
+                    </button>
+                  </div>
                 </div>
+
               </div>
-              
-              <!-- Dynamic Blog Slider -->
-              <swiper-container
-                slides-per-view="1"
-                breakpoints='{"768": {"slidesPerView": 2}, "1024": {"slidesPerView": 3}}'
-                space-between="30"
-                navigation="true"
-                pagination="true"
-                grab-cursor="true"
-                class="pb-12"
-              >
-                @for (blog of filteredBlogs(); track blog.title) {
-                  <swiper-slide>
-                    <!-- Card -->
-                    <article
-                      class="rounded-2xl overflow-hidden card-premium h-[480px] flex flex-col justify-between"
-                    > 
-                      <div class="overflow-hidden h-52">
-                        <img
-                          [src]="blog.image"
-                          [alt]="blog.title"
-                          class="w-full h-full object-cover transition-transform duration-500 hover:scale-110 pointer-events-none"
-                        />
-                      </div>
-                      <div class="p-6 flex-1 flex flex-col justify-between bg-card">
-                        <div>
-                          <div
-                            class="flex items-center gap-2 text-xs text-muted-foreground"
-                          >
-                            <span class="text-secondary font-bold">{{ blog.category }}</span><span>•</span><span>{{ blog.date }}</span>
-                          </div>
-                          <h4 class="font-heading font-bold text-lg mt-3 text-foreground leading-snug">
-                            {{ blog.title }}
-                          </h4>
-                          <p class="text-sm text-muted-foreground mt-2 leading-relaxed line-clamp-3">
-                            {{ blog.description }}
-                          </p>
-                        </div>
-                        <div class="mt-4 pt-4 border-t border-border/40 flex items-center justify-between text-xs">
-                          <span class="text-muted-foreground font-semibold"
-                            >{{ blog.author }}</span
-                          >
-                          <a
-                            [href]="blog.link"
-                            class="font-bold text-primary hover:text-primary/80 transition-colors inline-flex items-center gap-1 group/btn"
-                            >Read More <iconify-icon icon="lucide:arrow-right" class="text-sm transition-transform duration-300 group-hover/btn:translate-x-1"></iconify-icon></a
-                          >
-                        </div>
-                      </div>
-                    </article>
-                  </swiper-slide>
+
+              <!-- Premium Numbered Destination Selector -->
+              <div class="editorial-nav reveal-on-scroll">
+                @for (exp of experiences; track exp.id; let i = $index) {
+                  <button
+                    class="editorial-nav__item"
+                    [class.editorial-nav__item--active]="selectedExperienceId() === exp.id"
+                    (click)="selectExperience(exp.id)"
+                  >
+                    <span class="editorial-nav__num">{{ (i + 1).toString().padStart(2, '0') }}</span>
+                    <span class="editorial-nav__text">{{ exp.location }}</span>
+                    <span class="editorial-nav__line"></span>
+                  </button>
                 }
-              </swiper-container>
+              </div>
+
             </div>
           </section>
-
 
           <section class="py-20 border-b border-border bg-card relative" id="identity-section">
             <div class="absolute top-0 right-0 w-48 h-48 opacity-5 bg-no-repeat bg-contain zellige-pattern pointer-events-none"></div>
@@ -317,7 +290,7 @@
                 </h3>
                 <p class="text-muted-foreground mt-4 leading-relaxed text-sm">
                   We are building the digital bridge between travelers and
-                  Morocco’s most authentic experiences through certified guides,
+                  Morocco's most authentic experiences through certified guides,
                   trusted DMCs, AI-powered planning, and artisan commerce rooted
                   in cultural heritage.
                 </p>
@@ -360,457 +333,7 @@
               </div>
             </div>
           </section>
-          <!-- What We Offer (Services) Section -->
-          <section class="py-20 border-b border-border bg-muted/30 relative" id="services">
-            <div class="absolute bottom-0 left-0 w-36 h-36 opacity-5 bg-no-repeat bg-contain zellige-pattern pointer-events-none"></div>
 
-            <div class="max-w-7xl mx-auto px-6 space-y-12">
-              <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 reveal-on-scroll">
-                <div>
-                  <p class="text-xs uppercase tracking-wider font-bold text-primary">
-                    What We Offer
-                  </p>
-                  <h3 class="text-3xl lg:text-4xl font-heading font-bold mt-2">
-                    Travel that matters
-                  </h3>
-                </div>
-                <p class="text-sm text-muted-foreground max-w-2xl leading-relaxed">
-                  MarocSphere connects conscious travelers with authentic experiences 
-                  that directly support Moroccan communities.
-                </p>
-              </div>
-
-              <!-- Main 4 Services Grid -->
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 reveal-on-scroll">
-                
-                <!-- Service 1 -->
-                <div
-                  class="p-5 rounded-2xl bg-card border border-border/40 shadow-sm hover:shadow-lg transition-all duration-300 group flex flex-col justify-between"
-                >
-                  <div>
-                    <div class="overflow-hidden rounded-xl h-52">
-                      <img
-                        src="/images/Morocco (1).jpg"
-                        alt="Discover Authentic Experiences"
-                        class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 pointer-events-none"
-                      >
-                    </div>
-                    <h4 class="text-lg mt-4 font-heading font-bold text-foreground leading-snug">
-                      Discover Authentic Experiences
-                    </h4>
-                    <p class="mt-2.5 text-xs text-muted-foreground leading-relaxed">
-                      Browse curated cultural escapes, medina walks, desert tours,
-                      and immersive stays.
-                    </p>
-                  </div>
-                  <div class="mt-4 pt-3 border-t border-border/20 flex items-center gap-1.5 text-xs text-primary font-bold uppercase tracking-wider opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300">
-                    Explore <iconify-icon icon="lucide:arrow-right" class="text-sm"></iconify-icon>
-                  </div>
-                </div>
-
-                <!-- Service 2 -->
-                <div
-                  class="p-5 rounded-2xl bg-card border border-border/40 shadow-sm hover:shadow-lg transition-all duration-300 group flex flex-col justify-between"
-                >
-                  <div>
-                    <div class="overflow-hidden rounded-xl h-52">
-                      <img
-                        src="/images/Marrakech Morocco.jpg"
-                        alt="Certified Local Guides"
-                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 pointer-events-none"
-                      >
-                    </div>
-                    <h4 class="text-lg mt-4 font-heading font-bold text-foreground leading-snug">
-                      Certified Local Guides
-                    </h4>
-                    <p class="mt-2.5 text-xs text-muted-foreground leading-relaxed">
-                      Find multilingual experts by city, specialty, experience,
-                      and live availability.
-                    </p>
-                  </div>
-                  <div class="mt-4 pt-3 border-t border-border/20 flex items-center gap-1.5 text-xs text-primary font-bold uppercase tracking-wider opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300">
-                    Explore <iconify-icon icon="lucide:arrow-right" class="text-sm"></iconify-icon>
-                  </div>
-                </div>
-
-                <!-- Service 3 -->
-                <div
-                  class="p-5 rounded-2xl bg-card border border-border/40 shadow-sm hover:shadow-lg transition-all duration-300 group flex flex-col justify-between"
-                >
-                  <div>
-                    <div class="overflow-hidden rounded-xl h-52">
-                      <img
-                        src="/images/Moroccan Lanterns Aesthetic _ Marrakech Souk Travel Inspiration.jpg"
-                        alt="Traditional Moroccan Artisans"
-                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-115 group-hover:rotate-1 pointer-events-none"
-                      >
-                    </div>
-                    <h4 class="text-lg mt-4 font-heading font-bold text-foreground leading-snug">
-                      Traditional Moroccan Artisans
-                    </h4>
-                    <p class="mt-2.5 text-xs text-muted-foreground leading-relaxed">
-                      Shop verified crafts with QR traceability and export
-                      eligibility badges.
-                    </p>
-                  </div>
-                  <div class="mt-4 pt-3 border-t border-border/20 flex items-center gap-1.5 text-xs text-primary font-bold uppercase tracking-wider opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300">
-                    Explore <iconify-icon icon="lucide:arrow-right" class="text-sm"></iconify-icon>
-                  </div>
-                </div>
-
-                <!-- Service 4 -->
-                <div
-                  class="p-5 rounded-2xl bg-card border border-border/40 shadow-sm hover:shadow-lg transition-all duration-300 group flex flex-col justify-between"
-                >
-                  <div>
-                    <div class="overflow-hidden rounded-xl h-52">
-                      <img
-                        src="/images/marrakesh, morocco.jpg"
-                        alt="Destination Management Companies"
-                        class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.08] group-hover:-rotate-1 pointer-events-none"
-                      >
-                    </div>
-                    <h4 class="text-lg mt-4 font-heading font-bold text-foreground leading-snug">
-                      Destination Management Companies
-                    </h4>
-                    <p class="mt-2.5 text-xs text-muted-foreground leading-relaxed">
-                      Partner with trusted DMCs to coordinate premium circuits and
-                      group logistics.
-                    </p>
-                  </div>
-                  <div class="mt-4 pt-3 border-t border-border/20 flex items-center gap-1.5 text-xs text-primary font-bold uppercase tracking-wider opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300">
-                    Explore <iconify-icon icon="lucide:arrow-right" class="text-sm"></iconify-icon>
-                  </div>
-                </div>
-
-              </div>
-
-              <!-- Extra Expandable Services Grid -->
-              <div
-                [class.hidden]="!showAllServices()"
-                [class.grid]="showAllServices()"
-                class="hidden mt-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 reveal-on-scroll"
-              >
-                <!-- Service 5 -->
-                <div
-                  class="p-5 rounded-2xl bg-card border border-border/40 shadow-sm hover:shadow-lg transition-all duration-300 group flex flex-col justify-between"
-                >
-                  <div>
-                    <div class="overflow-hidden rounded-xl h-52">
-                      <img
-                        src="/images/17099673576913848.jpg"
-                        alt="AI Trip Planning"
-                        class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 pointer-events-none"
-                      >
-                    </div>
-                    <h4 class="text-lg mt-4 font-heading font-bold text-foreground leading-snug">
-                      AI Trip Planning
-                    </h4>
-                    <p class="mt-2.5 text-xs text-muted-foreground leading-relaxed">
-                      Generate day-by-day itineraries using budget, duration,
-                      interests, and language needs.
-                    </p>
-                  </div>
-                  <div class="mt-4 pt-3 border-t border-border/20 flex items-center gap-1.5 text-xs text-primary font-bold uppercase tracking-wider opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300">
-                    Explore <iconify-icon icon="lucide:arrow-right" class="text-sm"></iconify-icon>
-                  </div>
-                </div>
-
-                <!-- Service 6 -->
-                <div
-                  class="p-5 rounded-2xl bg-card border border-border/40 shadow-sm hover:shadow-lg transition-all duration-300 group flex flex-col justify-between"
-                >
-                  <div>
-                    <div class="overflow-hidden rounded-xl h-52">
-                      <img
-                        src="/images/86694361569811614.jpg"
-                        alt="Live Navigation"
-                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 pointer-events-none"
-                      >
-                    </div>
-                    <h4 class="text-lg mt-4 font-heading font-bold text-foreground leading-snug">
-                      Live Navigation
-                    </h4>
-                    <p class="mt-2.5 text-xs text-muted-foreground leading-relaxed">
-                      Map experiences, meeting points, attractions, and route
-                      calculations from your location.
-                    </p>
-                  </div>
-                  <div class="mt-4 pt-3 border-t border-border/20 flex items-center gap-1.5 text-xs text-primary font-bold uppercase tracking-wider opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300">
-                    Explore <iconify-icon icon="lucide:arrow-right" class="text-sm"></iconify-icon>
-                  </div>
-                </div>
-
-                <!-- Service 7 -->
-                <div
-                  class="p-5 rounded-2xl bg-card border border-border/40 shadow-sm hover:shadow-lg transition-all duration-300 group flex flex-col justify-between"
-                >
-                  <div>
-                    <div class="overflow-hidden rounded-xl h-52">
-                      <img
-                        src="/images/Unique Marrakech Itinerary_ Hidden Gems & Highlights.jpg"
-                        alt="Cultural Heritage"
-                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-115 pointer-events-none"
-                      >
-                    </div>
-                    <h4 class="text-lg mt-4 font-heading font-bold text-foreground leading-snug">
-                      Cultural Heritage
-                    </h4>
-                    <p class="mt-2.5 text-xs text-muted-foreground leading-relaxed">
-                      Highlight Moroccan stories, cooperatives, workshops, and
-                      historic landmarks.
-                    </p>
-                  </div>
-                  <div class="mt-4 pt-3 border-t border-border/20 flex items-center gap-1.5 text-xs text-primary font-bold uppercase tracking-wider opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300">
-                    Explore <iconify-icon icon="lucide:arrow-right" class="text-sm"></iconify-icon>
-                  </div>
-                </div>
-
-                <!-- Service 8 -->
-                <div
-                  class="p-5 rounded-2xl bg-card border border-border/40 shadow-sm hover:shadow-lg transition-all duration-300 group flex flex-col justify-between"
-                >
-                  <div>
-                    <div class="overflow-hidden rounded-xl h-52">
-                      <img
-                        src="/images/2603712282565939.jpg"
-                        alt="Safe Reservations"
-                        class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.08] pointer-events-none"
-                      >
-                    </div>
-                    <h4 class="text-lg mt-4 font-heading font-bold text-foreground leading-snug">
-                      Safe Reservations
-                    </h4>
-                    <p class="mt-2.5 text-xs text-muted-foreground leading-relaxed">
-                      Escrow-backed payments, booking statuses, invoices, and
-                      review moderation.
-                    </p>
-                  </div>
-                  <div class="mt-4 pt-3 border-t border-border/20 flex items-center gap-1.5 text-xs text-primary font-bold uppercase tracking-wider opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300">
-                    Explore <iconify-icon icon="lucide:arrow-right" class="text-sm"></iconify-icon>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Toggle Button -->
-              <div class="text-center mt-10 reveal-on-scroll">
-                <button
-                  (click)="toggleServices()"
-                  class="inline-flex items-center justify-center px-8 py-3.5 rounded-full text-xs font-bold uppercase tracking-wider bg-primary text-primary-foreground hover:bg-primary/95 hover:scale-[1.03] active:scale-[0.97] transition-all duration-300 shadow-lg shadow-primary/20 cursor-pointer"
-                >
-                  {{ showAllServices() ? 'Show Less Services' : 'See All Services' }}
-                </button>
-              </div>
-            </div>
-          </section>
-          <section class="py-24 border-b border-border bg-background" id="experiences">
-            <div class="max-w-7xl mx-auto px-6 space-y-16">
-              <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 reveal-on-scroll">
-                <div>
-                  <p class="text-xs uppercase tracking-wider font-bold text-primary">
-                    Featured Experiences
-                  </p>
-                  <h3 class="text-3xl lg:text-4xl font-heading font-bold mt-2 text-foreground">
-                    Signature journeys across Morocco
-                  </h3>
-                </div>
-                <a
-                  href="#"
-                  class="text-sm font-bold text-primary hover:text-primary/80 uppercase tracking-wider transition-colors"
-                  >View all experiences &rarr;</a
-                >
-              </div>
-
-              <!-- Experiences Grid -->
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                
-                <!-- Experience 1: Marrakech -->
-                <div
-                  class="group relative rounded-2xl overflow-hidden bg-card border border-border/60 shadow-sm transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 hover:border-primary/30 reveal-on-scroll"
-                >
-                  <!-- Image Container -->
-                  <div class="relative overflow-hidden h-72">
-                    <img
-                      src="/images/Marrakech Morocco.jpg"
-                      alt="Marrakech rooftop dinner"
-                      class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-                    <!-- Overlay Gradient -->
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60"></div>
-                    
-                    <!-- Price Tag -->
-                    <div class="absolute top-4 left-4 z-10 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-bold shadow-md tracking-wide">
-                      890 MAD
-                    </div>
-                    
-                    <!-- Wishlist Heart -->
-                    <button 
-                      (click)="toggleWishlist('marrakech')"
-                      class="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center text-muted-foreground hover:text-primary transition-all duration-300 hover:scale-110 shadow-sm cursor-pointer"
-                    >
-                      <iconify-icon 
-                        [icon]="wishlist()['marrakech'] ? 'mdi:heart' : 'mdi:heart-outline'" 
-                        [class.text-primary]="wishlist()['marrakech']" 
-                        class="text-xl transition-all duration-300"
-                        [class.scale-125]="wishlist()['marrakech']"
-                      ></iconify-icon>
-                    </button>
-
-                    <!-- Slide-in Overlay (Reserve) -->
-                    <div class="absolute bottom-0 left-0 right-0 p-5 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out flex items-center justify-center bg-black/40 backdrop-blur-md">
-                      <button class="w-full py-3 bg-primary text-primary-foreground rounded-full text-xs font-bold uppercase tracking-wider hover:bg-primary/90 transition-colors shadow-lg cursor-pointer">
-                        Reserve Now <iconify-icon icon="lucide:arrow-right" class="inline align-middle ml-1"></iconify-icon>
-                      </button>
-                    </div>
-                  </div>
-
-                  <!-- Content -->
-                  <div class="p-6 relative bg-card">
-                    <div class="flex items-start justify-between gap-4">
-                      <h4 class="font-heading font-bold text-lg text-foreground leading-snug">
-                        Marrakech Rooftop Evenings
-                      </h4>
-                      <!-- Star Rating Badge -->
-                      <span class="flex items-center gap-1 text-xs font-bold bg-secondary/10 text-secondary-foreground px-2 py-1 rounded-md shrink-0">
-                        <iconify-icon icon="lucide:star" class="text-secondary"></iconify-icon> 4.9
-                      </span>
-                    </div>
-                    <p class="text-sm text-muted-foreground mt-3 leading-relaxed">
-                      Fine dining, medina stories, and sunset views over the old city.
-                    </p>
-                    <div class="mt-5 pt-4 border-t border-border/40 flex items-center gap-4 text-xs font-semibold text-muted-foreground">
-                      <span class="flex items-center gap-1.5"><iconify-icon icon="lucide:clock" class="text-primary"></iconify-icon> 4 hours</span>
-                      <span class="flex items-center gap-1.5"><iconify-icon icon="lucide:map-pin" class="text-primary"></iconify-icon> Marrakech</span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Experience 2: Sahara -->
-                <div
-                  class="group relative rounded-2xl overflow-hidden bg-card border border-border/60 shadow-sm transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 hover:border-primary/30 reveal-on-scroll"
-                  style="transition-delay: 100ms;"
-                >
-                  <!-- Image Container -->
-                  <div class="relative overflow-hidden h-72">
-                    <img
-                      src="/images/Men walking through Moroccan desert.jpg"
-                      alt="Sahara camp"
-                      class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-                    <!-- Overlay Gradient -->
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60"></div>
-                    
-                    <!-- Price Tag -->
-                    <div class="absolute top-4 left-4 z-10 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-bold shadow-md tracking-wide">
-                      2,900 MAD
-                    </div>
-                    
-                    <!-- Wishlist Heart -->
-                    <button 
-                      (click)="toggleWishlist('sahara')"
-                      class="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center text-muted-foreground hover:text-primary transition-all duration-300 hover:scale-110 shadow-sm cursor-pointer"
-                    >
-                      <iconify-icon 
-                        [icon]="wishlist()['sahara'] ? 'mdi:heart' : 'mdi:heart-outline'" 
-                        [class.text-primary]="wishlist()['sahara']" 
-                        class="text-xl transition-all duration-300"
-                        [class.scale-125]="wishlist()['sahara']"
-                      ></iconify-icon>
-                    </button>
-
-                    <!-- Slide-in Overlay (Reserve) -->
-                    <div class="absolute bottom-0 left-0 right-0 p-5 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out flex items-center justify-center bg-black/40 backdrop-blur-md">
-                      <button class="w-full py-3 bg-primary text-primary-foreground rounded-full text-xs font-bold uppercase tracking-wider hover:bg-primary/90 transition-colors shadow-lg cursor-pointer">
-                        Reserve Now <iconify-icon icon="lucide:arrow-right" class="inline align-middle ml-1"></iconify-icon>
-                      </button>
-                    </div>
-                  </div>
-
-                  <!-- Content -->
-                  <div class="p-6 relative bg-card">
-                    <div class="flex items-start justify-between gap-4">
-                      <h4 class="font-heading font-bold text-lg text-foreground leading-snug">
-                        Sahara Dunes Escape
-                      </h4>
-                      <!-- Star Rating Badge -->
-                      <span class="flex items-center gap-1 text-xs font-bold bg-secondary/10 text-secondary-foreground px-2 py-1 rounded-md shrink-0">
-                        <iconify-icon icon="lucide:star" class="text-secondary"></iconify-icon> 4.8
-                      </span>
-                    </div>
-                    <p class="text-sm text-muted-foreground mt-3 leading-relaxed">
-                      Camel ride, luxury camp, and Berber music under desert stars.
-                    </p>
-                    <div class="mt-5 pt-4 border-t border-border/40 flex items-center gap-4 text-xs font-semibold text-muted-foreground">
-                      <span class="flex items-center gap-1.5"><iconify-icon icon="lucide:clock" class="text-primary"></iconify-icon> 2 days</span>
-                      <span class="flex items-center gap-1.5"><iconify-icon icon="lucide:map-pin" class="text-primary"></iconify-icon> Merzouga</span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Experience 3: Chefchaouen -->
-                <div
-                  class="group relative rounded-2xl overflow-hidden bg-card border border-border/60 shadow-sm transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 hover:border-primary/30 reveal-on-scroll"
-                  style="transition-delay: 200ms;"
-                >
-                  <!-- Image Container -->
-                  <div class="relative overflow-hidden h-72">
-                    <img
-                      src="/images/jardin majorelle 💙.jpg"
-                      alt="Chefchaouen alley"
-                      class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-                    <!-- Overlay Gradient -->
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60"></div>
-                    
-                    <!-- Price Tag -->
-                    <div class="absolute top-4 left-4 z-10 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-bold shadow-md tracking-wide">
-                      1,150 MAD
-                    </div>
-                    
-                    <!-- Wishlist Heart -->
-                    <button 
-                      (click)="toggleWishlist('chefchaouen')"
-                      class="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center text-muted-foreground hover:text-primary transition-all duration-300 hover:scale-110 shadow-sm cursor-pointer"
-                    >
-                      <iconify-icon 
-                        [icon]="wishlist()['chefchaouen'] ? 'mdi:heart' : 'mdi:heart-outline'" 
-                        [class.text-primary]="wishlist()['chefchaouen']" 
-                        class="text-xl transition-all duration-300"
-                        [class.scale-125]="wishlist()['chefchaouen']"
-                      ></iconify-icon>
-                    </button>
-
-                    <!-- Slide-in Overlay (Reserve) -->
-                    <div class="absolute bottom-0 left-0 right-0 p-5 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out flex items-center justify-center bg-black/40 backdrop-blur-md">
-                      <button class="w-full py-3 bg-primary text-primary-foreground rounded-full text-xs font-bold uppercase tracking-wider hover:bg-primary/90 transition-colors shadow-lg cursor-pointer">
-                        Reserve Now <iconify-icon icon="lucide:arrow-right" class="inline align-middle ml-1"></iconify-icon>
-                      </button>
-                    </div>
-                  </div>
-
-                  <!-- Content -->
-                  <div class="p-6 relative bg-card">
-                    <div class="flex items-start justify-between gap-4">
-                      <h4 class="font-heading font-bold text-lg text-foreground leading-snug">
-                        Blue City Discovery
-                      </h4>
-                      <!-- Star Rating Badge -->
-                      <span class="flex items-center gap-1 text-xs font-bold bg-secondary/10 text-secondary-foreground px-2 py-1 rounded-md shrink-0">
-                        <iconify-icon icon="lucide:star" class="text-secondary"></iconify-icon> 4.7
-                      </span>
-                    </div>
-                    <p class="text-sm text-muted-foreground mt-3 leading-relaxed">
-                      Guided alleys, local lunch, artisan workshops, and panoramic viewpoints.
-                    </p>
-                    <div class="mt-5 pt-4 border-t border-border/40 flex items-center gap-4 text-xs font-semibold text-muted-foreground">
-                      <span class="flex items-center gap-1.5"><iconify-icon icon="lucide:clock" class="text-primary"></iconify-icon> 1 day</span>
-                      <span class="flex items-center gap-1.5"><iconify-icon icon="lucide:map-pin" class="text-primary"></iconify-icon> Chefchaouen</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
           <section class="py-24 border-b border-border bg-card relative overflow-hidden" id="reviews">
             <div class="absolute top-0 left-0 w-64 h-64 opacity-[0.03] bg-no-repeat bg-contain zellige-pattern pointer-events-none"></div>
             <div class="absolute bottom-0 right-0 w-64 h-64 opacity-[0.03] bg-no-repeat bg-contain zellige-pattern pointer-events-none" style="filter: brightness(0) invert(1);"></div>
@@ -910,6 +433,519 @@
                 <div class="absolute bottom-0 left-0 h-[3px] bg-primary transition-all duration-100 ease-linear rounded-bl-3xl" [style.width.%]="testimonialProgress()"></div>
               </div>
 
+            </div>
+          </section>
+
+          <!-- Latest Blogs Section -->
+          <section class="py-20 border-b border-border bg-background relative" id="blogs">
+            <div class="absolute top-1/2 left-0 w-24 h-48 opacity-5 bg-no-repeat bg-contain zellige-pattern pointer-events-none"></div>
+
+            <div class="max-w-7xl mx-auto px-6 space-y-10 reveal-on-scroll">
+              <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                <div>
+                  <p class="text-xs uppercase tracking-wider font-bold text-primary">Latest Blogs</p>
+                  <h3 class="text-3xl lg:text-4xl font-heading font-bold mt-2">
+                    Stories shaping modern Moroccan tourism
+                  </h3>
+                </div>
+                
+                <!-- Category Filters -->
+                <div class="flex flex-wrap gap-2 text-xs">
+                  <button
+                    (click)="setBlogCategory('All')"
+                    [class.bg-primary]="selectedBlogCategory() === 'All'"
+                    [class.text-primary-foreground]="selectedBlogCategory() === 'All'"
+                    [class.bg-card]="selectedBlogCategory() !== 'All'"
+                    class="px-4 py-2 rounded-full border border-border/80 font-bold uppercase tracking-wider cursor-pointer transition-all duration-300 hover:scale-105 active:scale-95"
+                  >All</button>
+                  @for (cat of ['Tourism', 'Culture', 'Moroccan Heritage']; track cat) {
+                    <button
+                      (click)="setBlogCategory(cat)"
+                      [class.bg-primary]="selectedBlogCategory() === cat"
+                      [class.text-primary-foreground]="selectedBlogCategory() === cat"
+                      [class.bg-card]="selectedBlogCategory() !== cat"
+                      class="px-4 py-2 rounded-full border border-border/80 font-bold uppercase tracking-wider cursor-pointer transition-all duration-300 hover:scale-105 active:scale-95"
+                    >{{ cat }}</button>
+                  }
+                </div>
+              </div>
+              
+              <!-- Premium Editorial Blog Carousel -->
+              <div class="blog-carousel">
+                <div class="blog-carousel__viewport">
+                  <div
+                    class="blog-carousel__track"
+                    [style.--slide-index]="blogCurrentIndex()"
+                  >
+                    @for (blog of filteredBlogs(); track blog.title; let i = $index) {
+                      <div
+                        class="blog-carousel__slide"
+                        [class.blog-carousel__slide--active]="i === blogCurrentIndex()"
+                        [class.blog-carousel__slide--prev]="i < blogCurrentIndex()"
+                        [class.blog-carousel__slide--next]="i > blogCurrentIndex()"
+                      >
+                        <!-- Card -->
+                        <article
+                          glassCard
+                          class="blog-card rounded-2xl overflow-hidden card-premium h-[480px] flex flex-col justify-between"
+                        >
+                          <div class="overflow-hidden h-52">
+                            <img
+                              [src]="blog.image"
+                              [alt]="blog.title"
+                              class="blog-card-image w-full h-full object-cover pointer-events-none"
+                            />
+                          </div>
+                          <div class="p-6 flex-1 flex flex-col justify-between bg-card">
+                            <div>
+                              <div
+                                class="flex items-center gap-2 text-xs text-muted-foreground"
+                              >
+                                <span class="text-secondary font-bold">{{ blog.category }}</span><span>•</span><span>{{ blog.date }}</span>
+                              </div>
+                              <h4 class="font-heading font-bold text-lg mt-3 text-foreground leading-snug">
+                                {{ blog.title }}
+                              </h4>
+                              <p class="text-sm text-muted-foreground mt-2 leading-relaxed line-clamp-3">
+                                {{ blog.description }}
+                              </p>
+                            </div>
+                            <div class="mt-4 pt-4 border-t border-border/40 flex items-center justify-between text-xs">
+                              <span class="text-muted-foreground font-semibold"
+                                >{{ blog.author }}</span
+                              >
+                              <a
+                                [href]="blog.link"
+                                class="font-bold text-primary hover:text-primary/80 transition-colors inline-flex items-center gap-1 group/btn"
+                                >Read More <iconify-icon icon="lucide:arrow-right" class="text-sm transition-transform duration-300 group-hover/btn:translate-x-1"></iconify-icon></a
+                              >
+                            </div>
+                          </div>
+                        </article>
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <!-- Navigation & Indicator -->
+                <div class="blog-carousel__controls">
+                  <button
+                    (click)="prevBlog()"
+                    class="blog-carousel__btn"
+                    [disabled]="blogCurrentIndex() === 0"
+                    aria-label="Previous blog"
+                  >
+                    <iconify-icon icon="lucide:arrow-left"></iconify-icon>
+                  </button>
+                  <div class="blog-carousel__counter">
+                    <span class="blog-carousel__counter-current">{{ formatIndex(blogCurrentIndex() + 1) }}</span>
+                    <span class="blog-carousel__counter-sep">/</span>
+                    <span class="blog-carousel__counter-total">{{ formatIndex(filteredBlogs().length) }}</span>
+                    <div class="blog-carousel__progress">
+                      <div
+                        class="blog-carousel__progress-fill"
+                        [style.width.%]="(blogCurrentIndex() + 1) / filteredBlogs().length * 100"
+                      ></div>
+                    </div>
+                  </div>
+                  <button
+                    (click)="nextBlog()"
+                    class="blog-carousel__btn"
+                    [disabled]="blogCurrentIndex() >= filteredBlogs().length - 1"
+                    aria-label="Next blog"
+                  >
+                    <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- What We Offer (Services) — Premium Editorial -->
+          <section class="services-section py-24 relative" id="services">
+
+            <div class="max-w-7xl mx-auto px-6 space-y-14">
+
+              <!-- Section Header -->
+              <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-8 reveal-on-scroll">
+                <div>
+                  <p class="services-header__eyebrow">What We Offer</p>
+                  <h3 class="services-header__title">Travel that matters</h3>
+                </div>
+                <p class="services-header__subtitle">
+                  MarocSphere connects conscious travelers with authentic experiences
+                  that directly support Moroccan communities.
+                </p>
+              </div>
+
+              <!-- Main 4 Services Grid -->
+              <div class="services-grid reveal-on-scroll">
+
+                <!-- Service 1 — Discover Authentic Experiences -->
+                <div class="service-card" style="--card-index: 0"
+                     (mousemove)="onServiceCardMouseMove($event)"
+                     (mouseenter)="onServiceCardMouseEnter($event)"
+                     (mouseleave)="onServiceCardMouseLeave($event)">
+                  <div class="service-card__image-wrap">
+                    <img
+                      src="/images/morocco.jpg"
+                      alt="Discover Authentic Experiences"
+                      class="service-card__image"
+                      loading="lazy"
+                    >
+                    <div class="service-card__gradient"></div>
+                    <div class="service-card__shine"></div>
+                  </div>
+                  <div class="service-card__body">
+                    <div class="service-card__category">
+                      <iconify-icon icon="lucide:compass"></iconify-icon>
+                      <span>Tourism</span>
+                    </div>
+                    <h4 class="service-card__title">Discover Authentic Experiences</h4>
+                    <p class="service-card__desc">
+                      Browse curated cultural escapes, medina walks, desert tours,
+                      and immersive stays.
+                    </p>
+                    <div class="service-card__hover-content">
+                      <div class="service-card__hover-icon">
+                        <iconify-icon icon="lucide:compass"></iconify-icon>
+                      </div>
+                      <span class="service-card__hover-duration">4 hours</span>
+                      <div class="service-card__hover-cta">
+                        <span>Explore Journey</span>
+                        <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+                      </div>
+                    </div>
+                    <div class="service-card__arrow">
+                      <span>Explore</span>
+                      <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+                    </div>
+                  </div>
+                  <div class="service-card__glow"></div>
+                </div>
+
+                <!-- Service 2 — Certified Local Guides -->
+                <div class="service-card" style="--card-index: 1"
+                     (mousemove)="onServiceCardMouseMove($event)"
+                     (mouseenter)="onServiceCardMouseEnter($event)"
+                     (mouseleave)="onServiceCardMouseLeave($event)">
+                  <div class="service-card__image-wrap">
+                    <img
+                      src="/images/Men walking through Moroccan desert.jpg"
+                      alt="Certified Local Guides"
+                      class="service-card__image"
+                      loading="lazy"
+                    >
+                    <div class="service-card__gradient"></div>
+                    <div class="service-card__shine"></div>
+                  </div>
+                  <div class="service-card__body">
+                    <div class="service-card__category">
+                      <iconify-icon icon="lucide:map-pin"></iconify-icon>
+                      <span>Guides</span>
+                    </div>
+                    <h4 class="service-card__title">Certified Local Guides</h4>
+                    <p class="service-card__desc">
+                      Find multilingual experts by city, specialty, experience,
+                      and live availability.
+                    </p>
+                    <div class="service-card__hover-content">
+                      <div class="service-card__hover-icon">
+                        <iconify-icon icon="lucide:map-pin"></iconify-icon>
+                      </div>
+                      <span class="service-card__hover-duration">Full day</span>
+                      <div class="service-card__hover-cta">
+                        <span>Explore Journey</span>
+                        <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+                      </div>
+                    </div>
+                    <div class="service-card__arrow">
+                      <span>Explore</span>
+                      <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+                    </div>
+                  </div>
+                  <div class="service-card__glow"></div>
+                </div>
+
+                <!-- Service 3 — Traditional Moroccan Artisans -->
+                <div class="service-card" style="--card-index: 2"
+                     (mousemove)="onServiceCardMouseMove($event)"
+                     (mouseenter)="onServiceCardMouseEnter($event)"
+                     (mouseleave)="onServiceCardMouseLeave($event)">
+                  <div class="service-card__image-wrap">
+                    <img
+                      src="/images/Ceramica de Maroc.jpg"
+                      alt="Traditional Moroccan Artisans"
+                      class="service-card__image"
+                      loading="lazy"
+                    >
+                    <div class="service-card__gradient"></div>
+                    <div class="service-card__shine"></div>
+                  </div>
+                  <div class="service-card__body">
+                    <div class="service-card__category">
+                      <iconify-icon icon="lucide:palette"></iconify-icon>
+                      <span>Artisans</span>
+                    </div>
+                    <h4 class="service-card__title">Traditional Moroccan Artisans</h4>
+                    <p class="service-card__desc">
+                      Shop verified crafts with QR traceability and export
+                      eligibility badges.
+                    </p>
+                    <div class="service-card__hover-content">
+                      <div class="service-card__hover-icon">
+                        <iconify-icon icon="lucide:palette"></iconify-icon>
+                      </div>
+                      <span class="service-card__hover-duration">3 hours</span>
+                      <div class="service-card__hover-cta">
+                        <span>Explore Journey</span>
+                        <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+                      </div>
+                    </div>
+                    <div class="service-card__arrow">
+                      <span>Explore</span>
+                      <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+                    </div>
+                  </div>
+                  <div class="service-card__glow"></div>
+                </div>
+
+                <!-- Service 4 — Destination Management Companies -->
+                <div class="service-card" style="--card-index: 3"
+                     (mousemove)="onServiceCardMouseMove($event)"
+                     (mouseenter)="onServiceCardMouseEnter($event)"
+                     (mouseleave)="onServiceCardMouseLeave($event)">
+                  <div class="service-card__image-wrap">
+                    <img
+                      src="/images/marrakech2.png"
+                      alt="Destination Management Companies"
+                      class="service-card__image"
+                      loading="lazy"
+                    >
+                    <div class="service-card__gradient"></div>
+                    <div class="service-card__shine"></div>
+                  </div>
+                  <div class="service-card__body">
+                    <div class="service-card__category">
+                      <iconify-icon icon="lucide:building-2"></iconify-icon>
+                      <span>Partners</span>
+                    </div>
+                    <h4 class="service-card__title">Destination Management Companies</h4>
+                    <p class="service-card__desc">
+                      Partner with trusted DMCs to coordinate premium circuits and
+                      group logistics.
+                    </p>
+                    <div class="service-card__hover-content">
+                      <div class="service-card__hover-icon">
+                        <iconify-icon icon="lucide:building-2"></iconify-icon>
+                      </div>
+                      <span class="service-card__hover-duration">Custom</span>
+                      <div class="service-card__hover-cta">
+                        <span>Explore Journey</span>
+                        <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+                      </div>
+                    </div>
+                    <div class="service-card__arrow">
+                      <span>Explore</span>
+                      <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+                    </div>
+                  </div>
+                  <div class="service-card__glow"></div>
+                </div>
+
+              </div>
+
+              <!-- Extra Expandable Services Grid -->
+              <div
+                [class.hidden]="!showAllServices()"
+                class="services-grid mt-6 reveal-on-scroll"
+                [style.display]="showAllServices() ? 'grid' : 'none'"
+              >
+
+                <!-- Service 5 — AI Trip Planning -->
+                <div class="service-card" style="--card-index: 4"
+                     (mousemove)="onServiceCardMouseMove($event)"
+                     (mouseenter)="onServiceCardMouseEnter($event)"
+                     (mouseleave)="onServiceCardMouseLeave($event)">
+                  <div class="service-card__image-wrap">
+                    <img
+                      src="/images/Unique Marrakech Itinerary_ Hidden Gems & Highlights.jpg"
+                      alt="AI Trip Planning"
+                      class="service-card__image"
+                      loading="lazy"
+                    >
+                    <div class="service-card__gradient"></div>
+                    <div class="service-card__shine"></div>
+                  </div>
+                  <div class="service-card__body">
+                    <div class="service-card__category">
+                      <iconify-icon icon="lucide:sparkles"></iconify-icon>
+                      <span>Technology</span>
+                    </div>
+                    <h4 class="service-card__title">AI Trip Planning</h4>
+                    <p class="service-card__desc">
+                      Generate day-by-day itineraries using budget, duration,
+                      interests, and language needs.
+                    </p>
+                    <div class="service-card__hover-content">
+                      <div class="service-card__hover-icon">
+                        <iconify-icon icon="lucide:sparkles"></iconify-icon>
+                      </div>
+                      <span class="service-card__hover-duration">Instant</span>
+                      <div class="service-card__hover-cta">
+                        <span>Explore Journey</span>
+                        <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+                      </div>
+                    </div>
+                    <div class="service-card__arrow">
+                      <span>Explore</span>
+                      <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+                    </div>
+                  </div>
+                  <div class="service-card__glow"></div>
+                </div>
+
+                <!-- Service 6 — Live Navigation -->
+                <div class="service-card" style="--card-index: 5"
+                     (mousemove)="onServiceCardMouseMove($event)"
+                     (mouseenter)="onServiceCardMouseEnter($event)"
+                     (mouseleave)="onServiceCardMouseLeave($event)">
+                  <div class="service-card__image-wrap">
+                    <img
+                      src="/images/marrakesh, morocco.jpg"
+                      alt="Live Navigation"
+                      class="service-card__image"
+                      loading="lazy"
+                    >
+                    <div class="service-card__gradient"></div>
+                    <div class="service-card__shine"></div>
+                  </div>
+                  <div class="service-card__body">
+                    <div class="service-card__category">
+                      <iconify-icon icon="lucide:navigation"></iconify-icon>
+                      <span>Navigation</span>
+                    </div>
+                    <h4 class="service-card__title">Live Navigation</h4>
+                    <p class="service-card__desc">
+                      Map experiences, meeting points, attractions, and route
+                      calculations from your location.
+                    </p>
+                    <div class="service-card__hover-content">
+                      <div class="service-card__hover-icon">
+                        <iconify-icon icon="lucide:navigation"></iconify-icon>
+                      </div>
+                      <span class="service-card__hover-duration">Real-time</span>
+                      <div class="service-card__hover-cta">
+                        <span>Explore Journey</span>
+                        <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+                      </div>
+                    </div>
+                    <div class="service-card__arrow">
+                      <span>Explore</span>
+                      <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+                    </div>
+                  </div>
+                  <div class="service-card__glow"></div>
+                </div>
+
+                <!-- Service 7 — Cultural Heritage -->
+                <div class="service-card" style="--card-index: 6"
+                     (mousemove)="onServiceCardMouseMove($event)"
+                     (mouseenter)="onServiceCardMouseEnter($event)"
+                     (mouseleave)="onServiceCardMouseLeave($event)">
+                  <div class="service-card__image-wrap">
+                    <img
+                      src="/images/Casbah Ait Benhaddou, Morocco Stock Image - Image….jpg"
+                      alt="Cultural Heritage"
+                      class="service-card__image"
+                      loading="lazy"
+                    >
+                    <div class="service-card__gradient"></div>
+                    <div class="service-card__shine"></div>
+                  </div>
+                  <div class="service-card__body">
+                    <div class="service-card__category">
+                      <iconify-icon icon="lucide:landmark"></iconify-icon>
+                      <span>Heritage</span>
+                    </div>
+                    <h4 class="service-card__title">Cultural Heritage</h4>
+                    <p class="service-card__desc">
+                      Highlight Moroccan stories, cooperatives, workshops, and
+                      historic landmarks.
+                    </p>
+                    <div class="service-card__hover-content">
+                      <div class="service-card__hover-icon">
+                        <iconify-icon icon="lucide:landmark"></iconify-icon>
+                      </div>
+                      <span class="service-card__hover-duration">2 hours</span>
+                      <div class="service-card__hover-cta">
+                        <span>Explore Journey</span>
+                        <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+                      </div>
+                    </div>
+                    <div class="service-card__arrow">
+                      <span>Explore</span>
+                      <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+                    </div>
+                  </div>
+                  <div class="service-card__glow"></div>
+                </div>
+
+                <!-- Service 8 — Safe Reservations -->
+                <div class="service-card" style="--card-index: 7"
+                     (mousemove)="onServiceCardMouseMove($event)"
+                     (mouseenter)="onServiceCardMouseEnter($event)"
+                     (mouseleave)="onServiceCardMouseLeave($event)">
+                  <div class="service-card__image-wrap">
+                    <img
+                      src="/images/Moroccan Lanterns Aesthetic _ Marrakech Souk Travel Inspiration.jpg"
+                      alt="Safe Reservations"
+                      class="service-card__image"
+                      loading="lazy"
+                    >
+                    <div class="service-card__gradient"></div>
+                    <div class="service-card__shine"></div>
+                  </div>
+                  <div class="service-card__body">
+                    <div class="service-card__category">
+                      <iconify-icon icon="lucide:shield-check"></iconify-icon>
+                      <span>Trust</span>
+                    </div>
+                    <h4 class="service-card__title">Safe Reservations</h4>
+                    <p class="service-card__desc">
+                      Escrow-backed payments, booking statuses, invoices, and
+                      review moderation.
+                    </p>
+                    <div class="service-card__hover-content">
+                      <div class="service-card__hover-icon">
+                        <iconify-icon icon="lucide:shield-check"></iconify-icon>
+                      </div>
+                      <span class="service-card__hover-duration">24/7</span>
+                      <div class="service-card__hover-cta">
+                        <span>Explore Journey</span>
+                        <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+                      </div>
+                    </div>
+                    <div class="service-card__arrow">
+                      <span>Explore</span>
+                      <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+                    </div>
+                  </div>
+                  <div class="service-card__glow"></div>
+                </div>
+
+              </div>
+
+              <!-- Toggle Button -->
+              <div class="text-center mt-12 reveal-on-scroll">
+                <button
+                  (click)="toggleServices()"
+                  class="services-toggle-btn"
+                >
+                  {{ showAllServices() ? 'Show Less' : 'See All Services' }}
+                  <iconify-icon [icon]="showAllServices() ? 'lucide:chevron-up' : 'lucide:chevron-down'"></iconify-icon>
+                </button>
+              </div>
             </div>
           </section>
         </main>

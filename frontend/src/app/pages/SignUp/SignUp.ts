@@ -13,6 +13,7 @@ import { AuthService, RegisterRequest } from '../../services/auth.service';
   selector: 'app-sign-up',
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './SignUp.html',
+  styleUrls: ['./SignUp.css'],
 })
 export class SignUp {
   private fb = inject(FormBuilder);
