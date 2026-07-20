@@ -1,4 +1,15 @@
 package ma.marocsphere.service;
 
-public class AdminDataService {
+import ma.marocsphere.dto.AdminCreationDTO;
+import ma.marocsphere.dto.AdminResponseDTO;
+import ma.marocsphere.dto.AdminUpdateDTO;
+
+import java.util.List;
+
+public interface AdminDataService {
+    AdminResponseDTO getById(Long id);
+    List<AdminResponseDTO> getAll();
+    AdminResponseDTO create(AdminCreationDTO dto);
+    AdminResponseDTO update(Long id, AdminUpdateDTO dto);
+    void delete(Long id);
 }

@@ -23,5 +23,6 @@ public class GuideResponseDTO {
     private String statutCertification;
     private Float scoreCertification;
     private Boolean disponible;
+    private String status;
     private LocalDateTime dateCreation;
 }

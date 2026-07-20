@@ -6,6 +6,7 @@ import ma.marocsphere.dto.ClientResponseDTO;
 import ma.marocsphere.dto.ClientUpdateDTO;
 import ma.marocsphere.entity.Client;
 import ma.marocsphere.entity.Role;
+import ma.marocsphere.entity.UserStatus;
 import ma.marocsphere.entity.Utilisateur;
 import ma.marocsphere.repository.ClientRepo;
 import ma.marocsphere.repository.UtilisateurRepo;
@@ -88,6 +89,9 @@ public class ClientServiceImpl implements ClientService {
         if (dto.getTelephone() != null) client.setTelephone(dto.getTelephone());
         if (dto.getNationalite() != null) client.setNationalite(dto.getNationalite());
         if (dto.getLanguePreferee() != null) client.setLanguePreferee(dto.getLanguePreferee());
+        if (dto.getStatus() != null) {
+            client.setStatus(UserStatus.valueOf(dto.getStatus().toUpperCase()));
+        }
         Client saved = clientRepo.save(client);
         return toResponseDTO(saved);
     }
@@ -102,6 +106,7 @@ public class ClientServiceImpl implements ClientService {
                 .nationalite(client.getNationalite())
                 .languePreferee(client.getLanguePreferee())
                 .tierAbonnement(client.getTierAbonnement())
+                .status(client.getStatus().name())
                 .dateCreation(client.getDateCreation())
                 .build();
     }

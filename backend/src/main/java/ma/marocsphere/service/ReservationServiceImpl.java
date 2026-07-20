@@ -25,7 +25,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public List<ReservationResponseDTO> getAll() {
-        return reservationRepo.findAll().stream()
+        return reservationRepo.findAllWithClientAndGuide().stream()
                 .map(this::toResponseDTO)
                 .toList();
     }

@@ -40,6 +40,11 @@ public abstract class Utilisateur implements UserDetails {
     @Column(nullable = false)
     private Role role;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private UserStatus status = UserStatus.ENABLED;
+
     @Column(updatable = false)
     private LocalDateTime dateCreation;
 
@@ -58,7 +63,7 @@ public abstract class Utilisateur implements UserDetails {
     @Override public boolean isAccountNonExpired() { return true; }
     @Override public boolean isAccountNonLocked() { return true; }
     @Override public boolean isCredentialsNonExpired() { return true; }
-    @Override public boolean isEnabled() { return true; }
+    @Override public boolean isEnabled() { return this.status == UserStatus.ENABLED; }
 
     protected abstract Role assignerRole();
 }

@@ -21,5 +21,6 @@ public class DMCResponseDTO {
     private String languePreferee;
     private String nomEntreprise;
     private String zoneCouverture;
+    private String status;
     private LocalDateTime dateCreation;
 }

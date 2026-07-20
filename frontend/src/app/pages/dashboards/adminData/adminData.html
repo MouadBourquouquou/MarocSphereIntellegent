@@ -1,351 +1,314 @@
 <div data-page="admin-analytics-dashboard">
   <div class="min-h-screen w-full bg-background flex flex-col relative font-sans text-foreground">
-    <!-- State Management & Export Utilities -->
-    <!-- Navigation & Header -->
-    <header
-      class="sticky top-0 z-40 bg-card/90 backdrop-blur-md border-b border-border px-6 py-3 flex items-center justify-between"
-    >
-      <div class="flex items-center gap-8">
-        <div class="flex items-center gap-2">
-          <div>
-            <!-- LOGO -->
-            <a
-              class="flex items-center justify-center transition-transform duration-300 hover:scale-105"
-              routerLink="/"
-            >
-              <img src="/pics/LOGOPRINCIPALE.png" alt="MarocSphere" class="logo" />
-            </a>
-          </div>
-        </div>
-      </div>
 
-      <!-- Right Side Actions & Role Switcher -->
+    <!-- ═══ HEADER ════════════════════════════════════════════════════════════ -->
+    <header class="sticky top-0 z-40 bg-card/90 backdrop-blur-md border-b border-border px-6 py-3 flex items-center justify-between">
       <div class="flex items-center gap-4">
-        
-
-        <!-- Switch back to Super Admin -->
-        <div
-          class="flex items-center gap-2 px-3.5 py-1.5 bg-primary text-primary-foreground text-xs font-semibold rounded-lg hover:bg-primary/95 transition-all shadow-sm"
-        >
-          <iconify-icon icon="lucide:user" class="text-sm"></iconify-icon>
-          <span>Super Admin Portal</span>
+        <a class="flex items-center justify-center transition-transform duration-300 hover:scale-105" routerLink="/">
+          <img src="/pics/LOGOPRINCIPALE.png" alt="MarocSphere" class="logo" />
+        </a>
+        <span class="text-xs font-bold text-muted-foreground hidden md:block">Analytics Dashboard</span>
       </div>
 
-        <!-- User Profile -->
+      <div class="flex items-center gap-4">
+        <a routerLink="/admin"
+          class="flex items-center gap-2 px-3.5 py-1.5 bg-primary text-primary-foreground text-xs font-semibold rounded-lg hover:bg-primary/95 transition-all shadow-sm">
+          <iconify-icon icon="lucide:user-cog" class="text-sm"></iconify-icon>
+          <span>Portail Super Admin</span>
+        </a>
         <div class="flex items-center gap-2.5 pl-3 border-l border-border/80">
-          <img
-            src="https://randomuser.me/api/portraits/women/11.jpg"
-            alt="Auditor avatar"
-            class="w-9 h-9 rounded-full border border-secondary/40 object-cover"
-          />
+          <iconify-icon icon="lucide:bar-chart-2" class="text-3xl text-secondary"></iconify-icon>
           <div class="hidden lg:block text-left">
-            <span class="block text-xs font-bold text-foreground">Yasmin Al-Fassi</span>
-            <span class="block text-[10px] text-secondary-foreground font-semibold">Government Auditor</span>
+            <span class="block text-xs font-bold text-foreground">Auditeur Gouvernemental</span>
+            <span class="block text-[10px] text-secondary font-semibold">Lecture seule</span>
           </div>
         </div>
       </div>
     </header>
 
-    <!-- Workspace Grid Layout -->
+    <!-- ═══ BODY ═══════════════════════════════════════════════════════════════ -->
     <div class="flex-1 flex flex-col lg:flex-row">
-      <!-- Left Sidebar for Filters -->
+
+      <!-- ── SIDEBAR FILTERS ──────────────────────────────────────────────── -->
       <aside class="w-full lg:w-64 bg-card border-r border-border p-5 flex flex-col gap-6">
+
         <div>
-          <p class="text-[11px] font-bold text-muted-foreground tracking-widest uppercase mb-3">
-            Timeframe Range
-          </p>
+          <p class="text-[11px] font-bold text-muted-foreground tracking-widest uppercase mb-3">Plage temporelle</p>
           <div class="space-y-1.5">
-            <button
-              (click)="changeDateFilter('Last 24 Hours')"
-              [class.text-primary]="activeFilterDate === 'Last 24 Hours'"
-              [class.bg-accent/40]="activeFilterDate === 'Last 24 Hours'"
-              class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-muted-foreground hover:bg-muted hover:text-foreground transition-all"
-            >
-              Last 24 Hours
-            </button>
-            <button
-              (click)="changeDateFilter('Last 7 Days')"
-              [class.text-primary]="activeFilterDate === 'Last 7 Days'"
-              [class.bg-accent/40]="activeFilterDate === 'Last 7 Days'"
-              class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-muted-foreground hover:bg-muted hover:text-foreground transition-all"
-            >
-              Last 7 Days
-            </button>
-            <button
-              (click)="changeDateFilter('Last 30 Days')"
-              [class.text-primary]="activeFilterDate === 'Last 30 Days'"
-              [class.bg-accent/40]="activeFilterDate === 'Last 30 Days'"
-              class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-muted-foreground hover:bg-muted hover:text-foreground transition-all"
-            >
-              Last 30 Days
-            </button>
-            <button
-              (click)="changeDateFilter('Year to Date')"
-              [class.text-primary]="activeFilterDate === 'Year to Date'"
-              [class.bg-accent/40]="activeFilterDate === 'Year to Date'"
-              class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-muted-foreground hover:bg-muted hover:text-foreground transition-all"
-            >
-              Year to Date
+            <button *ngFor="let d of dateFilterOptions"
+              (click)="changeDateFilter(d)"
+              [class.text-primary]="activeFilterDate === d"
+              [class.bg-accent/40]="activeFilterDate === d"
+              class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-muted-foreground hover:bg-muted hover:text-foreground transition-all">
+              {{ d }}
             </button>
           </div>
         </div>
 
         <div>
-          <p class="text-[11px] font-bold text-muted-foreground tracking-widest uppercase mb-3">
-            Regional Scope
-          </p>
+          <p class="text-[11px] font-bold text-muted-foreground tracking-widest uppercase mb-3">Région</p>
           <div class="space-y-1.5">
-            <button
-              (click)="changeCityFilter('All Regions')"
-              [class.text-primary]="activeFilterCity === 'All Regions'"
-              [class.bg-accent/40]="activeFilterCity === 'All Regions'"
-              class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-muted-foreground hover:bg-muted hover:text-foreground transition-all"
-            >
-              All Regions
-            </button>
-            <button
-              (click)="changeCityFilter('Marrakech-Safi')"
-              [class.text-primary]="activeFilterCity === 'Marrakech-Safi'"
-              [class.bg-accent/40]="activeFilterCity === 'Marrakech-Safi'"
-              class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-muted-foreground hover:bg-muted hover:text-foreground transition-all"
-            >
-              Marrakech-Safi
-            </button>
-            <button
-              (click)="changeCityFilter('Fes-Meknes')"
-              [class.text-primary]="activeFilterCity === 'Fes-Meknes'"
-              [class.bg-accent/40]="activeFilterCity === 'Fes-Meknes'"
-              class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-muted-foreground hover:bg-muted hover:text-foreground transition-all"
-            >
-              Fes-Meknes
-            </button>
-            <button
-              (click)="changeCityFilter('Tangier-Tetouan')"
-              [class.text-primary]="activeFilterCity === 'Tangier-Tetouan'"
-              [class.bg-accent/40]="activeFilterCity === 'Tangier-Tetouan'"
-              class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-muted-foreground hover:bg-muted hover:text-foreground transition-all"
-            >
-              Tangier-Tetouan
+            <button *ngFor="let c of cityFilterOptions"
+              (click)="changeCityFilter(c)"
+              [class.text-primary]="activeFilterCity === c"
+              [class.bg-accent/40]="activeFilterCity === c"
+              class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-muted-foreground hover:bg-muted hover:text-foreground transition-all">
+              {{ c }}
             </button>
           </div>
         </div>
 
-        <!-- Moroccan Motif Decorative Graphic -->
-        <div
-          class="mt-auto p-4 bg-muted/60 border border-border/80 rounded-xl relative overflow-hidden"
-        >
+        <div class="mt-auto p-4 bg-muted/60 border border-border/80 rounded-xl">
           <div class="flex items-center gap-2 text-primary mb-2">
             <iconify-icon icon="lucide:sparkles" class="text-lg"></iconify-icon>
             <span class="text-xs font-bold uppercase tracking-wider">Heritage Tech</span>
           </div>
           <p class="text-[11px] text-muted-foreground leading-relaxed">
-            Analyzing regional travel patterns to digitally elevate Moroccan artisan and guide
-            economies.
+            Données en temps réel depuis la base de données MarocSphere.
           </p>
         </div>
       </aside>
 
-      <!-- Right Content Panel -->
+      <!-- ── MAIN CONTENT ──────────────────────────────────────────────────── -->
       <main class="flex-1 p-6 lg:p-8 flex flex-col gap-8 max-w-7xl mx-auto w-full">
-        <!-- Top Overview Header & Export Tools -->
+
+        <!-- Header + Export -->
         <section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 class="text-xl font-heading font-bold text-foreground">
-              National Tourism Intelligence
-            </h2>
-            <p class="text-xs text-muted-foreground">
-              Comprehensive platform telemetry, guide certifications, and cooperative marketplace
-              metrics.
-            </p>
+            <h2 class="text-xl font-heading font-bold text-foreground">Intelligence Nationale du Tourisme</h2>
+            <p class="text-xs text-muted-foreground">Télémétrie complète · certifications guides · métriques marché artisanal.</p>
             <p class="text-[11px] text-muted-foreground mt-1">
-              Active scope: {{ activeFilterCity }} • {{ activeFilterDate }}
+              Périmètre actif : <strong class="text-foreground">{{ activeFilterCity }}</strong> ·
+              <strong class="text-foreground">{{ activeFilterDate }}</strong>
             </p>
           </div>
           <div class="flex items-center gap-2">
-            <button
-              (click)="exportReport('PDF')"
-              class="flex items-center gap-1.5 px-3 py-2 border border-border bg-card hover:bg-muted text-foreground text-xs font-semibold rounded-lg transition-all shadow-sm"
-            >
-              <iconify-icon icon="lucide:download" class="text-sm"></iconify-icon>
-              <span>PDF</span>
+            <button (click)="exportReport('PDF')"
+              class="flex items-center gap-1.5 px-3 py-2 border border-border bg-card hover:bg-muted text-foreground text-xs font-semibold rounded-lg transition-all shadow-sm">
+              <iconify-icon icon="lucide:download" class="text-sm"></iconify-icon><span>PDF</span>
             </button>
-            <button
-              (click)="exportReport('Excel')"
-              class="flex items-center gap-1.5 px-3 py-2 border border-border bg-card hover:bg-muted text-foreground text-xs font-semibold rounded-lg transition-all shadow-sm"
-            >
-              <iconify-icon icon="lucide:download" class="text-sm"></iconify-icon>
-              <span>Excel</span>
+            <button (click)="exportReport('Excel')"
+              class="flex items-center gap-1.5 px-3 py-2 border border-border bg-card hover:bg-muted text-foreground text-xs font-semibold rounded-lg transition-all shadow-sm">
+              <iconify-icon icon="lucide:download" class="text-sm"></iconify-icon><span>Excel</span>
             </button>
-            <button
-              (click)="exportReport('CSV')"
-              class="flex items-center gap-1.5 px-3 py-2 border border-border bg-card hover:bg-muted text-foreground text-xs font-semibold rounded-lg transition-all shadow-sm"
-            >
-              <iconify-icon icon="lucide:download" class="text-sm"></iconify-icon>
-              <span>CSV</span>
+            <button (click)="exportReport('CSV')"
+              class="flex items-center gap-1.5 px-3 py-2 border border-border bg-card hover:bg-muted text-foreground text-xs font-semibold rounded-lg transition-all shadow-sm">
+              <iconify-icon icon="lucide:download" class="text-sm"></iconify-icon><span>CSV</span>
             </button>
           </div>
         </section>
 
-        <!-- Read-Only KPI Overview Grid -->
-        <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <!-- Loading spinner -->
+        <div *ngIf="isLoading" class="flex items-center justify-center py-20">
+          <iconify-icon icon="lucide:loader-circle" class="text-4xl text-primary animate-spin"></iconify-icon>
+        </div>
+
+        <!-- ── KPI CARDS ────────────────────────────────────────────────────── -->
+        <section *ngIf="!isLoading" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+
           <div class="bg-card p-5 rounded-xl border border-border/80 shadow-sm">
-            <span class="text-xs font-semibold text-muted-foreground block mb-1"
-              >Total Platform Users</span
-            >
-            <div class="text-2xl font-bold text-foreground">
-              {{ metrics.totalUsers.toLocaleString() }}
-            </div>
-            <span class="text-[10px] text-emerald-600 font-semibold block mt-1"
-              >+12.4% YoY Growth</span
-            >
+            <span class="text-xs font-semibold text-muted-foreground block mb-1">Total Utilisateurs</span>
+            <div class="text-2xl font-bold text-foreground">{{ metrics.totalUsers | number }}</div>
+            <span class="text-[10px] text-muted-foreground block mt-1">
+              {{ metrics.totalClients }} clients · {{ metrics.totalDmcs }} DMCs
+            </span>
           </div>
+
           <div class="bg-card p-5 rounded-xl border border-border/80 shadow-sm">
-            <span class="text-xs font-semibold text-muted-foreground block mb-1"
-              >Active Certified Guides</span
-            >
-            <div class="text-2xl font-bold text-foreground">
-              {{ metrics.certifiedGuides.toLocaleString() }}
-            </div>
-            <span class="text-[10px] text-emerald-600 font-semibold block mt-1"
-              >98% Active Duty Rate</span
-            >
+            <span class="text-xs font-semibold text-muted-foreground block mb-1">Guides Certifiés</span>
+            <div class="text-2xl font-bold text-foreground">{{ metrics.totalGuides | number }}</div>
+            <span class="text-[10px] text-emerald-600 font-semibold block mt-1">
+              {{ metrics.guidesDisponibles }} disponibles
+            </span>
           </div>
+
           <div class="bg-card p-5 rounded-xl border border-border/80 shadow-sm">
-            <span class="text-xs font-semibold text-muted-foreground block mb-1"
-              >Cooperative Artisans</span
-            >
-            <div class="text-2xl font-bold text-foreground">
-              {{ metrics.activeArtisans.toLocaleString() }}
-            </div>
-            <span class="text-[10px] text-emerald-600 font-semibold block mt-1"
-              >MAD 120K Sales Volume</span
-            >
+            <span class="text-xs font-semibold text-muted-foreground block mb-1">Artisans</span>
+            <div class="text-2xl font-bold text-foreground">{{ metrics.totalArtisans | number }}</div>
+            <span class="text-[10px] text-emerald-600 font-semibold block mt-1">
+              {{ metrics.artisansEligiblesExport }} éligibles export
+            </span>
           </div>
+
           <div class="bg-card p-5 rounded-xl border border-border/80 shadow-sm">
-            <span class="text-xs font-semibold text-muted-foreground block mb-1"
-              >Completed Trips</span
-            >
-            <div class="text-2xl font-bold text-foreground">
-              {{ metrics.completedTrips.toLocaleString() }}
-            </div>
-            <span class="text-[10px] text-emerald-600 font-semibold block mt-1"
-              >4.9★ Average Rating</span
-            >
+            <span class="text-xs font-semibold text-muted-foreground block mb-1">Réservations</span>
+            <div class="text-2xl font-bold text-foreground">{{ metrics.totalReservations | number }}</div>
+            <span class="text-[10px] text-amber-600 font-semibold block mt-1">
+              {{ metrics.reservationsEnAttente }} en attente · {{ metrics.reservationsConfirmees }} confirmées
+            </span>
           </div>
+
         </section>
 
-        <!-- Advanced Intelligence Charts -->
-        <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <!-- Interactive Chart 1 -->
+        <!-- ── CHARTS ────────────────────────────────────────────────────────── -->
+        <section *ngIf="!isLoading" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
           <div class="bg-card border border-border/80 rounded-xl p-5 shadow-sm lg:col-span-2">
-            <h3 class="font-bold text-sm mb-4">Tourist Origin Countries &amp; Peak Seasons</h3>
-            <div class="h-64 overflow-hidden">
-              <canvas #growthChart height="160"></canvas>
-            </div>
+            <h3 class="font-bold text-sm mb-1">Nationalités des Clients (Top origines)</h3>
+            <p class="text-xs text-muted-foreground mb-4">Basé sur {{ clients.length }} clients enregistrés.</p>
+            <div class="h-64"><canvas #growthChart height="160"></canvas></div>
           </div>
 
-          <!-- Interactive Chart 2 -->
           <div class="bg-card border border-border/80 rounded-xl p-5 shadow-sm">
-            <h3 class="font-bold text-sm mb-4">Preferred Travel Categories</h3>
-            <div class="h-64 overflow-hidden">
-              <canvas #destinationChart height="160"></canvas>
-            </div>
+            <h3 class="font-bold text-sm mb-1">Catégories d'Artisanat</h3>
+            <p class="text-xs text-muted-foreground mb-4">Répartition sur {{ artisans.length }} artisans.</p>
+            <div class="h-64"><canvas #destinationChart height="160"></canvas></div>
           </div>
+
         </section>
 
-        <!-- Regional Hotspots and Geographic Insights -->
-        <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <!-- Morocco Map Visualizer -->
-          <div
-            class="bg-card border border-border/80 rounded-xl p-5 shadow-sm lg:col-span-2 flex flex-col justify-between"
-          >
-            <div>
-              <h3 class="font-bold text-sm mb-1">Geographic Density Map</h3>
-              <p class="text-xs text-muted-foreground">
-                Interactive visualization of certified guide density and tourist hotspots.
-              </p>
-            </div>
-            <div class="my-4 relative">
-              <img
-                src="https://uxmagic.blob.core.windows.net/public/agent-images/map-placeholder-1784200633943-8bvzyswacom.png"
-                alt="Map of Morocco"
-                class="w-full rounded-lg border border-border/60 object-cover max-h-64"
-              />
-              <!-- Overlay indicators for hotspots -->
-              <div
-                class="absolute top-1/4 left-1/3 w-3 h-3 bg-primary rounded-full animate-ping"
-              ></div>
-              <div class="absolute top-1/4 left-1/3 w-3 h-3 bg-primary rounded-full"></div>
-              <div
-                class="absolute top-1/3 left-1/4 w-3 h-3 bg-secondary rounded-full animate-ping"
-              ></div>
-              <div class="absolute top-1/3 left-1/4 w-3 h-3 bg-secondary rounded-full"></div>
-            </div>
-            <div class="flex gap-4 text-xs">
-              <div class="flex items-center gap-1.5">
-                <span class="w-2.5 h-2.5 bg-primary rounded-full"></span
-                ><span>High Density (Marrakech)</span>
-              </div>
-              <div class="flex items-center gap-1.5">
-                <span class="w-2.5 h-2.5 bg-secondary rounded-full"></span
-                ><span>Medium Density (Fes)</span>
+        <!-- ── DETAIL PANELS ─────────────────────────────────────────────────── -->
+        <section *ngIf="!isLoading" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+          <!-- Top Guides by Score -->
+          <div class="bg-card border border-border/80 rounded-xl p-5 shadow-sm">
+            <h3 class="font-bold text-sm mb-4">Top Guides (Score Certification)</h3>
+            <div *ngIf="topGuidesByScore.length === 0" class="text-xs text-muted-foreground">Aucun guide.</div>
+            <div class="space-y-3">
+              <div *ngFor="let g of topGuidesByScore; let i = index"
+                class="flex items-center justify-between text-xs border-b border-border/60 pb-2 last:border-0">
+                <div class="flex items-center gap-2">
+                  <span class="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-[10px]">
+                    {{ i + 1 }}
+                  </span>
+                  <div>
+                    <div class="font-semibold text-foreground">{{ g.prenom }} {{ g.nom }}</div>
+                    <div class="text-muted-foreground">{{ g.languePreferee ?? '—' }}</div>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <span class="font-bold text-foreground">{{ g.scoreCertification | number:'1.1-1' }} ★</span>
+                  <div [class.text-emerald-600]="g.disponible" [class.text-muted-foreground]="!g.disponible" class="text-[10px]">
+                    {{ g.disponible ? 'Disponible' : 'Indisponible' }}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- Read-Only Insights Table -->
-          <div
-            class="bg-card border border-border/80 rounded-xl p-5 shadow-sm flex flex-col justify-between"
-          >
+          <!-- Reservation Status Breakdown -->
+          <div class="bg-card border border-border/80 rounded-xl p-5 shadow-sm">
+            <h3 class="font-bold text-sm mb-4">Statuts des Réservations</h3>
+            <div *ngIf="reservationByStatus.length === 0" class="text-xs text-muted-foreground">Aucune réservation.</div>
+            <div class="space-y-3">
+              <div *ngFor="let s of reservationByStatus; trackBy: trackByStatut"
+                class="space-y-1">
+                <div class="flex justify-between text-xs">
+                  <span class="font-semibold text-foreground">{{ s.statut }}</span>
+                  <span class="text-muted-foreground">{{ s.count }} ({{ s.pct }}%)</span>
+                </div>
+                <div class="w-full bg-muted rounded-full h-1.5">
+                  <div class="h-1.5 rounded-full"
+                    [style.width.%]="s.pct"
+                    [class.bg-emerald-500]="s.statut === 'CONFIRMEE'"
+                    [class.bg-amber-500]="s.statut === 'EN_ATTENTE'"
+                    [class.bg-red-500]="s.statut === 'ANNULEE'"
+                    [class.bg-primary]="!['CONFIRMEE','EN_ATTENTE','ANNULEE'].includes(s.statut)">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Artisan Categories & Key Indicators -->
+          <div class="bg-card border border-border/80 rounded-xl p-5 shadow-sm flex flex-col justify-between">
             <div>
-              <h3 class="font-bold text-sm mb-3">Key Tourism Indicators</h3>
-              <div class="space-y-3">
-                <div
-                  class="flex justify-between items-center text-xs border-b border-border/60 pb-2"
-                >
-                  <span class="text-muted-foreground">Average Trip Duration:</span>
-                  <span class="font-semibold text-foreground">7.4 Days</span>
+              <h3 class="font-bold text-sm mb-4">Indicateurs Clés</h3>
+              <div class="space-y-3 text-xs">
+                <div class="flex justify-between items-center border-b border-border/60 pb-2">
+                  <span class="text-muted-foreground">Total Clients :</span>
+                  <span class="font-semibold text-foreground">{{ metrics.totalClients | number }}</span>
                 </div>
-                <div
-                  class="flex justify-between items-center text-xs border-b border-border/60 pb-2"
-                >
-                  <span class="text-muted-foreground">Average Trip Budget:</span>
-                  <span class="font-semibold text-foreground">MAD 14,800</span>
+                <div class="flex justify-between items-center border-b border-border/60 pb-2">
+                  <span class="text-muted-foreground">Guides disponibles :</span>
+                  <span class="font-semibold text-emerald-600">{{ metrics.guidesDisponibles | number }}</span>
                 </div>
-                <div
-                  class="flex justify-between items-center text-xs border-b border-border/60 pb-2"
-                >
-                  <span class="text-muted-foreground">AI Itinerary Generation Rate:</span>
-                  <span class="font-semibold text-foreground">84% of Users</span>
+                <div class="flex justify-between items-center border-b border-border/60 pb-2">
+                  <span class="text-muted-foreground">Artisans éligibles export :</span>
+                  <span class="font-semibold text-foreground">{{ metrics.artisansEligiblesExport | number }}</span>
                 </div>
-                <div class="flex justify-between items-center text-xs pb-1">
-                  <span class="text-muted-foreground">Preferred Language:</span>
-                  <span class="font-semibold text-foreground">English (42%)</span>
+                <div class="flex justify-between items-center border-b border-border/60 pb-2">
+                  <span class="text-muted-foreground">DMCs actifs :</span>
+                  <span class="font-semibold text-foreground">{{ metrics.totalDmcs | number }}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-muted-foreground">Résas confirmées :</span>
+                  <span class="font-semibold text-emerald-600">{{ metrics.reservationsConfirmees | number }}</span>
                 </div>
               </div>
             </div>
             <div class="p-3 bg-muted/40 rounded-lg text-[10px] text-muted-foreground mt-4">
-              * This data is calculated based on telemetry logs representing transactions processed
-              in the last 30 days.
+              * Données en temps réel depuis la base de données MarocSphere.
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ── TOP ARTISAN CATEGORIES TABLE ────────────────────────────────── -->
+        <section *ngIf="!isLoading && topArtisanCategories.length > 0"
+          class="bg-card border border-border/80 rounded-xl p-5 shadow-sm">
+          <h3 class="font-bold text-sm mb-4">Catégories d'Artisanat — Détail</h3>
+          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+            <div *ngFor="let cat of topArtisanCategories; trackBy: trackByLabel"
+              class="p-3 bg-muted/40 rounded-lg text-center">
+              <div class="text-lg font-bold text-foreground">{{ cat.count }}</div>
+              <div class="text-xs text-muted-foreground mt-1 truncate" [title]="cat.label">{{ cat.label }}</div>
             </div>
           </div>
         </section>
+
+        <!-- ── TOP CLIENT NATIONALITIES TABLE ──────────────────────────────── -->
+        <section *ngIf="!isLoading && topClientNationalities.length > 0"
+          class="bg-card border border-border/80 rounded-xl p-5 shadow-sm">
+          <h3 class="font-bold text-sm mb-4">Origines des Clients — Top nationalités</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="bg-muted/40 border-b border-border text-muted-foreground uppercase font-bold">
+                  <th class="p-3">Rang</th>
+                  <th class="p-3">Nationalité</th>
+                  <th class="p-3">Nombre de clients</th>
+                  <th class="p-3">Part (%)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let n of topClientNationalities; let i = index; trackBy: trackByLabel"
+                  class="border-b border-border/60 hover:bg-muted/20 transition-all">
+                  <td class="p-3 font-bold text-primary">#{{ i + 1 }}</td>
+                  <td class="p-3 font-semibold text-foreground">{{ n.label }}</td>
+                  <td class="p-3 text-foreground">{{ n.count }}</td>
+                  <td class="p-3">
+                    <div class="flex items-center gap-2">
+                      <div class="w-24 bg-muted rounded-full h-1.5">
+                        <div class="h-1.5 bg-primary rounded-full"
+                          [style.width.%]="clients.length ? (n.count / clients.length * 100) : 0">
+                        </div>
+                      </div>
+                      <span>{{ clients.length ? (n.count / clients.length * 100 | number:'1.0-1') : 0 }}%</span>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
       </main>
+    </div><!-- end flex body -->
+
+    <!-- ═══ TOAST ══════════════════════════════════════════════════════════════ -->
+    <div *ngIf="toastVisible"
+      class="fixed bottom-6 right-6 z-50 bg-card border border-border rounded-xl shadow-xl px-4 py-3.5 flex items-center gap-3 max-w-sm transition-all duration-300 pointer-events-none"
+      [class.border-emerald-200]="toastType === 'success'"
+      [class.border-red-200]="toastType === 'error'">
+      <iconify-icon
+        [icon]="toastType === 'success' ? 'lucide:circle-check' : 'lucide:circle-alert'"
+        class="text-xl"
+        [class.text-emerald-500]="toastType === 'success'"
+        [class.text-red-500]="toastType === 'error'">
+      </iconify-icon>
+      <p class="text-xs font-bold text-foreground">{{ toastMessage }}</p>
     </div>
 
-    <!-- Dynamic Toast Notification (Angular-style) -->
-    <div
-      id="toast-notification"
-      class="fixed bottom-6 right-6 z-50 bg-card border border-border rounded-xl shadow-xl px-4 py-3.5 flex items-center gap-3 max-w-sm translate-y-12 opacity-0 transition-all duration-300 pointer-events-none"
-    >
-      <div id="toast-icon">
-        <iconify-icon icon="lucide:circle-check" class="text-emerald-500 text-xl"></iconify-icon>
-      </div>
-      <div>
-        <p id="toast-text" class="text-xs font-bold text-foreground">
-          Auditor Portal initialized successfully.
-        </p>
-      </div>
-    </div>
   </div>
 </div>

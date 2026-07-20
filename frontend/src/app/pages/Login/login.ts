@@ -41,6 +41,7 @@ export class login {
           ARTISAN: '/dashboard-artisan',
           GUIDE:   '/dashboard-guide',
           ADMIN:   '/admin',
+          ADMIN_DATA: '/adminData',
           DMC:     '/dashboard-dmc',
         };
         const destination = dashboardRoutes[role] ?? '/landing';

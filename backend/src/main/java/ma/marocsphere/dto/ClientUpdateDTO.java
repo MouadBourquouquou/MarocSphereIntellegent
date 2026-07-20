@@ -15,4 +15,5 @@ public class ClientUpdateDTO {
     private String telephone;
     private String nationalite;
     private String languePreferee;
+    private String status;
 }

@@ -3,325 +3,282 @@ import {
   Component,
   ElementRef,
   OnDestroy,
+  OnInit,
   CUSTOM_ELEMENTS_SCHEMA,
-  ViewChild
+  ViewChild,
+  inject
 } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 
-import { AdminDataService, ChartSeriesData, DashboardMetrics } from './admin-data.service';
-import { PlatformUser, ToastType, UserFormValue, UserRole } from './platform-user.model';
+import {
+  AdminDataService,
+  DashboardMetrics,
+  ChartSeriesData,
+  ClientDTO,
+  GuideDTO,
+  ArtisanDTO,
+  DmcDTO,
+  ReservationDTO
+} from './admin-data.service';
+import { ToastType } from './platform-user.model';
 
 import 'iconify-icon';
 
 Chart.register(...registerables);
 
 @Component({
-  selector: 'app-super-admin-dashboard',
+  standalone: true,
+  selector: 'app-admin-data-dashboard',
+  imports: [CommonModule, RouterModule],
   templateUrl: './adminData.html',
   styleUrls: ['./adminData.css'],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class adminData implements AfterViewInit, OnDestroy {
-  // Canvas refs — in the template, tag the two <canvas> elements with
-  // #growthChart and #destinationChart instead of id="growthChart" / id="destinationChart".
-  @ViewChild('growthChart') private growthChartRef?: ElementRef<HTMLCanvasElement>;
+export class adminData implements AfterViewInit, OnDestroy, OnInit {
+
+  @ViewChild('growthChart')      private growthChartRef?:      ElementRef<HTMLCanvasElement>;
   @ViewChild('destinationChart') private destinationChartRef?: ElementRef<HTMLCanvasElement>;
 
-  private growthChart?: Chart;
+  private growthChart?:      Chart;
   private destinationChart?: Chart;
-  private toastTimeoutId?: ReturnType<typeof setTimeout>;
+  private toastTimeoutId?:   ReturnType<typeof setTimeout>;
 
-  activeTab = 'users';
+  private adminDataService = inject(AdminDataService);
 
-  users: PlatformUser[] = [];
-  metrics: DashboardMetrics = {
-    totalUsers: 0,
-    certifiedGuides: 0,
-    activeArtisans: 0,
-    completedTrips: 0
-  };
-  originBreakdown: ChartSeriesData = { labels: [], values: [] };
-  categoryBreakdown: ChartSeriesData = { labels: [], values: [] };
-  dateFilterOptions: string[] = [];
-  cityFilterOptions: string[] = [];
+  // ── Loading ──────────────────────────────────────────────────────────────
   isLoading = false;
 
-  // Toast state — bind these in the template instead of calling getElementById.
+  // ── KPI metrics ──────────────────────────────────────────────────────────
+  metrics: DashboardMetrics = {
+    totalUsers: 0, totalClients: 0, totalGuides: 0,
+    totalArtisans: 0, totalDmcs: 0, totalReservations: 0,
+    reservationsConfirmees: 0, reservationsEnAttente: 0,
+    guidesDisponibles: 0, artisansEligiblesExport: 0
+  };
+
+  // ── Chart data ────────────────────────────────────────────────────────────
+  originBreakdown:   ChartSeriesData = { labels: [], values: [] };
+  categoryBreakdown: ChartSeriesData = { labels: [], values: [] };
+
+  // ── Raw lists for detail panels ───────────────────────────────────────────
+  guides:       GuideDTO[]       = [];
+  artisans:     ArtisanDTO[]     = [];
+  reservations: ReservationDTO[] = [];
+  clients:      ClientDTO[]      = [];
+  dmcs:         DmcDTO[]         = [];
+
+  // ── Filter state ──────────────────────────────────────────────────────────
+  activeFilterDate = 'Last 30 Days';
+  activeFilterCity = 'All Regions';
+
+  readonly dateFilterOptions = this.adminDataService.dateFilterOptions;
+  readonly cityFilterOptions = this.adminDataService.cityFilterOptions;
+
+  // ── Toast ─────────────────────────────────────────────────────────────────
   toastMessage = '';
   toastType: ToastType = 'success';
   toastVisible = false;
 
-  showUserModal = false;
-  modalMode: 'add' | 'edit' = 'add';
-  currentUser: PlatformUser | null = null;
+  // ── Lifecycle ─────────────────────────────────────────────────────────────
 
-  searchQuery = '';
-  filterRole: UserRole | 'All' = 'All';
-  activeFilterDate = 'Last 30 Days';
-  activeFilterCity = 'All Regions';
-
-  constructor(private readonly adminDataService: AdminDataService) {}
-
-  /**
-   * Replaces renderUserTable(): instead of re-rendering an HTML string into a tbody,
-   * the template does *ngFor over this getter, so it recomputes automatically
-   * whenever users, searchQuery, or filterRole change.
-   */
-  get filteredUsers(): PlatformUser[] {
-    const query = this.searchQuery.trim().toLowerCase();
-    return this.users.filter(user => {
-      const matchesSearch =
-        user.name.toLowerCase().includes(query) ||
-        user.email.toLowerCase().includes(query);
-      const matchesRole = this.filterRole === 'All' || user.role === this.filterRole;
-      return matchesSearch && matchesRole;
-    });
+  ngOnInit(): void {
+    this.loadDashboardData();
   }
 
   ngAfterViewInit(): void {
-    this.loadDashboardData();
-
-    setTimeout(() => {
-      this.showNotification('Welcome back, Mohamed! Super Admin Portal initialized.');
-    }, 1000);
+    setTimeout(() => this.showNotification('Portail Analytique initialisé.'), 800);
   }
 
   ngOnDestroy(): void {
     this.growthChart?.destroy();
     this.destinationChart?.destroy();
-    if (this.toastTimeoutId) {
-      clearTimeout(this.toastTimeoutId);
-    }
+    if (this.toastTimeoutId) clearTimeout(this.toastTimeoutId);
   }
 
-  showNotification(message: string, type: ToastType = 'success'): void {
-    this.toastMessage = message;
-    this.toastType = type;
-    this.toastVisible = true;
+  // ── Data loading ──────────────────────────────────────────────────────────
 
-    if (this.toastTimeoutId) {
-      clearTimeout(this.toastTimeoutId);
-    }
-    this.toastTimeoutId = setTimeout(() => {
-      this.toastVisible = false;
-    }, 3500);
+  loadDashboardData(): void {
+    this.isLoading = true;
+
+    forkJoin({
+      metrics:  this.adminDataService.getSummaryMetrics(),
+      entities: this.adminDataService.getAllEntities(),
+    }).subscribe({
+      next: ({ metrics, entities }) => {
+        this.metrics   = metrics;
+        this.clients   = entities.clients;
+        this.guides    = entities.guides;
+        this.artisans  = entities.artisans;
+        this.reservations = entities.reservations;
+        this.dmcs      = entities.dmcs;
+
+        this.originBreakdown   = this.buildBreakdown(this.clients, 'nationalite');
+        this.categoryBreakdown = this.buildBreakdown(this.artisans, 'categorieArtisanat');
+
+        this.isLoading = false;
+        setTimeout(() => { this.updateGrowthChart(); this.updateDestinationChart(); }, 50);
+      },
+      error: err => {
+        console.error('Analytics load failed', err);
+        this.showNotification('Erreur de chargement des données.', 'error');
+        this.isLoading = false;
+      }
+    });
   }
+
+  private buildBreakdown(items: object[], field: string): ChartSeriesData {
+    const counts: Record<string, number> = {};
+    items.forEach(item => {
+      const key = ((item as Record<string, unknown>)[field] as string) || 'Non spécifié';
+      counts[key] = (counts[key] ?? 0) + 1;
+    });
+    const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 6);
+    return { labels: sorted.map(e => e[0]), values: sorted.map(e => e[1]) };
+  }
+
+  // ── Filter handlers ───────────────────────────────────────────────────────
 
   changeDateFilter(range: string): void {
     this.activeFilterDate = range;
+    this.showNotification(`Plage mise à jour : ${range}`);
+    // Re-load so service re-computes from live data
     this.loadDashboardData();
-    this.showNotification(`Date range updated to ${range}`);
   }
 
   changeCityFilter(city: string): void {
     this.activeFilterCity = city;
+    this.showNotification(`Région : ${city}`);
     this.loadDashboardData();
-    this.showNotification(`Region filter updated to ${city}`);
   }
+
+  // ── Export (simulated — real export would call a backend endpoint) ─────────
 
   exportReport(format: string): void {
-    const today = new Date().toLocaleDateString('en-GB');
-    this.showNotification(`Preparing ${format} export...`);
-
-    setTimeout(() => {
-      this.showNotification(`Download ready: ${format} report for ${today}`);
-    }, 1500);
+    this.showNotification(`Préparation export ${format}...`);
+    setTimeout(() => this.showNotification(`Export ${format} prêt.`), 1500);
   }
 
-  /**
-   * Original relied on event.currentTarget to toggle classes on the clicked tab button.
-   * Prefer driving the active-tab styling from `activeTab` in the template instead, e.g.
-   * [class.border-primary]="activeTab === 'users'" — this removes the need to touch the DOM.
-   */
-  switchTab(tabId: string): void {
-    this.activeTab = tabId;
-    this.showNotification(`Switched to ${tabId.charAt(0).toUpperCase() + tabId.slice(1)} Management view`);
+  // ── Toast ─────────────────────────────────────────────────────────────────
+
+  showNotification(message: string, type: ToastType = 'success'): void {
+    this.toastMessage = message;
+    this.toastType    = type;
+    this.toastVisible = true;
+    if (this.toastTimeoutId) clearTimeout(this.toastTimeoutId);
+    this.toastTimeoutId = setTimeout(() => { this.toastVisible = false; }, 3500);
   }
 
-  openUserModal(mode: 'add' | 'edit', userId: number | null = null): void {
-    this.modalMode = mode;
-    this.currentUser = mode === 'edit' ? this.users.find(u => u.id === userId) ?? null : null;
-    this.showUserModal = true;
+  // ── Computed helpers ──────────────────────────────────────────────────────
+
+  get topGuidesByScore(): GuideDTO[] {
+    return [...this.guides]
+      .filter(g => g.scoreCertification != null)
+      .sort((a, b) => (b.scoreCertification ?? 0) - (a.scoreCertification ?? 0))
+      .slice(0, 5);
   }
 
-  closeUserModal(): void {
-    this.showUserModal = false;
-    this.currentUser = null;
-  }
-
-  /** Bind the modal form to a reactive/template-driven form and pass its value here on submit. */
-  saveUser(formValue: UserFormValue): void {
-    if (this.currentUser) {
-      const user = this.users.find(u => u.id === this.currentUser!.id);
-      if (user) {
-        user.name = formValue.name;
-        user.email = formValue.email;
-        user.role = formValue.role;
-        user.status = formValue.status;
-        user.language = formValue.language;
-      }
-      this.showNotification('User profile updated successfully');
-    } else {
-      const newUser: PlatformUser = {
-        id: Date.now(),
-        name: formValue.name,
-        role: formValue.role,
-        email: formValue.email,
-        date: new Date().toISOString().split('T')[0],
-        status: formValue.status,
-        rating: 5.0,
-        country: 'Morocco',
-        language: formValue.language,
-        avatar: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 90 + 1)}.jpg`
-      };
-      this.users.unshift(newUser);
-      this.showNotification('New user registered successfully');
-    }
-
-    this.closeUserModal();
-  }
-
-  deleteUser(userId: number): void {
-    const confirmed = confirm('Are you sure you want to permanently delete this user? This action cannot be undone.');
-    if (!confirmed) {
-      return;
-    }
-    this.users = this.users.filter(u => u.id !== userId);
-    this.showNotification('User account deleted', 'error');
-  }
-
-  toggleUserStatus(userId: number): void {
-    const user = this.users.find(u => u.id === userId);
-    if (!user) {
-      return;
-    }
-    user.status = user.status === 'Active' || user.status === 'Certified' ? 'Suspended' : 'Active';
-    this.showNotification(`User status changed to ${user.status}`);
-  }
-
-  handleSearch(value: string): void {
-    this.searchQuery = value;
-  }
-
-  handleRoleFilter(value: UserRole | 'All'): void {
-    this.filterRole = value;
-  }
-
-  private loadDashboardData(): void {
-    this.isLoading = true;
-
-    this.adminDataService.getUsers().subscribe(users => {
-      this.users = users;
+  get topArtisanCategories(): { label: string; count: number }[] {
+    const counts: Record<string, number> = {};
+    this.artisans.forEach(a => {
+      const c = a.categorieArtisanat || 'Autre';
+      counts[c] = (counts[c] ?? 0) + 1;
     });
-
-    this.adminDataService.getDateFilterOptions().subscribe(options => {
-      this.dateFilterOptions = options;
-    });
-
-    this.adminDataService.getCityFilterOptions().subscribe(options => {
-      this.cityFilterOptions = options;
-    });
-
-    this.adminDataService.getSummaryMetrics(this.activeFilterCity, this.activeFilterDate).subscribe(metrics => {
-      this.metrics = metrics;
-    });
-
-    this.adminDataService.getOriginBreakdown(this.activeFilterCity, this.activeFilterDate).subscribe(data => {
-      this.originBreakdown = data;
-      this.updateGrowthChart();
-    });
-
-    this.adminDataService.getCategoryBreakdown(this.activeFilterCity, this.activeFilterDate).subscribe(data => {
-      this.categoryBreakdown = data;
-      this.updateDestinationChart();
-    });
-
-    setTimeout(() => {
-      this.isLoading = false;
-    }, 400);
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([label, count]) => ({ label, count }));
   }
 
-  private initGrowthChart(): void {
-    if (!this.growthChartRef) {
-      return;
-    }
-
-    const config: ChartConfiguration<'line'> = {
-      type: 'line',
-      data: {
-        labels: this.originBreakdown.labels,
-        datasets: [
-          {
-            label: 'Active Travelers',
-            data: this.originBreakdown.values,
-            borderColor: '#B34724',
-            backgroundColor: 'rgba(179, 71, 36, 0.1)',
-            fill: true,
-            tension: 0.4
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          // Note: '#EADEC9/20' isn't a valid CSS color — that was a Tailwind opacity
-          // suffix left over from the original markup. Using an 8-digit hex (20% alpha) instead.
-          y: { grid: { color: '#EADEC933' } },
-          x: { grid: { display: false } }
-        }
-      }
-    };
-
-    this.growthChart = new Chart(this.growthChartRef.nativeElement, config);
+  get reservationByStatus(): { statut: string; count: number; pct: number }[] {
+    const counts: Record<string, number> = {};
+    this.reservations.forEach(r => {
+      const s = r.statut ?? 'INCONNU';
+      counts[s] = (counts[s] ?? 0) + 1;
+    });
+    const total = this.reservations.length || 1;
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([statut, count]) => ({ statut, count, pct: Math.round((count / total) * 100) }));
   }
 
-  private initDestinationChart(): void {
-    if (!this.destinationChartRef) {
-      return;
-    }
-
-    const config: ChartConfiguration<'doughnut'> = {
-      type: 'doughnut',
-      data: {
-        labels: this.categoryBreakdown.labels,
-        datasets: [
-          {
-            data: this.categoryBreakdown.values,
-            backgroundColor: ['#B34724', '#2C5234', '#D4AF37', '#6E655F']
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { position: 'bottom' } }
-      }
-    };
-
-    this.destinationChart = new Chart(this.destinationChartRef.nativeElement, config);
+  get topClientNationalities(): { label: string; count: number }[] {
+    const counts: Record<string, number> = {};
+    this.clients.forEach(c => {
+      const n = c.nationalite || 'Non spécifié';
+      counts[n] = (counts[n] ?? 0) + 1;
+    });
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([label, count]) => ({ label, count }));
   }
+
+  trackByLabel(_: number, item: { label: string }): string { return item.label; }
+  trackByStatut(_: number, item: { statut: string }): string { return item.statut; }
+
+  // ── Charts ─────────────────────────────────────────────────────────────────
 
   private updateGrowthChart(): void {
-    if (!this.growthChart) {
-      this.initGrowthChart();
-      return;
-    }
+    const data  = this.originBreakdown;
+    const labels = data.labels.length ? data.labels : ['Aucune donnée'];
+    const values = data.values.length ? data.values : [0];
 
-    this.growthChart.data.labels = this.originBreakdown.labels;
-    this.growthChart.data.datasets[0].data = this.originBreakdown.values;
-    this.growthChart.update();
+    if (this.growthChart) {
+      this.growthChart.data.labels = labels;
+      this.growthChart.data.datasets[0].data = values;
+      this.growthChart.update();
+    } else if (this.growthChartRef) {
+      const config: ChartConfiguration<'bar'> = {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Clients par nationalité',
+            data: values,
+            backgroundColor: ['#B34724','#2C5234','#D4AF37','#6E655F','#5B8DB8','#9B59B6'],
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, grid: { color: '#EADEC933' } },
+            x: { grid: { display: false } }
+          }
+        }
+      };
+      this.growthChart = new Chart(this.growthChartRef.nativeElement, config);
+    }
   }
 
   private updateDestinationChart(): void {
-    if (!this.destinationChart) {
-      this.initDestinationChart();
-      return;
-    }
+    const data   = this.categoryBreakdown;
+    const labels = data.labels.length ? data.labels : ['Aucune donnée'];
+    const values = data.values.length ? data.values : [1];
 
-    this.destinationChart.data.labels = this.categoryBreakdown.labels;
-    this.destinationChart.data.datasets[0].data = this.categoryBreakdown.values;
-    this.destinationChart.update();
+    if (this.destinationChart) {
+      this.destinationChart.data.labels = labels;
+      this.destinationChart.data.datasets[0].data = values;
+      this.destinationChart.update();
+    } else if (this.destinationChartRef) {
+      const config: ChartConfiguration<'doughnut'> = {
+        type: 'doughnut',
+        data: {
+          labels,
+          datasets: [{
+            data: values,
+            backgroundColor: ['#B34724','#2C5234','#D4AF37','#6E655F','#5B8DB8','#9B59B6']
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom' } }
+        }
+      };
+      this.destinationChart = new Chart(this.destinationChartRef.nativeElement, config);
+    }
   }
 }

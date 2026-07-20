@@ -1,358 +1,234 @@
 <div data-page="super-admin-dashboard">
   <div class="min-h-screen w-full bg-background flex flex-col relative font-sans text-foreground">
-    <!-- Embedded Angular State Management Script -->
 
-    <!-- Navigation & Header -->
-    <header
-      class="sticky top-0 z-40 bg-card/90 backdrop-blur-md border-b border-border px-6 py-3 flex items-center justify-between"
-    >
+    <!-- ═══ HEADER ═══════════════════════════════════════════════════════════ -->
+    <header class="sticky top-0 z-40 bg-card/90 backdrop-blur-md border-b border-border px-6 py-3 flex items-center justify-between">
       <div class="flex items-center gap-8">
-        <div>
-            <!-- LOGO -->
-            <a
-              class="flex items-center justify-center transition-transform duration-300 hover:scale-105"
-              routerLink="/"
-            >
-              <img src="/pics/LOGOPRINCIPALE.png" alt="MarocSphere" class="logo" />
-            </a>
-        </div>
-
-        <!-- Quick Search -->
+        <a class="flex items-center justify-center transition-transform duration-300 hover:scale-105" routerLink="/">
+          <img src="/pics/LOGOPRINCIPALE.png" alt="MarocSphere" class="logo" />
+        </a>
         <div class="relative hidden md:block w-72">
-          <iconify-icon
-            icon="lucide:search"
-            class="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground text-lg"
-          ></iconify-icon>
-          <input
-            type="text"
-            [(ngModel)]="searchQuery"
-            (ngModelChange)="handleSearch($event)"
-            placeholder="Search users, reservations, guides..."
-            class="w-full pl-10 pr-4 py-2 bg-muted/60 border border-border/80 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
-          />
+          <iconify-icon icon="lucide:search" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground text-lg"></iconify-icon>
+          <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="handleSearch($event)"
+            placeholder="Rechercher utilisateurs, réservations, guides..."
+            class="w-full pl-10 pr-4 py-2 bg-muted/60 border border-border/80 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all" />
         </div>
       </div>
-
-      <!-- Right Side Actions & Role Switcher -->
       <div class="flex items-center gap-4">
-        <!-- Role Switcher Link -->
-        <a
-          href="#"
-          (click)="showNotification('Navigating to Read-Only Analytics Dashboard...')"
-          class="flex items-center gap-2 px-3.5 py-1.5 bg-secondary text-secondary-foreground text-xs font-semibold rounded-lg hover:bg-secondary/90 transition-all shadow-sm"
-        >
-          <iconify-icon icon="lucide:activity" class="text-sm"></iconify-icon>
-          <span>Switch to Analytics Dashboard</span>
-        </a>
-
-        <!-- Notifications Dropdown Trigger -->
-        <div class="relative">
-          <button
-            (click)="showNotification('No new alerts at this moment')"
-            class="p-2 text-muted-foreground hover:text-primary rounded-full hover:bg-muted transition-all relative"
-          >
-            <iconify-icon icon="lucide:bell" class="text-xl"></iconify-icon>
-            <span
-              class="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full ring-2 ring-card"
-            ></span>
-          </button>
-        </div>
-
-        <!-- User Profile Dropdown -->
+        <button (click)="showNotification('Aucune nouvelle alerte.')" class="p-2 text-muted-foreground hover:text-primary rounded-full hover:bg-muted transition-all relative">
+          <iconify-icon icon="lucide:bell" class="text-xl"></iconify-icon>
+          <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full ring-2 ring-card"></span>
+        </button>
         <div class="flex items-center gap-2.5 pl-3 border-l border-border/80">
-          <img
-            src="https://randomuser.me/api/portraits/men/1.jpg"
-            alt="Admin avatar"
-            class="w-9 h-9 rounded-full border border-primary/40 object-cover"
-          />
+          <iconify-icon icon="lucide:user-cog" class="text-3xl text-primary"></iconify-icon>
           <div class="hidden lg:block text-left">
-            <span class="block text-xs font-bold text-foreground">Mohamed El Fassi</span>
-            <span class="block text-[10px] text-primary font-semibold">Super Admin</span>
+            <span class="block text-xs font-bold text-foreground">Super Admin</span>
+            <span class="block text-[10px] text-primary font-semibold">MarocSphere</span>
           </div>
         </div>
       </div>
     </header>
 
-    <!-- Main Workspace -->
+    <!-- ═══ BODY ══════════════════════════════════════════════════════════════ -->
     <div class="flex-1 flex flex-col lg:flex-row">
-      <!-- Left Sticky Sidebar -->
+
+      <!-- ── SIDEBAR ──────────────────────────────────────────────────────── -->
       <aside class="w-full lg:w-64 bg-card border-r border-border p-5 flex flex-col gap-6">
         <div>
-          <p class="text-[11px] font-bold text-muted-foreground tracking-widest uppercase mb-3">
-            Main Command
-          </p>
+          <p class="text-[11px] font-bold text-muted-foreground tracking-widest uppercase mb-3">Gestion</p>
           <nav class="flex flex-col gap-1.5">
-            <button
-              (click)="switchTab('users')"
-              [ngClass]="activeTab === 'users' ? 'border-primary text-primary bg-accent/40' : 'text-muted-foreground'"
-              class="tab-btn flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg text-sm font-semibold border border-transparent transition-all"
-            >
+
+            <button (click)="switchTab('users')"
+              [ngClass]="activeTab==='users' ? 'border-primary text-primary bg-accent/40' : 'text-muted-foreground'"
+              class="tab-btn flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg text-sm font-semibold border border-transparent transition-all">
               <div class="flex items-center gap-3">
-                <iconify-icon icon="lucide:user" class="text-lg"></iconify-icon>
-                <span>User Manager</span>
+                <iconify-icon icon="lucide:users" class="text-lg"></iconify-icon>
+                <span>Utilisateurs</span>
               </div>
-              <span
-                class="bg-primary/10 text-primary text-[10px] font-bold px-2 py-0.5 rounded-full"
-                >5</span
-              >
+              <span class="bg-primary/10 text-primary text-[10px] font-bold px-2 py-0.5 rounded-full">{{ totalUsers }}</span>
             </button>
-            <button
-              (click)="switchTab('guides')"
-              [ngClass]="activeTab === 'guides' ? 'border-primary text-primary bg-accent/40' : 'text-muted-foreground'"
-              class="tab-btn flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg text-sm font-semibold border border-transparent transition-all"
-            >
+
+            <button (click)="switchTab('guides')"
+              [ngClass]="activeTab==='guides' ? 'border-primary text-primary bg-accent/40' : 'text-muted-foreground'"
+              class="tab-btn flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg text-sm font-semibold border border-transparent transition-all">
               <div class="flex items-center gap-3">
                 <iconify-icon icon="lucide:shield" class="text-lg"></iconify-icon>
-                <span>Guides &amp; Certification</span>
+                <span>Guides</span>
               </div>
-              <span
-                class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full"
-                >Pending</span
-              >
+              <span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full">{{ totalGuides }}</span>
             </button>
-            <button
-              (click)="switchTab('artisans')"
-              [ngClass]="activeTab === 'artisans' ? 'border-primary text-primary bg-accent/40' : 'text-muted-foreground'"
-              class="tab-btn flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg text-sm font-semibold border border-transparent transition-all"
-            >
+
+            <button (click)="switchTab('artisans')"
+              [ngClass]="activeTab==='artisans' ? 'border-primary text-primary bg-accent/40' : 'text-muted-foreground'"
+              class="tab-btn flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg text-sm font-semibold border border-transparent transition-all">
               <div class="flex items-center gap-3">
                 <iconify-icon icon="lucide:layers" class="text-lg"></iconify-icon>
-                <span>Artisan Marketplace</span>
+                <span>Artisans</span>
               </div>
+              <span class="bg-primary/10 text-primary text-[10px] font-bold px-2 py-0.5 rounded-full">{{ totalArtisans }}</span>
             </button>
-            <button
-              (click)="switchTab('reservations')"
-              [ngClass]="activeTab === 'reservations' ? 'border-primary text-primary bg-accent/40' : 'text-muted-foreground'"
-              class="tab-btn flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg text-sm font-semibold border border-transparent transition-all"
-            >
+
+            <button (click)="switchTab('reservations')"
+              [ngClass]="activeTab==='reservations' ? 'border-primary text-primary bg-accent/40' : 'text-muted-foreground'"
+              class="tab-btn flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg text-sm font-semibold border border-transparent transition-all">
               <div class="flex items-center gap-3">
                 <iconify-icon icon="lucide:calendar" class="text-lg"></iconify-icon>
-                <span>Reservations</span>
+                <span>Réservations</span>
               </div>
+              <span class="bg-primary/10 text-primary text-[10px] font-bold px-2 py-0.5 rounded-full">{{ totalReservations }}</span>
             </button>
+
           </nav>
         </div>
 
         <div>
-          <p class="text-[11px] font-bold text-muted-foreground tracking-widest uppercase mb-3">
-            Insights
-          </p>
+          <p class="text-[11px] font-bold text-muted-foreground tracking-widest uppercase mb-3">Insights</p>
           <nav class="flex flex-col gap-1.5">
-            <button
-              (click)="switchTab('analytics')"
-              [ngClass]="activeTab === 'analytics' ? 'border-primary text-primary bg-accent/40' : 'text-muted-foreground'"
-              class="tab-btn flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg text-sm font-semibold border border-transparent transition-all"
-            >
+            <button (click)="switchTab('analytics')"
+              [ngClass]="activeTab==='analytics' ? 'border-primary text-primary bg-accent/40' : 'text-muted-foreground'"
+              class="tab-btn flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg text-sm font-semibold border border-transparent transition-all">
               <div class="flex items-center gap-3">
                 <iconify-icon icon="lucide:chart-bar" class="text-lg"></iconify-icon>
-                <span>Tourism Analytics</span>
+                <span>Analytics</span>
               </div>
             </button>
           </nav>
         </div>
 
-        <!-- Moroccan Geometric Accent Card -->
-        <div
-          class="mt-auto p-4 bg-gradient-to-br from-primary to-primary/80 rounded-xl text-primary-foreground relative overflow-hidden shadow-md"
-        >
-          <div
-            class="absolute -right-8 -bottom-8 w-24 h-24 border-4 border-border/10 rounded-full"
-          ></div>
+        <div class="mt-auto p-4 bg-gradient-to-br from-primary to-primary/80 rounded-xl text-primary-foreground relative overflow-hidden shadow-md">
           <iconify-icon icon="lucide:sparkles" class="text-2xl mb-2 text-tertiary"></iconify-icon>
           <h4 class="font-heading font-bold text-sm">MarocSphere AI v2.4</h4>
-          <p class="text-xs text-primary-foreground/80 mt-1">
-            Smart travel generation engine active and optimizing itineraries.
-          </p>
+          <p class="text-xs text-primary-foreground/80 mt-1">Moteur de génération de voyages actif.</p>
         </div>
       </aside>
 
-      <!-- Right Content Workspace -->
+      <!-- ── MAIN CONTENT ───────────────────────────────────────────────── -->
       <main class="flex-1 p-6 lg:p-8 flex flex-col gap-8 max-w-7xl mx-auto w-full">
-        <!-- Top Overview Stats Cards (Animated KPI Counters) -->
-        <section class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          <!-- KPI Card -->
-          <div
-            class="bg-card p-4 rounded-xl border border-border/80 shadow-sm hover:shadow-md transition-all group hover:-translate-y-0.5"
-          >
+
+        <!-- Loading spinner -->
+        <div *ngIf="loadingStats" class="flex items-center justify-center py-20">
+          <iconify-icon icon="lucide:loader-circle" class="text-4xl text-primary animate-spin"></iconify-icon>
+        </div>
+
+        <!-- ── KPI CARDS ──────────────────────────────────────────────────── -->
+        <section *ngIf="!loadingStats" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+
+          <div class="bg-card p-4 rounded-xl border border-border/80 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5">
             <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-semibold text-muted-foreground">Total Users</span>
-              <div
-                class="w-7 h-7 bg-primary/10 rounded-lg flex items-center justify-center text-primary"
-              >
+              <span class="text-xs font-semibold text-muted-foreground">Total Utilisateurs</span>
+              <div class="w-7 h-7 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
+                <iconify-icon icon="lucide:users" class="text-base"></iconify-icon>
+              </div>
+            </div>
+            <div class="text-xl font-bold tracking-tight text-foreground">{{ totalUsers | number }}</div>
+            <p class="text-[10px] text-muted-foreground mt-1">Tous rôles confondus</p>
+          </div>
+
+          <div class="bg-card p-4 rounded-xl border border-border/80 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-semibold text-muted-foreground">Clients</span>
+              <div class="w-7 h-7 bg-secondary/10 rounded-lg flex items-center justify-center text-secondary">
                 <iconify-icon icon="lucide:user" class="text-base"></iconify-icon>
               </div>
             </div>
-            <div class="text-xl font-bold tracking-tight text-foreground transition-all">
-              14,280
-            </div>
-            <p class="text-[10px] text-emerald-600 font-semibold mt-1 flex items-center gap-1">
-              <iconify-icon icon="lucide:arrow-right" class="rotate-[-45deg]"></iconify-icon>
-              <span>+12.4% this month</span>
-            </p>
+            <div class="text-xl font-bold tracking-tight text-foreground">{{ totalClients | number }}</div>
+            <p class="text-[10px] text-muted-foreground mt-1">Voyageurs inscrits</p>
           </div>
 
-          <!-- KPI Card -->
-          <div
-            class="bg-card p-4 rounded-xl border border-border/80 shadow-sm hover:shadow-md transition-all group hover:-translate-y-0.5"
-          >
+          <div class="bg-card p-4 rounded-xl border border-border/80 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5">
             <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-semibold text-muted-foreground">Certified Guides</span>
-              <div
-                class="w-7 h-7 bg-secondary/10 rounded-lg flex items-center justify-center text-secondary"
-              >
+              <span class="text-xs font-semibold text-muted-foreground">Guides</span>
+              <div class="w-7 h-7 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-800">
                 <iconify-icon icon="lucide:shield" class="text-base"></iconify-icon>
               </div>
             </div>
-            <div class="text-xl font-bold tracking-tight text-foreground">320</div>
-            <p class="text-[10px] text-amber-600 font-semibold mt-1">98% Active Duty</p>
+            <div class="text-xl font-bold tracking-tight text-foreground">{{ totalGuides | number }}</div>
+            <p class="text-[10px] text-emerald-600 font-semibold mt-1">{{ certifiedGuides.length }} certifiés</p>
           </div>
- 
-          
-          <div
-            class="bg-card p-4 rounded-xl border border-border/80 shadow-sm hover:shadow-md transition-all group hover:-translate-y-0.5 col-span-2 md:col-span-1"
-          >
+
+          <div class="bg-card p-4 rounded-xl border border-border/80 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5">
             <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-semibold text-muted-foreground">Total Artisans</span>
-              <div
-                class="w-7 h-7 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-800"
-              >
-                <iconify-icon icon="lucide:credit-card" class="text-base"></iconify-icon>
+              <span class="text-xs font-semibold text-muted-foreground">Artisans</span>
+              <div class="w-7 h-7 bg-amber-100 rounded-lg flex items-center justify-center text-amber-800">
+                <iconify-icon icon="lucide:layers" class="text-base"></iconify-icon>
               </div>
             </div>
-            <div class="text-xl font-bold tracking-tight text-foreground">MAD 480K</div>
-            <p class="text-[10px] text-emerald-600 font-semibold mt-1 flex items-center gap-1">
-              <span>95% Active Duty</span>
-            </p>
+            <div class="text-xl font-bold tracking-tight text-foreground">{{ totalArtisans | number }}</div>
+            <p class="text-[10px] text-muted-foreground mt-1">{{ totalDmcs }} DMCs aussi</p>
           </div>
 
-
-          <!-- KPI Card -->
-          <div
-            class="bg-card p-4 rounded-xl border border-border/80 shadow-sm hover:shadow-md transition-all group hover:-translate-y-0.5"
-          >
+          <div class="bg-card p-4 rounded-xl border border-border/80 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5">
             <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-semibold text-muted-foreground">Active Bookings</span>
-              <div
-                class="w-7 h-7 bg-tertiary/10 rounded-lg flex items-center justify-center text-tertiary"
-              >
+              <span class="text-xs font-semibold text-muted-foreground">Réservations</span>
+              <div class="w-7 h-7 bg-tertiary/10 rounded-lg flex items-center justify-center text-tertiary">
                 <iconify-icon icon="lucide:calendar" class="text-base"></iconify-icon>
               </div>
             </div>
-            <div class="text-xl font-bold tracking-tight text-foreground">1,840</div>
-            <p class="text-[10px] text-amber-600 font-semibold mt-1">
-              <span>+8% peak season</span>
-            </p>
+            <div class="text-xl font-bold tracking-tight text-foreground">{{ totalReservations | number }}</div>
+            <p class="text-[10px] text-amber-600 font-semibold mt-1">{{ pendingReservations.length }} en attente</p>
           </div>
 
-          <!-- KPI Card -->
-          <div
-            class="bg-card p-4 rounded-xl border border-border/80 shadow-sm hover:shadow-md transition-all group hover:-translate-y-0.5"
-          >
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-semibold text-muted-foreground">AI Itineraries</span>
-              <div
-                class="w-7 h-7 bg-primary/10 rounded-lg flex items-center justify-center text-primary"
-              >
-                <iconify-icon icon="lucide:zap" class="text-base"></iconify-icon>
-              </div>
-            </div>
-            <div class="text-xl font-bold tracking-tight text-foreground">12,450</div>
-            <p class="text-[10px] text-muted-foreground mt-1">Avg 4.9★ satisfaction</p>
-          </div>
-
-          <!-- KPI Card -->
-          
         </section>
 
-        <!-- TAB 1: USER MANAGEMENT (DEFAULT) -->
-        <section *ngIf="activeTab === 'users'" class="tab-content flex flex-col gap-6">
+        <!-- ═══ TAB 1 : USERS ═════════════════════════════════════════════ -->
+        <section *ngIf="!loadingStats && activeTab === 'users'" class="flex flex-col gap-6">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h2 class="text-xl font-heading font-bold text-foreground">
-                User Directory &amp; CRUD Management
-              </h2>
-              <p class="text-xs text-muted-foreground">
-                Add, edit, delete, or suspend client, guide, and artisan profiles.
-              </p>
+              <h2 class="text-xl font-heading font-bold text-foreground">Répertoire Utilisateurs</h2>
+              <p class="text-xs text-muted-foreground">Tous les profils enregistrés sur la plateforme.</p>
             </div>
-            <button
-              (click)="openUserModal('add')"
-              class="flex items-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-lg hover:bg-primary/95 transition-all shadow-md"
-            >
+            <button (click)="openModal('add')"
+              class="flex items-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-lg hover:bg-primary/95 transition-all shadow-md">
               <iconify-icon icon="lucide:plus" class="text-lg"></iconify-icon>
-              <span>Add New User</span>
+              <span>Ajouter</span>
             </button>
           </div>
 
-          <!-- Filters & Search Toolbar -->
-          <div
-            class="bg-card p-4 rounded-xl border border-border/80 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm"
-          >
-            <div class="flex items-center gap-3 w-full sm:w-auto">
-              <span class="text-xs font-bold text-muted-foreground uppercase">Filter Role:</span>
-              <div class="flex rounded-lg bg-muted p-1">
-                <button
-                  (click)="handleRoleFilter('All')"
-                  class="px-3 py-1 rounded-md text-xs font-semibold transition-all hover:text-primary bg-card text-foreground shadow-sm"
-                >
-                  All
-                </button>
-                <button
-                  (click)="handleRoleFilter('Guide')"
-                  class="px-3 py-1 rounded-md text-xs font-semibold transition-all text-muted-foreground hover:text-primary"
-                >
-                  Guides
-                </button>
-                <button
-                  (click)="handleRoleFilter('Artisan')"
-                  class="px-3 py-1 rounded-md text-xs font-semibold transition-all text-muted-foreground hover:text-primary"
-                >
-                  Artisans
-                </button>
-                <button
-                  (click)="handleRoleFilter('DMC')"
-                  class="px-3 py-1 rounded-md text-xs font-semibold transition-all text-muted-foreground hover:text-primary"
-                >
-                  DMCs
+          <!-- Filters -->
+          <div class="bg-card p-4 rounded-xl border border-border/80 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+            <div class="flex items-center gap-3 flex-wrap">
+              <span class="text-xs font-bold text-muted-foreground uppercase">Rôle :</span>
+              <div class="flex rounded-lg bg-muted p-1 gap-1 flex-wrap">
+                <button *ngFor="let r of roleOptions"
+                  (click)="handleRoleFilter(r)"
+                  [class.bg-card]="filterRole === r" [class.shadow-sm]="filterRole === r"
+                  [class.text-primary]="filterRole === r" [class.text-muted-foreground]="filterRole !== r"
+                  class="px-3 py-1 rounded-md text-xs font-semibold transition-all hover:text-primary">
+                  {{ r === 'All' ? 'Tous' : r }}
                 </button>
               </div>
             </div>
-
             <div class="text-xs text-muted-foreground">
-              Showing <strong class="text-foreground">{{ filteredUsers.length }}</strong> registered profiles
+              <strong class="text-foreground">{{ filteredUsers.length }}</strong> profil(s) affiché(s)
             </div>
           </div>
 
-          <!-- Interactive Table Container -->
+          <!-- Table -->
           <div class="bg-card rounded-xl border border-border/80 shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
               <table class="w-full text-left border-collapse">
                 <thead>
-                  <tr
-                    class="bg-muted/40 border-b border-border text-xs font-bold text-muted-foreground uppercase"
-                  >
-                    <th class="p-4">Profile &amp; Name</th>
-                    <th class="p-4">Role</th>
+                  <tr class="bg-muted/40 border-b border-border text-xs font-bold text-muted-foreground uppercase">
+                    <th class="p-4">Profil</th>
+                    <th class="p-4">Rôle</th>
                     <th class="p-4">Email</th>
-                    <th class="p-4">Registration Date</th>
-                    <th class="p-4">Status</th>
-                    <th class="p-4">Country</th>
-                    <th class="p-4">Languages</th>
+                    <th class="p-4">Inscription</th>
+                    <th class="p-4">Statut</th>
+                    <th class="p-4">Pays</th>
+                    <th class="p-4">Langue</th>
                     <th class="p-4 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr *ngIf="filteredUsers.length === 0" class="border-b border-border/60">
-                    <td colspan="8" class="p-6 text-center text-sm text-muted-foreground">
-                      No users match the current filters.
-                    </td>
+                    <td colspan="8" class="p-6 text-center text-sm text-muted-foreground">Aucun utilisateur trouvé.</td>
                   </tr>
                   <tr *ngFor="let user of filteredUsers; trackBy: trackUser" class="border-b border-border/60 hover:bg-muted/20 transition-all">
                     <td class="p-4">
                       <div class="flex items-center gap-3">
                         <img [src]="user.avatar" [alt]="user.name" class="w-10 h-10 rounded-full object-cover border border-border" />
                         <div>
-                          <div class="font-semibold text-foreground">{{ user.name }}</div>
+                          <div class="font-semibold text-foreground text-sm">{{ user.name }}</div>
                           <div class="text-xs text-muted-foreground">{{ user.email }}</div>
                         </div>
                       </div>
@@ -364,10 +240,10 @@
                     <td class="p-4 text-sm text-muted-foreground">{{ user.date }}</td>
                     <td class="p-4">
                       <span class="px-2.5 py-1 rounded-full text-xs font-semibold"
-                            [class.bg-emerald-100]="user.status === 'Active' || user.status === 'Certified'"
-                            [class.text-emerald-800]="user.status === 'Active' || user.status === 'Certified'"
-                            [class.bg-amber-100]="user.status === 'Suspended'"
-                            [class.text-amber-800]="user.status === 'Suspended'">
+                        [class.bg-emerald-100]="user.status==='Active'||user.status==='Certified'"
+                        [class.text-emerald-800]="user.status==='Active'||user.status==='Certified'"
+                        [class.bg-amber-100]="user.status==='Suspended'"
+                        [class.text-amber-800]="user.status==='Suspended'">
                         {{ user.status }}
                       </span>
                     </td>
@@ -375,9 +251,12 @@
                     <td class="p-4 text-sm text-muted-foreground">{{ user.language }}</td>
                     <td class="p-4 text-right">
                       <div class="flex items-center justify-end gap-2">
-                        <button (click)="openUserModal('edit', user.id)" class="px-3 py-1.5 bg-accent text-primary text-xs font-semibold rounded-lg hover:bg-accent/80 transition-all">Edit</button>
-                        <button (click)="deleteUser(user.id)" class="px-3 py-1.5 border border-border text-muted-foreground text-xs font-semibold rounded-lg hover:bg-muted transition-all">Delete</button>
-                        <button (click)="toggleUserStatus(user.id)" class="px-3 py-1.5 bg-muted text-foreground text-xs font-semibold rounded-lg hover:bg-muted/80 transition-all">Toggle Status</button>
+                        <button (click)="openModal('edit', user)"
+                          class="px-3 py-1.5 bg-accent text-primary text-xs font-semibold rounded-lg hover:bg-accent/80 transition-all">Modifier</button>
+                        <button (click)="deleteUser(user.id, user.role)"
+                          class="px-3 py-1.5 border border-border text-muted-foreground text-xs font-semibold rounded-lg hover:bg-muted transition-all">Supprimer</button>
+                        <button (click)="toggleUserStatus(user.id)"
+                          class="px-3 py-1.5 bg-muted text-foreground text-xs font-semibold rounded-lg hover:bg-muted/80 transition-all">Toggle</button>
                       </div>
                     </td>
                   </tr>
@@ -387,319 +266,130 @@
           </div>
         </section>
 
-        <!-- TAB 2: GUIDES & CERTIFICATION -->
-        <section *ngIf="activeTab === 'guides'" class="tab-content flex flex-col gap-6">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h2 class="text-xl font-heading font-bold text-foreground">Certified Local Guides</h2>
-            </div>
+        <!-- ═══ TAB 2 : GUIDES ═══════════════════════════════════════════ -->
+        <section *ngIf="!loadingStats && activeTab === 'guides'" class="flex flex-col gap-6">
+          <div>
+            <h2 class="text-xl font-heading font-bold text-foreground">Guides Certifiés</h2>
+            <p class="text-xs text-muted-foreground">{{ availableGuides.length }} disponibles · {{ certifiedGuides.length }} certifiés sur {{ totalGuides }}</p>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Guide Card 1 -->
-            <div
-              class="bg-card border border-border/80 rounded-xl p-5 shadow-sm hover:shadow-md transition-all relative overflow-hidden"
-            >
-              <div
-                class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-accent/20 to-transparent rounded-bl-full"
-              ></div>
-              <div class="flex items-start gap-4">
-                <img
-                  src="https://randomuser.me/api/portraits/men/45.jpg"
-                  alt="Guide Avatar"
-                  class="w-14 h-14 rounded-full border-2 border-primary/20 object-cover"
-                />
-                <div>
-                  <span
-                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 mb-1.5"
-                    >Certified</span
-                  >
-                  <h3 class="font-bold text-foreground">Rachid Ait Benhaddou</h3>
-                  <p class="text-xs text-muted-foreground">Fes &amp; Meknes Specialist</p>
-                </div>
-              </div>
-              <div
-                class="mt-4 pt-4 border-t border-border/60 text-xs text-muted-foreground space-y-2"
-              >
-                <div class="flex justify-between">
-                  <span>Languages:</span
-                  ><strong class="text-foreground">Arabic, French, English, German</strong>
-                </div>
-                <div class="flex justify-between">
-                  <span>Rating:</span><strong class="text-foreground">4.9 ★ (140 reviews)</strong>
-                </div>
-                <div class="flex justify-between">
-                  <span>Reservations:</span><strong class="text-foreground">24 Completed</strong>
-                </div>
-                <div class="flex justify-between">
-                  <span>Years Exp:</span><strong class="text-foreground">8 years</strong>
-                </div>
-                <div class="flex justify-between">
-                  <span>Credentials:</span
-                  ><strong class="text-primary underline cursor-pointer">rachid-license.pdf</strong>
-                </div>
-              </div>
-            </div>
+          <div *ngIf="guides.length === 0" class="text-center py-12 text-muted-foreground text-sm">
+            Aucun guide enregistré.
+          </div>
 
-            <!-- Guide Card 2 -->
-            <div
-              class="bg-card border border-border/80 rounded-xl p-5 shadow-sm hover:shadow-md transition-all relative overflow-hidden"
-            >
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div *ngFor="let g of guides; trackBy: trackGuide"
+              class="bg-card border border-border/80 rounded-xl p-5 shadow-sm hover:shadow-md transition-all relative overflow-hidden">
+              <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-accent/20 to-transparent rounded-bl-full"></div>
               <div class="flex items-start gap-4">
-                <img
-                  src="https://randomuser.me/api/portraits/women/12.jpg"
-                  alt="Guide Avatar"
-                  class="w-14 h-14 rounded-full border-2 border-primary/20 object-cover"
-                />
+                <img [src]="'https://randomuser.me/api/portraits/men/' + ((+g.id % 90) + 1) + '.jpg'"
+                  [alt]="g.prenom + ' ' + g.nom" class="w-14 h-14 rounded-full border-2 border-primary/20 object-cover" />
                 <div>
-                  <span
-                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 mb-1.5"
-                    >Certified</span
-                  >
-                  <h3 class="font-bold text-foreground">Layla Oudghiri</h3>
-                  <p class="text-xs text-muted-foreground">Marrakech Medina Explorer</p>
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold mb-1.5"
+                    [class.bg-emerald-100]="g.statutCertification==='CERTIFIE'"
+                    [class.text-emerald-800]="g.statutCertification==='CERTIFIE'"
+                    [class.bg-amber-100]="g.statutCertification!=='CERTIFIE'"
+                    [class.text-amber-800]="g.statutCertification!=='CERTIFIE'">
+                    {{ g.statutCertification ?? 'EN ATTENTE' }}
+                  </span>
+                  <h3 class="font-bold text-foreground text-sm">{{ g.prenom }} {{ g.nom }}</h3>
+                  <p class="text-xs text-muted-foreground">{{ g.nationalite }}</p>
                 </div>
               </div>
-              <div
-                class="mt-4 pt-4 border-t border-border/60 text-xs text-muted-foreground space-y-2"
-              >
+              <div class="mt-4 pt-4 border-t border-border/60 text-xs text-muted-foreground space-y-2">
                 <div class="flex justify-between">
-                  <span>Languages:</span
-                  ><strong class="text-foreground">Arabic, French, English, German</strong>
+                  <span>Email :</span><strong class="text-foreground truncate max-w-[140px]">{{ g.email }}</strong>
                 </div>
                 <div class="flex justify-between">
-                  <span>Rating:</span><strong class="text-foreground">4.9 ★ (140 reviews)</strong>
+                  <span>Langue :</span><strong class="text-foreground">{{ g.languePreferee ?? '—' }}</strong>
                 </div>
                 <div class="flex justify-between">
-                  <span>Reservations:</span><strong class="text-foreground">24 Completed</strong>
+                  <span>Licence :</span><strong class="text-foreground">{{ g.numeroLicence ?? '—' }}</strong>
                 </div>
                 <div class="flex justify-between">
-                  <span>Years Exp:</span><strong class="text-foreground">8 years</strong>
+                  <span>Score :</span>
+                  <strong class="text-foreground">{{ g.scoreCertification !== null ? (g.scoreCertification | number:'1.1-1') + ' ★' : '—' }}</strong>
                 </div>
                 <div class="flex justify-between">
-                  <span>Credentials:</span
-                  ><strong class="text-primary underline cursor-pointer">rachid-license.pdf</strong>
+                  <span>Disponible :</span>
+                  <span [class.text-emerald-600]="g.disponible" [class.text-red-500]="!g.disponible" class="font-semibold">
+                    {{ g.disponible ? 'Oui' : 'Non' }}
+                  </span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Inscrit le :</span><strong class="text-foreground">{{ g.dateCreation | date:'dd/MM/yyyy' }}</strong>
                 </div>
               </div>
-            </div>
-
-            <!-- Guide Card 3 -->
-            <div
-              class="bg-card border border-border/80 rounded-xl p-5 shadow-sm hover:shadow-md transition-all relative overflow-hidden"
-            >
-              <div class="flex items-start gap-4">
-                <img
-                  src="https://randomuser.me/api/portraits/men/82.jpg"
-                  alt="Guide Avatar"
-                  class="w-14 h-14 rounded-full border-2 border-primary/20 object-cover"
-                />
-                <div>
-                  <span
-                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 mb-1.5"
-                    >Certified</span
-                  >
-                  <h3 class="font-bold text-foreground">Idris El Glaoui</h3>
-                  <p class="text-xs text-muted-foreground">Atlas Trekking Expert</p>
-                </div>
-              </div>
-              <div
-                class="mt-4 pt-4 border-t border-border/60 text-xs text-muted-foreground space-y-2"
-              >
-                <div class="flex justify-between">
-                  <span>Languages:</span
-                  ><strong class="text-foreground">Arabic, French, English, German</strong>
-                </div>
-                <div class="flex justify-between">
-                  <span>Rating:</span><strong class="text-foreground">4.9 ★ (140 reviews)</strong>
-                </div>
-                <div class="flex justify-between">
-                  <span>Reservations:</span><strong class="text-foreground">24 Completed</strong>
-                </div>
-                <div class="flex justify-between">
-                  <span>Years Exp:</span><strong class="text-foreground">8 years</strong>
-                </div>
-                <div class="flex justify-between">
-                  <span>Credentials:</span
-                  ><strong class="text-primary underline cursor-pointer">rachid-license.pdf</strong>
-                </div>
+              <div class="mt-4 flex gap-2">
+                <button (click)="deleteGuideById(+g.id)"
+                  class="flex-1 py-1.5 border border-border text-muted-foreground text-xs font-semibold rounded-lg hover:bg-muted transition-all">
+                  Supprimer
+                </button>
               </div>
             </div>
           </div>
         </section>
 
-        <!-- TAB 3: ARTISAN MARKETPLACE -->
-        <section *ngIf="activeTab === 'artisans'" class="tab-content flex flex-col gap-6">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h2 class="text-xl font-heading font-bold text-foreground">
-                Artisan Profiles &amp; Product Moderation
-              </h2>
-              <p class="text-xs text-muted-foreground">
-                Monitor traditional craft sales, moderate listing quality, and support local
-                cooperatives.
-              </p>
-            </div>
+        <!-- ═══ TAB 3 : ARTISANS ════════════════════════════════════════ -->
+        <section *ngIf="!loadingStats && activeTab === 'artisans'" class="flex flex-col gap-6">
+          <div>
+            <h2 class="text-xl font-heading font-bold text-foreground">Artisans & Coopératives</h2>
+            <p class="text-xs text-muted-foreground">{{ totalArtisans }} artisans enregistrés sur la plateforme.</p>
           </div>
 
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-2 space-y-6">
-              <!-- Active Artisan List -->
-              <div class="bg-card rounded-xl border border-border/80 shadow-sm overflow-hidden">
-                <div class="p-4 border-b border-border bg-muted/20">
-                  <h3 class="font-bold text-sm">Featured Artisans &amp; Cooperatives</h3>
-                </div>
-                <div class="divide-y divide-border/60">
-                  <div
-                    class="p-4 flex items-center justify-between hover:bg-muted/20 transition-all"
-                  >
-                    <div class="flex items-center gap-3">
-                      <div
-                        class="w-10 h-10 rounded-lg bg-accent flex items-center justify-center text-primary font-bold"
-                      >
-                        CA
-                      </div>
-                      <div>
-                        <h4 class="font-bold text-sm">Cooperative Artisanale de Tapis</h4>
-                        <p class="text-xs text-muted-foreground">
-                          Khenifra • Berber Rugs &amp; Textiles
-                        </p>
-                      </div>
-                    </div>
-                    <div class="text-right">
-                      <span class="text-sm font-bold text-foreground">MAD 12,400 Sales</span>
-                      <p class="text-[10px] text-emerald-600">14 Orders</p>
-                    </div>
-                  </div>
-                  <div
-                    class="p-4 flex items-center justify-between hover:bg-muted/20 transition-all"
-                  >
-                    <div class="flex items-center gap-3">
-                      <div
-                        class="w-10 h-10 rounded-lg bg-accent flex items-center justify-center text-primary font-bold"
-                      >
-                        ZB
-                      </div>
-                      <div>
-                        <h4 class="font-bold text-sm">Zellij Builders of Fes</h4>
-                        <p class="text-xs text-muted-foreground">
-                          Fes • Traditional Mosaic Tilework
-                        </p>
-                      </div>
-                    </div>
-                    <div class="text-right">
-                      <span class="text-sm font-bold text-foreground">MAD 34,800 Sales</span>
-                      <p class="text-[10px] text-emerald-600">8 Orders</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Product Moderation Sidebar -->
-            <div class="bg-card border border-border/80 rounded-xl p-5 shadow-sm">
-              <h3 class="font-bold text-sm mb-4">Pending Product Moderation</h3>
-              <div class="space-y-4">
-                <div class="border border-border/60 rounded-lg p-3 space-y-2">
-                  <div class="flex justify-between items-start">
-                    <span class="text-xs font-bold text-primary">Berber Wool Blanket</span>
-                    <span
-                      class="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-semibold"
-                      >New Listing</span
-                    >
-                  </div>
-                  <p class="text-xs text-muted-foreground">
-                    Submitted by Cooperative Khenifra. Retail Price: MAD 1,200
-                  </p>
-                  <div class="flex gap-2 pt-2">
-                    <button
-                      (click)="showNotification('Listing approved')"
-                      class="flex-1 py-1 bg-emerald-600 text-primary-foreground text-[10px] font-bold rounded hover:bg-emerald-700 transition-all"
-                    >
-                      Approve
-                    </button>
-                    <button
-                      (click)="showNotification('Listing rejected', 'error')"
-                      class="px-2 py-1 border border-border text-muted-foreground text-[10px] font-bold rounded hover:bg-muted transition-all"
-                    >
-                      Reject
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- TAB 4: RESERVATIONS -->
-        <section *ngIf="activeTab === 'reservations'" class="tab-content flex flex-col gap-6">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h2 class="text-xl font-heading font-bold text-foreground">
-                Active Reservation Logs
-              </h2>
-              <p class="text-xs text-muted-foreground">
-                Monitor bookings for premium local guides, custom AI itineraries, and boutique
-                stays.
-              </p>
-            </div>
+          <div *ngIf="artisans.length === 0" class="text-center py-12 text-muted-foreground text-sm">
+            Aucun artisan enregistré.
           </div>
 
           <div class="bg-card rounded-xl border border-border/80 shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
               <table class="w-full text-left border-collapse">
                 <thead>
-                  <tr
-                    class="bg-muted/40 border-b border-border text-xs font-bold text-muted-foreground uppercase"
-                  >
-                    <th class="p-4">Reservation ID</th>
-                    <th class="p-4">Client</th>
-                    <th class="p-4">Experience / Guide</th>
-                    <th class="p-4">Date</th>
-                    <th class="p-4">Status</th>
-                    <th class="p-4">Amount</th>
+                  <tr class="bg-muted/40 border-b border-border text-xs font-bold text-muted-foreground uppercase">
+                    <th class="p-4">Artisan</th>
+                    <th class="p-4">Catégorie</th>
+                    <th class="p-4">Pays</th>
+                    <th class="p-4">Langue</th>
+                    <th class="p-4">Export</th>
+                    <th class="p-4">Coopérative</th>
+                    <th class="p-4">Inscrit le</th>
                     <th class="p-4 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr class="border-b border-border/60">
-                    <td class="p-4 font-bold text-primary">#RES-2940</td>
-                    <td class="p-4">Sarah Miller</td>
-                    <td class="p-4">Fes Medina Private Tour (Layla O.)</td>
-                    <td class="p-4 text-sm text-muted-foreground">2025-03-15</td>
+                  <tr *ngFor="let a of artisans; trackBy: trackArtisan"
+                    class="border-b border-border/60 hover:bg-muted/20 transition-all">
                     <td class="p-4">
-                      <span
-                        class="px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800"
-                        >Confirmed</span
-                      >
+                      <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-lg bg-accent flex items-center justify-center text-primary font-bold text-sm">
+                          {{ (a.prenom?.[0] ?? '') }}{{ (a.nom?.[0] ?? '') }}
+                        </div>
+                        <div>
+                          <div class="font-semibold text-sm text-foreground">{{ a.prenom }} {{ a.nom }}</div>
+                          <div class="text-xs text-muted-foreground">{{ a.email }}</div>
+                        </div>
+                      </div>
                     </td>
-                    <td class="p-4 font-semibold text-foreground">MAD 1,500</td>
-                    <td class="p-4 text-right">
-                      <button
-                        (click)="showNotification('Opening reservation details')"
-                        class="px-3 py-1 bg-accent text-primary text-xs font-semibold rounded-lg hover:bg-accent/80 transition-all"
-                      >
-                        Manage
-                      </button>
-                    </td>
-                  </tr>
-                  <tr class="border-b border-border/60">
-                    <td class="p-4 font-bold text-primary">#RES-2941</td>
-                    <td class="p-4">Youssef El Alami</td>
-                    <td class="p-4">Atlas Trekking 3-Day Adventure</td>
-                    <td class="p-4 text-sm text-muted-foreground">2025-03-18</td>
                     <td class="p-4">
-                      <span
-                        class="px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800"
-                        >Pending</span
-                      >
+                      <span class="px-2 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800">
+                        {{ a.categorieArtisanat ?? '—' }}
+                      </span>
                     </td>
-                    <td class="p-4 font-semibold text-foreground">MAD 4,200</td>
+                    <td class="p-4 text-sm text-muted-foreground">{{ a.nationalite ?? '—' }}</td>
+                    <td class="p-4 text-sm text-muted-foreground">{{ a.languePreferee ?? '—' }}</td>
+                    <td class="p-4">
+                      <span [class.text-emerald-600]="a.eligibleExport" [class.text-muted-foreground]="!a.eligibleExport" class="text-xs font-semibold">
+                        {{ a.eligibleExport ? '✓ Éligible' : 'Non' }}
+                      </span>
+                    </td>
+                    <td class="p-4 text-sm text-muted-foreground">
+                      {{ a.independant ? 'Indépendant' : ('Coop. #' + a.cooperativeId) }}
+                    </td>
+                    <td class="p-4 text-sm text-muted-foreground">{{ a.dateCreation | date:'dd/MM/yyyy' }}</td>
                     <td class="p-4 text-right">
-                      <button
-                        (click)="showNotification('Opening reservation details')"
-                        class="px-3 py-1 bg-accent text-primary text-xs font-semibold rounded-lg hover:bg-accent/80 transition-all"
-                      >
-                        Manage
+                      <button (click)="deleteArtisanById(+a.id)"
+                        class="px-3 py-1.5 border border-border text-muted-foreground text-xs font-semibold rounded-lg hover:bg-muted transition-all">
+                        Supprimer
                       </button>
                     </td>
                   </tr>
@@ -709,171 +399,226 @@
           </div>
         </section>
 
-        <!-- TAB 5: TOURISM ANALYTICS -->
-        <section *ngIf="activeTab === 'analytics'" class="tab-content flex flex-col gap-6">
+        <!-- ═══ TAB 4 : RESERVATIONS ════════════════════════════════════ -->
+        <section *ngIf="!loadingStats && activeTab === 'reservations'" class="flex flex-col gap-6">
           <div>
-            <h2 class="text-xl font-heading font-bold text-foreground">
-              Tourism Performance Intelligence
-            </h2>
+            <h2 class="text-xl font-heading font-bold text-foreground">Journal des Réservations</h2>
             <p class="text-xs text-muted-foreground">
-              Explore real-time telemetry on traveler preferences, regional density, and platform
-              monetization.
+              {{ totalReservations }} au total ·
+              <span class="text-emerald-600 font-semibold">{{ confirmedReservations.length }} confirmées</span> ·
+              <span class="text-amber-600 font-semibold">{{ pendingReservations.length }} en attente</span>
             </p>
           </div>
 
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Interactive Chart 1 -->
-            <div class="bg-card border border-border/80 rounded-xl p-5 shadow-sm lg:col-span-2">
-              <h3 class="font-bold text-sm mb-4">User Registrations &amp; Growth Trajectory</h3>
-              <div class="h-64 overflow-hidden">
-                <canvas #growthChart height="160"></canvas>
-              </div>
-            </div>
+          <div *ngIf="reservations.length === 0" class="text-center py-12 text-muted-foreground text-sm">
+            Aucune réservation enregistrée.
+          </div>
 
-            <!-- Interactive Chart 2 -->
+          <div class="bg-card rounded-xl border border-border/80 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-muted/40 border-b border-border text-xs font-bold text-muted-foreground uppercase">
+                    <th class="p-4">ID</th>
+                    <th class="p-4">Client</th>
+                    <th class="p-4">Guide</th>
+                    <th class="p-4">Date</th>
+                    <th class="p-4">Statut</th>
+                    <th class="p-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let r of reservations; trackBy: trackRes"
+                    class="border-b border-border/60 hover:bg-muted/20 transition-all">
+                    <td class="p-4 font-bold text-primary">#{{ r.id }}</td>
+                    <td class="p-4 text-sm text-foreground">{{ getClientName(r.clientId) }}</td>
+                    <td class="p-4 text-sm text-muted-foreground">{{ getGuideName(r.guideId) }}</td>
+                    <td class="p-4 text-sm text-muted-foreground">{{ r.date | date:'dd/MM/yyyy HH:mm' }}</td>
+                    <td class="p-4">
+                      <span class="px-2.5 py-1 rounded-full text-xs font-semibold"
+                        [ngClass]="reservationStatusClass(r.statut)">
+                        {{ r.statut }}
+                      </span>
+                    </td>
+                    <td class="p-4 text-right">
+                      <button (click)="deleteReservationById(+r.id)"
+                        class="px-3 py-1.5 border border-border text-muted-foreground text-xs font-semibold rounded-lg hover:bg-muted transition-all">
+                        Supprimer
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ═══ TAB 5 : ANALYTICS ═══════════════════════════════════════ -->
+        <section *ngIf="!loadingStats && activeTab === 'analytics'" class="flex flex-col gap-6">
+          <div>
+            <h2 class="text-xl font-heading font-bold text-foreground">Analytics Plateforme</h2>
+            <p class="text-xs text-muted-foreground">Distribution des utilisateurs et statuts des réservations en temps réel.</p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="bg-card border border-border/80 rounded-xl p-5 shadow-sm lg:col-span-2">
+              <h3 class="font-bold text-sm mb-4">Distribution des utilisateurs par type</h3>
+              <div class="h-64"><canvas #growthChart height="160"></canvas></div>
+            </div>
             <div class="bg-card border border-border/80 rounded-xl p-5 shadow-sm">
-              <h3 class="font-bold text-sm mb-4">Most Booked Destinations</h3>
-              <div class="h-64 overflow-hidden">
-                <canvas #destinationChart height="160"></canvas>
+              <h3 class="font-bold text-sm mb-4">Statuts des réservations</h3>
+              <div class="h-64"><canvas #destinationChart height="160"></canvas></div>
+            </div>
+          </div>
+
+          <!-- Summary table -->
+          <div class="bg-card border border-border/80 rounded-xl p-5 shadow-sm">
+            <h3 class="font-bold text-sm mb-4">Résumé des indicateurs</h3>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 text-xs">
+              <div class="p-3 bg-muted/40 rounded-lg">
+                <span class="text-muted-foreground block">Clients</span>
+                <strong class="text-lg text-foreground">{{ totalClients }}</strong>
+              </div>
+              <div class="p-3 bg-muted/40 rounded-lg">
+                <span class="text-muted-foreground block">Guides</span>
+                <strong class="text-lg text-foreground">{{ totalGuides }}</strong>
+                <span class="text-emerald-600 block">{{ certifiedGuides.length }} certifiés</span>
+              </div>
+              <div class="p-3 bg-muted/40 rounded-lg">
+                <span class="text-muted-foreground block">Artisans</span>
+                <strong class="text-lg text-foreground">{{ totalArtisans }}</strong>
+              </div>
+              <div class="p-3 bg-muted/40 rounded-lg">
+                <span class="text-muted-foreground block">DMCs</span>
+                <strong class="text-lg text-foreground">{{ totalDmcs }}</strong>
+              </div>
+              <div class="p-3 bg-muted/40 rounded-lg">
+                <span class="text-muted-foreground block">Réservations</span>
+                <strong class="text-lg text-foreground">{{ totalReservations }}</strong>
+                <span class="text-amber-600 block">{{ pendingReservations.length }} en attente</span>
               </div>
             </div>
           </div>
         </section>
-      </main>
-    </div>
 
-    <!-- Dynamic Toast Notification (Angular-style) -->
-    <div
-      *ngIf="toastVisible"
+      </main>
+    </div><!-- end flex body -->
+
+    <!-- ═══ TOAST ══════════════════════════════════════════════════════════ -->
+    <div *ngIf="toastVisible"
       class="fixed bottom-6 right-6 z-50 bg-card border border-border rounded-xl shadow-xl px-4 py-3.5 flex items-center gap-3 max-w-sm transition-all duration-300 pointer-events-none"
       [class.border-emerald-200]="toastType === 'success'"
-      [class.border-red-200]="toastType === 'error'"
-    >
-      <div>
-        <iconify-icon
-          [icon]="toastType === 'success' ? 'lucide:circle-check' : 'lucide:circle-alert'"
-          class="text-xl"
-          [class.text-emerald-500]="toastType === 'success'"
-          [class.text-red-500]="toastType === 'error'"
-        ></iconify-icon>
-      </div>
-      <div>
-        <p class="text-xs font-bold text-foreground">{{ toastMessage }}</p>
-      </div>
+      [class.border-red-200]="toastType === 'error'">
+      <iconify-icon
+        [icon]="toastType === 'success' ? 'lucide:circle-check' : 'lucide:circle-alert'"
+        class="text-xl"
+        [class.text-emerald-500]="toastType === 'success'"
+        [class.text-red-500]="toastType === 'error'">
+      </iconify-icon>
+      <p class="text-xs font-bold text-foreground">{{ toastMessage }}</p>
     </div>
 
-    <!-- Interactive CRUD Modal (Add/Edit User) -->
-    <div
-      *ngIf="showUserModal"
-      class="fixed inset-0 z-50 bg-foreground/40 backdrop-blur-sm flex items-center justify-center p-4"
-    >
-      <div
-        class="bg-card border border-border rounded-2xl max-w-md w-full p-6 shadow-2xl relative overflow-hidden"
-      >
-        <!-- Decorative Top Border -->
-        <div
-          class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-primary via-tertiary to-secondary"
-        ></div>
-
+    <!-- ═══ MODAL ADD/EDIT ═════════════════════════════════════════════════ -->
+    <div *ngIf="showModal"
+      class="fixed inset-0 z-50 bg-foreground/40 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="bg-card border border-border rounded-2xl max-w-md w-full p-6 shadow-2xl relative overflow-hidden">
+        <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-primary via-tertiary to-secondary"></div>
         <div class="flex items-center justify-between mb-5">
-          <h3 class="font-heading font-extrabold text-lg text-foreground">
-            {{ modalTitle }}
-          </h3>
-          <button
-            (click)="closeUserModal()"
-            class="p-1.5 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-all"
-          >
+          <h3 class="font-heading font-extrabold text-lg text-foreground">{{ modalTitle }}</h3>
+          <button (click)="closeModal()" class="p-1.5 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-all">
             <iconify-icon icon="lucide:x" class="text-xl"></iconify-icon>
           </button>
         </div>
-
-        <form (ngSubmit)="submitUserForm()" class="space-y-4">
-          <div>
-            <label class="block text-xs font-bold text-muted-foreground uppercase mb-1.5"
-              >Full Name</label
-            >
-            <input
-              type="text"
-              name="formName"
-              required
-              [(ngModel)]="formName"
-              class="w-full px-3.5 py-2 border border-border rounded-lg text-sm bg-muted/20 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
-            />
+        <form (ngSubmit)="submitModal()" class="space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-muted-foreground uppercase mb-1.5">Prénom</label>
+              <input type="text" name="fPrenom" required [(ngModel)]="fPrenom"
+                class="w-full px-3.5 py-2 border border-border rounded-lg text-sm bg-muted/20 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-muted-foreground uppercase mb-1.5">Nom</label>
+              <input type="text" name="fNom" required [(ngModel)]="fNom"
+                class="w-full px-3.5 py-2 border border-border rounded-lg text-sm bg-muted/20 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all" />
+            </div>
           </div>
           <div>
-            <label class="block text-xs font-bold text-muted-foreground uppercase mb-1.5"
-              >Email Address</label
-            >
-            <input
-              type="email"
-              name="formEmail"
-              required
-              [(ngModel)]="formEmail"
-              class="w-full px-3.5 py-2 border border-border rounded-lg text-sm bg-muted/20 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
-            />
+            <label class="block text-xs font-bold text-muted-foreground uppercase mb-1.5">Email</label>
+            <input type="email" name="fEmail" required [(ngModel)]="fEmail"
+              class="w-full px-3.5 py-2 border border-border rounded-lg text-sm bg-muted/20 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all" />
+          </div>
+          <div *ngIf="modalMode === 'add'">
+            <label class="block text-xs font-bold text-muted-foreground uppercase mb-1.5">Mot de passe</label>
+            <input type="password" name="fPassword" required [(ngModel)]="fPassword"
+              class="w-full px-3.5 py-2 border border-border rounded-lg text-sm bg-muted/20 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all" />
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-xs font-bold text-muted-foreground uppercase mb-1.5"
-                >Role</label
-              >
-              <select
-                name="formRole"
-                [(ngModel)]="formRole"
-                class="w-full px-3.5 py-2 border border-border rounded-lg text-sm bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
-              >
+              <label class="block text-xs font-bold text-muted-foreground uppercase mb-1.5">Rôle</label>
+              <select name="fRole" [(ngModel)]="fRole"
+                class="w-full px-3.5 py-2 border border-border rounded-lg text-sm bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all">
+                <option value="Client">Client</option>
                 <option value="Guide">Guide</option>
                 <option value="Artisan">Artisan</option>
-                <option value="Client">Client</option>
                 <option value="DMC">DMC</option>
                 <option value="Administrator">Administrator</option>
               </select>
             </div>
             <div>
-              <label class="block text-xs font-bold text-muted-foreground uppercase mb-1.5"
-                >Status</label
-              >
-              <select
-                name="formStatus"
-                [(ngModel)]="formStatus"
-                class="w-full px-3.5 py-2 border border-border rounded-lg text-sm bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
-              >
-                <option value="Active">Active</option>
-                <option value="Certified">Certified</option>
-                <option value="Suspended">Suspended</option>
-              </select>
+              <label class="block text-xs font-bold text-muted-foreground uppercase mb-1.5">Téléphone</label>
+              <input type="text" name="fTelephone" [(ngModel)]="fTelephone" placeholder="+212..."
+                class="w-full px-3.5 py-2 border border-border rounded-lg text-sm bg-muted/20 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all" />
             </div>
           </div>
-          <div>
-            <label class="block text-xs font-bold text-muted-foreground uppercase mb-1.5"
-              >Spoken Languages</label
-            >
-            <input
-              type="text"
-              name="formLanguage"
-              placeholder="e.g. Arabic, French, English"
-              [(ngModel)]="formLanguage"
-              class="w-full px-3.5 py-2 border border-border rounded-lg text-sm bg-muted/20 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
-            />
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-muted-foreground uppercase mb-1.5">Nationalité</label>
+              <input type="text" name="fNationalite" [(ngModel)]="fNationalite"
+                class="w-full px-3.5 py-2 border border-border rounded-lg text-sm bg-muted/20 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-muted-foreground uppercase mb-1.5">Langue</label>
+              <input type="text" name="fLangue" [(ngModel)]="fLangue" placeholder="Arabe, Français..."
+                class="w-full px-3.5 py-2 border border-border rounded-lg text-sm bg-muted/20 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all" />
+            </div>
           </div>
-
           <div class="pt-4 flex gap-3">
-            <button
-              type="button"
-              (click)="closeUserModal()"
-              class="flex-1 py-2.5 border border-border text-muted-foreground hover:text-foreground text-sm font-semibold rounded-lg hover:bg-muted transition-all"
-            >
-              Cancel
+            <button type="button" (click)="closeModal()"
+              class="flex-1 py-2.5 border border-border text-muted-foreground hover:text-foreground text-sm font-semibold rounded-lg hover:bg-muted transition-all">
+              Annuler
             </button>
-            <button
-              type="submit"
-              class="flex-1 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-lg hover:bg-primary/95 transition-all shadow-md"
-            >
-              Save Profile
+            <button type="submit" [disabled]="modalSaving"
+              class="flex-1 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-lg hover:bg-primary/95 transition-all shadow-md disabled:opacity-50">
+              {{ modalSaving ? 'Enregistrement...' : 'Sauvegarder' }}
             </button>
           </div>
         </form>
       </div>
     </div>
+
+    <!-- ═══ CONFIRM DIALOG ═════════════════════════════════════════════════ -->
+    <div *ngIf="showConfirm"
+      class="fixed inset-0 z-50 bg-foreground/40 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="bg-card border border-border rounded-2xl max-w-sm w-full p-6 shadow-2xl">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
+            <iconify-icon icon="lucide:alert-triangle" class="text-xl text-amber-600"></iconify-icon>
+          </div>
+          <h3 class="font-heading font-extrabold text-base text-foreground">Confirmation</h3>
+        </div>
+        <p class="text-sm text-muted-foreground mb-6">{{ confirmMessage }}</p>
+        <div class="flex gap-3">
+          <button (click)="confirmCancel()"
+            class="flex-1 py-2.5 border border-border text-muted-foreground hover:text-foreground text-sm font-semibold rounded-lg hover:bg-muted transition-all">
+            Annuler
+          </button>
+          <button (click)="confirmOk()"
+            class="flex-1 py-2.5 bg-destructive text-white text-sm font-semibold rounded-lg hover:bg-destructive/90 transition-all shadow-md">
+            Confirmer
+          </button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>

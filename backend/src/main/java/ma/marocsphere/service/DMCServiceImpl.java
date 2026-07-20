@@ -3,10 +3,12 @@ package ma.marocsphere.service;
 import lombok.RequiredArgsConstructor;
 import ma.marocsphere.dto.DMCCreationDTO;
 import ma.marocsphere.dto.DMCResponseDTO;
+import ma.marocsphere.dto.DMCUpdateDTO;
 import ma.marocsphere.entity.DMC;
 import ma.marocsphere.repository.DMCRepo;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
@@ -46,6 +48,16 @@ public class DMCServiceImpl implements DMCService {
                 .build();
         DMC saved = dmcRepo.save(dmc);
         return toResponseDTO(saved);
+    }
+
+    @Override
+    @Transactional
+    public DMCResponseDTO update(Long id, DMCUpdateDTO dto) {
+        DMC dmc = dmcRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("DMC non trouvé avec l'id : " + id));
+        if (dto.getNomEntreprise() != null) dmc.setNomEntreprise(dto.getNomEntreprise());
+        if (dto.getZoneCouverture() != null) dmc.setZoneCouverture(dto.getZoneCouverture());
+        return toResponseDTO(dmcRepo.save(dmc));
     }
 
     private DMCResponseDTO toResponseDTO(DMC dmc) {

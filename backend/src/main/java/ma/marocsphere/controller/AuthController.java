@@ -3,6 +3,7 @@ package ma.marocsphere.controller;
 import lombok.RequiredArgsConstructor;
 import ma.marocsphere.dto.*;
 import ma.marocsphere.entity.Role;
+import ma.marocsphere.service.AdminDataService;
 import ma.marocsphere.service.AdminService;
 import ma.marocsphere.service.ArtisanService;
 import ma.marocsphere.service.ClientService;
@@ -12,6 +13,7 @@ import ma.marocsphere.util.JwtUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -30,6 +32,7 @@ public class AuthController {
     private final JwtUtil jwtUtil;
     private final ClientService clientService;
     private final AdminService adminService;
+    private final AdminDataService adminDataService;
     private final GuideService guideService;
     private final ArtisanService artisanService;
     private final CooperativeService cooperativeService;
@@ -43,9 +46,15 @@ public class AuthController {
         String email = credentials.get("email");
         String password = credentials.get("password");
 
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(email, password)
-        );
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(email, password)
+            );
+        } catch (DisabledException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of(
+                    "message", "Your account has been suspended."
+            ));
+        }
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
         String token = jwtUtil.generateToken(userDetails);
@@ -75,7 +84,7 @@ public class AuthController {
             roleEnum = Role.valueOf(dto.getRole().toUpperCase());
         } catch (IllegalArgumentException | NullPointerException e) {
             return ResponseEntity.badRequest().body(Map.of(
-                    "message", "Role invalide. Valeurs acceptées : CLIENT, GUIDE, ARTISAN"
+                    "message", "Role invalide. Valeurs acceptées : CLIENT, GUIDE, ARTISAN, ADMIN, ADMIN_DATA"
             ));
         }
 
@@ -146,10 +155,24 @@ public class AuthController {
                         .telephone(dto.getTelephone())
                         .nationalite(dto.getNationalite())
                         .languePreferee(dto.getLanguePreferee())
-                        .role(dto.getRole())
+                        .role(dto.getRole().toUpperCase())
                         .build();
                 return ResponseEntity.status(HttpStatus.CREATED)
                         .body(adminService.create(adminDto));
+            }
+            case ADMIN_DATA -> {
+                AdminCreationDTO adminDataDto = AdminCreationDTO.builder()
+                        .email(dto.getEmail())
+                        .password(dto.getPassword())
+                        .nom(dto.getNom())
+                        .prenom(dto.getPrenom())
+                        .telephone(dto.getTelephone())
+                        .nationalite(dto.getNationalite())
+                        .languePreferee(dto.getLanguePreferee())
+                        .role(dto.getRole().toUpperCase())
+                        .build();
+                return ResponseEntity.status(HttpStatus.CREATED)
+                        .body(adminDataService.create(adminDataDto));
             }
             default -> {
                 return ResponseEntity.badRequest().body(Map.of(

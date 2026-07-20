@@ -2,6 +2,7 @@ package ma.marocsphere.controller;
 
 import ma.marocsphere.dto.DMCCreationDTO;
 import ma.marocsphere.dto.DMCResponseDTO;
+import ma.marocsphere.dto.DMCUpdateDTO;
 import ma.marocsphere.service.DMCService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +33,11 @@ public class DMCController {
     @PostMapping
     public ResponseEntity<DMCResponseDTO> create(@RequestBody DMCCreationDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(dmcService.create(dto));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<DMCResponseDTO> update(@PathVariable Long id, @RequestBody DMCUpdateDTO dto) {
+        return ResponseEntity.ok(dmcService.update(id, dto));
     }
 
     @DeleteMapping("/{id}")

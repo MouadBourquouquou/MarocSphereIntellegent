@@ -20,5 +20,6 @@ public class AdminResponseDTO {
     private String nationalite;
     private String languePreferee;
     private String role;
+    private String status;
     private LocalDateTime dateCreation;
 }

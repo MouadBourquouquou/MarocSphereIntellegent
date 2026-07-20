@@ -6,6 +6,7 @@ import ma.marocsphere.dto.GuideResponseDTO;
 import ma.marocsphere.dto.GuideUpdateDTO;
 import ma.marocsphere.entity.Guide;
 import ma.marocsphere.entity.Role;
+import ma.marocsphere.entity.UserStatus;
 import ma.marocsphere.entity.Utilisateur;
 import ma.marocsphere.repository.GuideRepo;
 import ma.marocsphere.repository.UtilisateurRepo;
@@ -95,6 +96,9 @@ public class GuideServiceImpl implements GuideService {
         if (dto.getNumeroLicence() != null) guide.setNumeroLicence(dto.getNumeroLicence());
         if (dto.getStatutCertification() != null) guide.setStatutCertification(dto.getStatutCertification());
         if (dto.getDisponible() != null) guide.setDisponible(dto.getDisponible());
+        if (dto.getStatus() != null) {
+            guide.setStatus(UserStatus.valueOf(dto.getStatus().toUpperCase()));
+        }
         Guide saved = guideRepo.save(guide);
         return toResponseDTO(saved);
     }
@@ -112,6 +116,7 @@ public class GuideServiceImpl implements GuideService {
                 .statutCertification(guide.getStatutCertification())
                 .scoreCertification(guide.getScoreCertification())
                 .disponible(guide.getDisponible())
+                .status(guide.getStatus().name())
                 .dateCreation(guide.getDateCreation())
                 .build();
     }

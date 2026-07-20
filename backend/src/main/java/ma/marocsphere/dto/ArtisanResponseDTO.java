@@ -26,5 +26,6 @@ public class ArtisanResponseDTO {
     private Long cooperativeId; // null si indépendant
     private String avatarUrl;
     private String bannerUrl;
+    private String status;
     private LocalDateTime dateCreation;
 }

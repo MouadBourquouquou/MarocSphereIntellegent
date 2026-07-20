@@ -1,14 +1,103 @@
-import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, forkJoin, map } from 'rxjs';
 
-import { PlatformUser } from './platform-user.model';
+const BASE = 'http://localhost:8080/api';
+
+// ── Backend DTO shapes ──────────────────────────────────────────────────────
+
+export interface ClientDTO {
+  id: number;
+  email: string;
+  nom: string;
+  prenom: string;
+  telephone: string;
+  nationalite: string;
+  languePreferee: string;
+  tierAbonnement: string | null;
+  dateCreation: string;
+}
+
+export interface GuideDTO {
+  id: number;
+  email: string;
+  nom: string;
+  prenom: string;
+  telephone: string;
+  nationalite: string;
+  languePreferee: string;
+  numeroLicence: string;
+  statutCertification: string;
+  scoreCertification: number;
+  disponible: boolean;
+  dateCreation: string;
+}
+
+export interface ArtisanDTO {
+  id: number;
+  email: string;
+  nom: string;
+  prenom: string;
+  telephone: string;
+  nationalite: string;
+  languePreferee: string;
+  categorieArtisanat: string;
+  qrTraceId: string;
+  eligibleExport: boolean;
+  independant: boolean;
+  cooperativeId: number | null;
+  avatarUrl: string | null;
+  bannerUrl: string | null;
+  dateCreation: string;
+}
+
+export interface DmcDTO {
+  id: number;
+  email: string;
+  nom: string;
+  prenom: string;
+  telephone: string;
+  nationalite: string;
+  languePreferee: string;
+  nomEntreprise: string;
+  zoneCouverture: string;
+  dateCreation: string;
+}
+
+export interface ReservationDTO {
+  id: number;
+  clientId: number;
+  guideId: number | null;
+  statut: string;
+  date: string;
+}
+
+export interface PlatformStatsDTO {
+  totalClients: number;
+  totalGuides: number;
+  totalArtisans: number;
+  totalDmcs: number;
+  totalAdmins: number;
+  totalReservations: number;
+  reservationsConfirmees: number;
+  reservationsEnAttente: number;
+  guidesDisponibles: number;
+  artisansEligiblesExport: number;
+}
+
+// ── View models used by the dashboard components ────────────────────────────
 
 export interface DashboardMetrics {
   totalUsers: number;
-  certifiedGuides: number;
-  activeArtisans: number;
-  completedTrips: number;
+  totalClients: number;
+  totalGuides: number;
+  totalArtisans: number;
+  totalDmcs: number;
+  totalReservations: number;
+  reservationsConfirmees: number;
+  reservationsEnAttente: number;
+  guidesDisponibles: number;
+  artisansEligiblesExport: number;
 }
 
 export interface ChartSeriesData {
@@ -16,103 +105,141 @@ export interface ChartSeriesData {
   values: number[];
 }
 
-/**
- * Placeholder service for the admin dashboard data.
- * Each method returns an Observable<T> so the component can depend on a stable contract
- * while the backend team later swaps these mock implementations for real HTTP calls.
- */
+export interface AllEntities {
+  clients: ClientDTO[];
+  guides: GuideDTO[];
+  artisans: ArtisanDTO[];
+  dmcs: DmcDTO[];
+  reservations: ReservationDTO[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class AdminDataService {
-  private readonly mockUsers: PlatformUser[] = [
-    { id: 101, name: 'Youssef El Alami', role: 'Guide', email: 'youssef.guide@marocsphere.com', date: '2025-01-12', status: 'Certified', rating: 4.9, country: 'Morocco', language: 'Arabic, French, English', avatar: 'https://randomuser.me/api/portraits/men/32.jpg' },
-    { id: 102, name: 'Amina Benjelloun', role: 'Artisan', email: 'amina.crafts@marocsphere.com', date: '2025-02-05', status: 'Active', rating: 4.8, country: 'Morocco', language: 'Arabic, French', avatar: 'https://randomuser.me/api/portraits/women/44.jpg' },
-    { id: 103, name: 'Sarah Miller', role: 'Client', email: 'sarah.m@yahoo.com', date: '2025-02-18', status: 'Active', rating: 5.0, country: 'USA', language: 'English', avatar: 'https://randomuser.me/api/portraits/women/68.jpg' },
-    { id: 104, name: 'Atlas Voyages', role: 'DMC', email: 'operations@atlasvoyages.ma', date: '2024-11-20', status: 'Active', rating: 4.7, country: 'Morocco', language: 'Arabic, French, Spanish', avatar: 'https://randomuser.me/api/portraits/men/78.jpg' },
-    { id: 105, name: 'Karim Mansouri', role: 'Administrator', email: 'karim.m@marocsphere.com', date: '2024-09-01', status: 'Active', rating: 5.0, country: 'Morocco', language: 'Arabic, French, English', avatar: 'https://randomuser.me/api/portraits/men/54.jpg' }
-  ];
+  private http = inject(HttpClient);
 
-  private readonly dateFilterOptions = ['Last 24 Hours', 'Last 7 Days', 'Last 30 Days', 'Year to Date'];
-  private readonly cityFilterOptions = ['All Regions', 'Marrakech-Safi', 'Fes-Meknes', 'Tangier-Tetouan'];
-
-  getUsers(): Observable<PlatformUser[]> {
-    return of(this.mockUsers).pipe(delay(300));
+  /** Fetch the pre-computed stats from the backend (counts only). */
+  getStats(): Observable<PlatformStatsDTO> {
+    return this.http.get<PlatformStatsDTO>(`${BASE}/admins/stats`);
   }
 
-  getDateFilterOptions(): Observable<string[]> {
-    return of([...this.dateFilterOptions]).pipe(delay(300));
+  /** Fetch all entity lists in one parallel request. */
+  getAllEntities(): Observable<AllEntities> {
+    return forkJoin({
+      clients:      this.http.get<ClientDTO[]>(`${BASE}/clients`),
+      guides:       this.http.get<GuideDTO[]>(`${BASE}/guides`),
+      artisans:     this.http.get<ArtisanDTO[]>(`${BASE}/artisans`),
+      dmcs:         this.http.get<DmcDTO[]>(`${BASE}/dmcs`),
+      reservations: this.http.get<ReservationDTO[]>(`${BASE}/reservations`),
+    });
   }
 
-  getCityFilterOptions(): Observable<string[]> {
-    return of([...this.cityFilterOptions]).pipe(delay(300));
+  getClients(): Observable<ClientDTO[]> {
+    return this.http.get<ClientDTO[]>(`${BASE}/clients`);
   }
 
-  getSummaryMetrics(city: string, range: string): Observable<DashboardMetrics> {
-    return of(this.buildMetrics(city, range)).pipe(delay(300));
+  getGuides(): Observable<GuideDTO[]> {
+    return this.http.get<GuideDTO[]>(`${BASE}/guides`);
   }
 
-  getOriginBreakdown(city: string, range: string): Observable<ChartSeriesData> {
-    return of(this.buildOriginBreakdown(city, range)).pipe(delay(300));
+  getArtisans(): Observable<ArtisanDTO[]> {
+    return this.http.get<ArtisanDTO[]>(`${BASE}/artisans`);
   }
 
-  getCategoryBreakdown(city: string, range: string): Observable<ChartSeriesData> {
-    return of(this.buildCategoryBreakdown(city, range)).pipe(delay(300));
+  getDmcs(): Observable<DmcDTO[]> {
+    return this.http.get<DmcDTO[]>(`${BASE}/dmcs`);
   }
 
-  private buildMetrics(city: string, range: string): DashboardMetrics {
-    const cityMultiplier = city === 'All Regions' ? 1 : 0.78;
-    const rangeMultiplier = this.getRangeMultiplier(range);
-
-    return {
-      totalUsers: Math.round(14280 * cityMultiplier * rangeMultiplier),
-      certifiedGuides: Math.round(320 * cityMultiplier * rangeMultiplier),
-      activeArtisans: Math.round(180 * cityMultiplier * rangeMultiplier),
-      completedTrips: Math.round(12450 * cityMultiplier * rangeMultiplier)
-    };
+  getReservations(): Observable<ReservationDTO[]> {
+    return this.http.get<ReservationDTO[]>(`${BASE}/reservations`);
   }
 
-  private buildOriginBreakdown(city: string, range: string): ChartSeriesData {
-    const rangeMultiplier = this.getRangeMultiplier(range);
-    const cityMultiplier = city === 'All Regions' ? 1 : 0.8;
-
-    return {
-      labels: ['France', 'Spain', 'Germany', 'Italy', 'United States'],
-      values: [
-        Math.round(12800 * rangeMultiplier * cityMultiplier),
-        Math.round(9500 * rangeMultiplier * cityMultiplier),
-        Math.round(7600 * rangeMultiplier * cityMultiplier),
-        Math.round(6400 * rangeMultiplier * cityMultiplier),
-        Math.round(5200 * rangeMultiplier * cityMultiplier)
-      ]
-    };
+  /** Map raw stats to the DashboardMetrics view model. */
+  getSummaryMetrics(): Observable<DashboardMetrics> {
+    return this.getStats().pipe(
+      map(s => ({
+        totalUsers: s.totalClients + s.totalGuides + s.totalArtisans + s.totalDmcs + s.totalAdmins,
+        totalClients: s.totalClients,
+        totalGuides: s.totalGuides,
+        totalArtisans: s.totalArtisans,
+        totalDmcs: s.totalDmcs,
+        totalReservations: s.totalReservations,
+        reservationsConfirmees: s.reservationsConfirmees,
+        reservationsEnAttente: s.reservationsEnAttente,
+        guidesDisponibles: s.guidesDisponibles,
+        artisansEligiblesExport: s.artisansEligiblesExport,
+      }))
+    );
   }
 
-  private buildCategoryBreakdown(city: string, range: string): ChartSeriesData {
-    const rangeMultiplier = this.getRangeMultiplier(range);
-    const cityMultiplier = city === 'All Regions' ? 1 : 0.85;
-
-    return {
-      labels: ['Cultural Tours', 'Food Experiences', 'Desert Trips', 'Coastal Escapes'],
-      values: [
-        Math.round(4200 * rangeMultiplier * cityMultiplier),
-        Math.round(3100 * rangeMultiplier * cityMultiplier),
-        Math.round(2500 * rangeMultiplier * cityMultiplier),
-        Math.round(1800 * rangeMultiplier * cityMultiplier)
-      ]
-    };
+  /**
+   * Builds a breakdown chart from the guide languePreferee field —
+   * counts how many guides speak each language.
+   */
+  getGuideLanguageBreakdown(): Observable<ChartSeriesData> {
+    return this.getGuides().pipe(
+      map(guides => {
+        const counts: Record<string, number> = {};
+        guides.forEach(g => {
+          const lang = g.languePreferee || 'Non spécifié';
+          counts[lang] = (counts[lang] ?? 0) + 1;
+        });
+        const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 6);
+        return { labels: sorted.map(e => e[0]), values: sorted.map(e => e[1]) };
+      })
+    );
   }
 
-  private getRangeMultiplier(range: string): number {
-    switch (range) {
-      case 'Last 24 Hours':
-        return 0.4;
-      case 'Last 7 Days':
-        return 0.7;
-      case 'Last 30 Days':
-        return 1;
-      case 'Year to Date':
-        return 1.35;
-      default:
-        return 1;
-    }
+  /**
+   * Builds a breakdown chart from the artisan categorieArtisanat field.
+   */
+  getArtisanCategoryBreakdown(): Observable<ChartSeriesData> {
+    return this.getArtisans().pipe(
+      map(artisans => {
+        const counts: Record<string, number> = {};
+        artisans.forEach(a => {
+          const cat = a.categorieArtisanat || 'Autre';
+          counts[cat] = (counts[cat] ?? 0) + 1;
+        });
+        const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 6);
+        return { labels: sorted.map(e => e[0]), values: sorted.map(e => e[1]) };
+      })
+    );
   }
+
+  /**
+   * Builds a reservation status breakdown.
+   */
+  getReservationStatusBreakdown(): Observable<ChartSeriesData> {
+    return this.getReservations().pipe(
+      map(reservations => {
+        const counts: Record<string, number> = {};
+        reservations.forEach(r => {
+          const s = r.statut || 'INCONNU';
+          counts[s] = (counts[s] ?? 0) + 1;
+        });
+        const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+        return { labels: sorted.map(e => e[0]), values: sorted.map(e => e[1]) };
+      })
+    );
+  }
+
+  /**
+   * Builds a client origin (nationalite) breakdown — top countries.
+   */
+  getClientOriginBreakdown(): Observable<ChartSeriesData> {
+    return this.getClients().pipe(
+      map(clients => {
+        const counts: Record<string, number> = {};
+        clients.forEach(c => {
+          const n = c.nationalite || 'Non spécifié';
+          counts[n] = (counts[n] ?? 0) + 1;
+        });
+        const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 6);
+        return { labels: sorted.map(e => e[0]), values: sorted.map(e => e[1]) };
+      })
+    );
+  }
+
+  readonly dateFilterOptions = ['Last 24 Hours', 'Last 7 Days', 'Last 30 Days', 'Year to Date'];
+  readonly cityFilterOptions = ['All Regions', 'Marrakech-Safi', 'Fes-Meknes', 'Tangier-Tetouan'];
 }

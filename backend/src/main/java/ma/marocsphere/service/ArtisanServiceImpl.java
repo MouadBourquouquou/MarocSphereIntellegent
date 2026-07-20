@@ -7,6 +7,7 @@ import ma.marocsphere.dto.ArtisanUpdateDTO;
 import ma.marocsphere.entity.Artisan;
 import ma.marocsphere.entity.Cooperative;
 import ma.marocsphere.entity.Role;
+import ma.marocsphere.entity.UserStatus;
 import ma.marocsphere.entity.Utilisateur;
 import ma.marocsphere.repository.ArtisanRepo;
 import ma.marocsphere.repository.CooperativeRepo;
@@ -47,7 +48,7 @@ public class ArtisanServiceImpl implements ArtisanService {
 
     @Override
     public List<ArtisanResponseDTO> getAll() {
-        return artisanRepo.findAll().stream()
+        return artisanRepo.findAllWithCooperative().stream()
                 .map(this::toResponseDTO)
                 .toList();
     }
@@ -106,6 +107,9 @@ public class ArtisanServiceImpl implements ArtisanService {
         if (dto.getIndependant() != null) artisan.setIndependant(dto.getIndependant());
         if (dto.getAvatarUrl() != null) artisan.setAvatarUrl(dto.getAvatarUrl());
         if (dto.getBannerUrl() != null) artisan.setBannerUrl(dto.getBannerUrl());
+        if (dto.getStatus() != null) {
+            artisan.setStatus(UserStatus.valueOf(dto.getStatus().toUpperCase()));
+        }
         Artisan saved = artisanRepo.save(artisan);
         return toResponseDTO(saved);
     }
@@ -127,6 +131,7 @@ public class ArtisanServiceImpl implements ArtisanService {
                 .cooperativeId(cooperativeId)
                 .avatarUrl(artisan.getAvatarUrl())
                 .bannerUrl(artisan.getBannerUrl())
+                .status(artisan.getStatus().name())
                 .dateCreation(artisan.getDateCreation())
                 .build();
     }

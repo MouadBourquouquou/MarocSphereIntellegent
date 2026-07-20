@@ -12,4 +12,5 @@ public interface GuideRepo extends JpaRepository<Guide, Long> {
     Optional<Guide> findByEmail(String email);
     boolean existsByEmail(String email);
     List<Guide> findByDisponibleTrue();
+    long countByDisponibleTrue();
 }

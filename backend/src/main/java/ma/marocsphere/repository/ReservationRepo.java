@@ -2,6 +2,7 @@ package ma.marocsphere.repository;
 
 import ma.marocsphere.entity.Reservation;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -11,4 +12,8 @@ public interface ReservationRepo extends JpaRepository<Reservation, Long> {
     List<Reservation> findByClientId(Long clientId);
     List<Reservation> findByGuideId(Long guideId);
     List<Reservation> findByStatut(String statut);
+    long countByStatut(String statut);
+
+    @Query("SELECT r FROM Reservation r LEFT JOIN FETCH r.client LEFT JOIN FETCH r.guide")
+    List<Reservation> findAllWithClientAndGuide();
 }

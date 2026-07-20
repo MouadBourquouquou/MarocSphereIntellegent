@@ -20,6 +20,7 @@ public class ClientResponseDTO {
     private String nationalite;
     private String languePreferee;
     private String tierAbonnement;
+    private String status;
     private LocalDateTime dateCreation;
 
 }

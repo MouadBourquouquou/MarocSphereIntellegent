@@ -11,8 +11,22 @@ export const adminGuard: CanActivateFn = () => {
   if (role === 'ADMIN') return true;
 
   if (auth.isAuthenticated()) {
-    // logged in but not admin → back to their dashboard
-    return router.createUrlTree(['/dashboard-client']);
+    return router.createUrlTree(['/adminData']);
+  }
+
+  return router.createUrlTree(['/login']);
+};
+
+export const adminDataGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+
+  const role = auth.currentUser()?.role?.toUpperCase().replace('ROLE_', '');
+
+  if (role === 'ADMIN_DATA') return true;
+
+  if (auth.isAuthenticated()) {
+    return router.createUrlTree(['/admin']);
   }
 
   return router.createUrlTree(['/login']);

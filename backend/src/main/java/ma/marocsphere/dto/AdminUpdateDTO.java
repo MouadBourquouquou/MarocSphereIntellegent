@@ -9,14 +9,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class GuideUpdateDTO {
+public class AdminUpdateDTO {
     private String nom;
     private String prenom;
     private String telephone;
     private String nationalite;
     private String languePreferee;
-    private String numeroLicence;
-    private String statutCertification;
-    private Boolean disponible;
     private String status;
 }

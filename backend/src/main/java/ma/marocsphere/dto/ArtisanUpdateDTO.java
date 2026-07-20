@@ -20,4 +20,5 @@ public class ArtisanUpdateDTO {
     private Boolean independant;
     private String avatarUrl;
     private String bannerUrl;
+    private String status;
 }
