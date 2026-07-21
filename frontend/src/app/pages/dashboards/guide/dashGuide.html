@@ -34,13 +34,7 @@
                     <div class="hidden sm:block text-left">
                         <p class="text-xs font-bold text-foreground leading-tight">{{ guidePrenom() }} {{ guideName() }}</p>
                         <p class="text-[10px] text-muted-foreground">
-                            @if (statutCertification() === 'CERTIFIED') {
-                                Certified Guide
-                            } @else if (statutCertification() === 'PENDING') {
-                                Certification Pending
-                            } @else {
-                                Guide
-                            }
+                            Certified Guide
                         </p>
                     </div>
                 </div>
