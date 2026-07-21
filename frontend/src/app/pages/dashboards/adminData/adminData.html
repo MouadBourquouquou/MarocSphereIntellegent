@@ -1,314 +1,507 @@
 <div data-page="admin-analytics-dashboard">
   <div class="min-h-screen w-full bg-background flex flex-col relative font-sans text-foreground">
-
-    <!-- ═══ HEADER ════════════════════════════════════════════════════════════ -->
-    <header class="sticky top-0 z-40 bg-card/90 backdrop-blur-md border-b border-border px-6 py-3 flex items-center justify-between">
-      <div class="flex items-center gap-4">
-        <a class="flex items-center justify-center transition-transform duration-300 hover:scale-105" routerLink="/">
+    <!-- ═══ HEADER ═══════════════════════════════════════════════════════════ -->
+    <header
+      class="sticky top-0 z-40 bg-card/90 backdrop-blur-md border-b border-border px-6 py-3 flex items-center justify-between"
+    >
+      <div class="flex items-center gap-8">
+        <a
+          class="flex items-center justify-center transition-transform duration-300 hover:scale-105"
+          routerLink="/"
+        >
           <img src="/pics/LOGOPRINCIPALE.png" alt="MarocSphere" class="logo" />
         </a>
-        <span class="text-xs font-bold text-muted-foreground hidden md:block">Analytics Dashboard</span>
-      </div>
-
-      <div class="flex items-center gap-4">
-        <a routerLink="/admin"
-          class="flex items-center gap-2 px-3.5 py-1.5 bg-primary text-primary-foreground text-xs font-semibold rounded-lg hover:bg-primary/95 transition-all shadow-sm">
-          <iconify-icon icon="lucide:user-cog" class="text-sm"></iconify-icon>
-          <span>Portail Super Admin</span>
-        </a>
-        <div class="flex items-center gap-2.5 pl-3 border-l border-border/80">
-          <iconify-icon icon="lucide:bar-chart-2" class="text-3xl text-secondary"></iconify-icon>
-          <div class="hidden lg:block text-left">
-            <span class="block text-xs font-bold text-foreground">Auditeur Gouvernemental</span>
-            <span class="block text-[10px] text-secondary font-semibold">Lecture seule</span>
-          </div>
+        <div class="relative hidden md:block w-72">
+          <iconify-icon
+            icon="lucide:search"
+            class="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground text-lg"
+          ></iconify-icon>
+          <input
+            type="text"
+            [(ngModel)]="searchQuery"
+            placeholder="Search guides, clients, artisans..."
+            class="w-full pl-10 pr-4 py-2 bg-muted/60 border border-border/80 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
+          />
         </div>
+      </div>
+      <div class="flex items-center gap-4">
+        <button
+          (click)="showNotification('No new alerts.')"
+          class="p-2 text-muted-foreground hover:text-primary rounded-full hover:bg-muted transition-all relative"
+        >
+          <iconify-icon icon="lucide:bell" class="text-xl"></iconify-icon>
+          <span
+            class="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full ring-2 ring-card"
+          ></span>
+        </button>
+        <button
+          (click)="logout()"
+          class="flex items-center gap-2.5 pl-3 border-l border-border/80 hover:bg-muted/40 rounded-lg py-1.5 pr-2 transition-all cursor-pointer"
+        >
+          <img width="20" height="20" src="/images/logout.png" alt="exit--v1" />
+        </button>
       </div>
     </header>
-
-    <!-- ═══ BODY ═══════════════════════════════════════════════════════════════ -->
+    <!-- ═══ BODY ══════════════════════════════════════════════════════════════ -->
     <div class="flex-1 flex flex-col lg:flex-row">
-
-      <!-- ── SIDEBAR FILTERS ──────────────────────────────────────────────── -->
+      <!-- ── SIDEBAR ──────────────────────────────────────────────────────── -->
       <aside class="w-full lg:w-64 bg-card border-r border-border p-5 flex flex-col gap-6">
-
         <div>
-          <p class="text-[11px] font-bold text-muted-foreground tracking-widest uppercase mb-3">Plage temporelle</p>
-          <div class="space-y-1.5">
-            <button *ngFor="let d of dateFilterOptions"
-              (click)="changeDateFilter(d)"
-              [class.text-primary]="activeFilterDate === d"
-              [class.bg-accent/40]="activeFilterDate === d"
-              class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-muted-foreground hover:bg-muted hover:text-foreground transition-all">
-              {{ d }}
-            </button>
-          </div>
-        </div>
-
-        <div>
-          <p class="text-[11px] font-bold text-muted-foreground tracking-widest uppercase mb-3">Région</p>
-          <div class="space-y-1.5">
-            <button *ngFor="let c of cityFilterOptions"
-              (click)="changeCityFilter(c)"
-              [class.text-primary]="activeFilterCity === c"
-              [class.bg-accent/40]="activeFilterCity === c"
-              class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-muted-foreground hover:bg-muted hover:text-foreground transition-all">
-              {{ c }}
-            </button>
-          </div>
-        </div>
-
-        <div class="mt-auto p-4 bg-muted/60 border border-border/80 rounded-xl">
-          <div class="flex items-center gap-2 text-primary mb-2">
-            <iconify-icon icon="lucide:sparkles" class="text-lg"></iconify-icon>
-            <span class="text-xs font-bold uppercase tracking-wider">Heritage Tech</span>
-          </div>
-          <p class="text-[11px] text-muted-foreground leading-relaxed">
-            Données en temps réel depuis la base de données MarocSphere.
+          <p class="text-[11px] font-bold text-muted-foreground tracking-widest uppercase mb-3">
+            Analytics
           </p>
+          <nav class="flex flex-col gap-1.5">
+            <button
+              (click)="switchTab('overview')"
+              [ngClass]="
+                activeTab === 'overview'
+                  ? 'border-primary text-primary bg-accent/40'
+                  : 'text-muted-foreground'
+              "
+              class="tab-btn flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg text-sm font-semibold border border-transparent transition-all"
+            >
+              <div class="flex items-center gap-3">
+                <iconify-icon icon="lucide:layout-dashboard" class="text-lg"></iconify-icon>
+                <span>Overview</span>
+              </div>
+            </button>
+
+            <button
+              (click)="switchTab('nationalities')"
+              [ngClass]="
+                activeTab === 'nationalities'
+                  ? 'border-primary text-primary bg-accent/40'
+                  : 'text-muted-foreground'
+              "
+              class="tab-btn flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg text-sm font-semibold border border-transparent transition-all"
+            >
+              <div class="flex items-center gap-3">
+                <iconify-icon icon="lucide:globe" class="text-lg"></iconify-icon>
+                <span>Nationalities</span>
+              </div>
+              <span
+                class="bg-primary/10 text-primary text-[10px] font-bold px-2 py-0.5 rounded-full"
+                >{{ clients.length }}</span
+              >
+            </button>
+
+            <button
+              (click)="switchTab('reservations')"
+              [ngClass]="
+                activeTab === 'reservations'
+                  ? 'border-primary text-primary bg-accent/40'
+                  : 'text-muted-foreground'
+              "
+              class="tab-btn flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg text-sm font-semibold border border-transparent transition-all"
+            >
+              <div class="flex items-center gap-3">
+                <iconify-icon icon="lucide:calendar" class="text-lg"></iconify-icon>
+                <span>Reservations</span>
+              </div>
+              <span
+                class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full"
+                >{{ reservations.length }}</span
+              >
+            </button>
+
+            <button
+              (click)="switchTab('artisans')"
+              [ngClass]="
+                activeTab === 'artisans'
+                  ? 'border-primary text-primary bg-accent/40'
+                  : 'text-muted-foreground'
+              "
+              class="tab-btn flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg text-sm font-semibold border border-transparent transition-all"
+            >
+              <div class="flex items-center gap-3">
+                <iconify-icon icon="lucide:layers" class="text-lg"></iconify-icon>
+                <span>Artisan Categories</span>
+              </div>
+              <span
+                class="bg-primary/10 text-primary text-[10px] font-bold px-2 py-0.5 rounded-full"
+                >{{ artisans.length }}</span
+              >
+            </button>
+          </nav>
         </div>
+
+        <!-- <div>
+          <p class="text-[11px] font-bold text-muted-foreground tracking-widest uppercase mb-3">Filters</p>
+          <nav class="flex flex-col gap-1.5"> -->
+        <!-- <button (click)="switchTab('filters')"
+              [ngClass]="activeTab==='filters' ? 'border-primary text-primary bg-accent/40' : 'text-muted-foreground'"
+              class="tab-btn flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg text-sm font-semibold border border-transparent transition-all">
+              <div class="flex items-center gap-3">
+                <iconify-icon icon="lucide:sliders-horizontal" class="text-lg"></iconify-icon>
+                <span>Filters</span>
+              </div>
+            </button> -->
+        <!-- </nav>
+        </div> -->
       </aside>
 
-      <!-- ── MAIN CONTENT ──────────────────────────────────────────────────── -->
+      <!-- ── MAIN CONTENT ───────────────────────────────────────────────── -->
       <main class="flex-1 p-6 lg:p-8 flex flex-col gap-8 max-w-7xl mx-auto w-full">
-
-        <!-- Header + Export -->
-        <section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h2 class="text-xl font-heading font-bold text-foreground">Intelligence Nationale du Tourisme</h2>
-            <p class="text-xs text-muted-foreground">Télémétrie complète · certifications guides · métriques marché artisanal.</p>
-            <p class="text-[11px] text-muted-foreground mt-1">
-              Périmètre actif : <strong class="text-foreground">{{ activeFilterCity }}</strong> ·
-              <strong class="text-foreground">{{ activeFilterDate }}</strong>
-            </p>
-          </div>
-          <div class="flex items-center gap-2">
-            <button (click)="exportReport('PDF')"
-              class="flex items-center gap-1.5 px-3 py-2 border border-border bg-card hover:bg-muted text-foreground text-xs font-semibold rounded-lg transition-all shadow-sm">
-              <iconify-icon icon="lucide:download" class="text-sm"></iconify-icon><span>PDF</span>
-            </button>
-            <button (click)="exportReport('Excel')"
-              class="flex items-center gap-1.5 px-3 py-2 border border-border bg-card hover:bg-muted text-foreground text-xs font-semibold rounded-lg transition-all shadow-sm">
-              <iconify-icon icon="lucide:download" class="text-sm"></iconify-icon><span>Excel</span>
-            </button>
-            <button (click)="exportReport('CSV')"
-              class="flex items-center gap-1.5 px-3 py-2 border border-border bg-card hover:bg-muted text-foreground text-xs font-semibold rounded-lg transition-all shadow-sm">
-              <iconify-icon icon="lucide:download" class="text-sm"></iconify-icon><span>CSV</span>
-            </button>
-          </div>
-        </section>
-
         <!-- Loading spinner -->
         <div *ngIf="isLoading" class="flex items-center justify-center py-20">
-          <iconify-icon icon="lucide:loader-circle" class="text-4xl text-primary animate-spin"></iconify-icon>
+          <iconify-icon
+            icon="lucide:loader-circle"
+            class="text-4xl text-primary animate-spin"
+          ></iconify-icon>
         </div>
 
-        <!-- ── KPI CARDS ────────────────────────────────────────────────────── -->
-        <section *ngIf="!isLoading" class="grid grid-cols-2 md:grid-cols-4 gap-4">
-
-          <div class="bg-card p-5 rounded-xl border border-border/80 shadow-sm">
-            <span class="text-xs font-semibold text-muted-foreground block mb-1">Total Utilisateurs</span>
-            <div class="text-2xl font-bold text-foreground">{{ metrics.totalUsers | number }}</div>
-            <span class="text-[10px] text-muted-foreground block mt-1">
-              {{ metrics.totalClients }} clients · {{ metrics.totalDmcs }} DMCs
-            </span>
+        <!-- ═══ TAB 1 : OVERVIEW ═════════════════════════════════════════════ -->
+        <section *ngIf="!isLoading && activeTab === 'overview'" class="flex flex-col gap-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-xl font-heading font-bold text-foreground">
+                National Tourism Intelligence
+              </h2>
+            </div>
+            <div class="flex items-center gap-2">
+              <button
+                (click)="exportReport('PDF')"
+                class="flex items-center gap-1.5 px-3 py-2 border border-border bg-card hover:bg-muted text-foreground text-xs font-semibold rounded-lg transition-all shadow-sm"
+              >
+                <iconify-icon icon="lucide:download" class="text-sm"></iconify-icon><span>PDF</span>
+              </button>
+              <button
+                (click)="exportReport('Excel')"
+                class="flex items-center gap-1.5 px-3 py-2 border border-border bg-card hover:bg-muted text-foreground text-xs font-semibold rounded-lg transition-all shadow-sm"
+              >
+                <iconify-icon icon="lucide:download" class="text-sm"></iconify-icon
+                ><span>Excel</span>
+              </button>
+              <button
+                (click)="exportReport('CSV')"
+                class="flex items-center gap-1.5 px-3 py-2 border border-border bg-card hover:bg-muted text-foreground text-xs font-semibold rounded-lg transition-all shadow-sm"
+              >
+                <iconify-icon icon="lucide:download" class="text-sm"></iconify-icon><span>CSV</span>
+              </button>
+            </div>
           </div>
 
-          <div class="bg-card p-5 rounded-xl border border-border/80 shadow-sm">
-            <span class="text-xs font-semibold text-muted-foreground block mb-1">Guides Certifiés</span>
-            <div class="text-2xl font-bold text-foreground">{{ metrics.totalGuides | number }}</div>
-            <span class="text-[10px] text-emerald-600 font-semibold block mt-1">
-              {{ metrics.guidesDisponibles }} disponibles
-            </span>
-          </div>
+          <!-- KPI CARDS -->
+          <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div
+              class="bg-card p-4 rounded-xl border border-border/80 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5"
+            >
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-semibold text-muted-foreground">Total Users</span>
+                <div
+                  class="w-7 h-7 bg-primary/10 rounded-lg flex items-center justify-center text-primary"
+                >
+                  <iconify-icon icon="lucide:users" class="text-base"></iconify-icon>
+                </div>
+              </div>
+              <div class="text-xl font-bold tracking-tight text-foreground">
+                {{ metrics.totalUsers | number }}
+              </div>
+            </div>
 
-          <div class="bg-card p-5 rounded-xl border border-border/80 shadow-sm">
-            <span class="text-xs font-semibold text-muted-foreground block mb-1">Artisans</span>
-            <div class="text-2xl font-bold text-foreground">{{ metrics.totalArtisans | number }}</div>
-            <span class="text-[10px] text-emerald-600 font-semibold block mt-1">
-              {{ metrics.artisansEligiblesExport }} éligibles export
-            </span>
-          </div>
+            <div
+              class="bg-card p-4 rounded-xl border border-border/80 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5"
+            >
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-semibold text-muted-foreground">Clients</span>
+                <div
+                  class="w-7 h-7 bg-secondary/10 rounded-lg flex items-center justify-center text-secondary"
+                >
+                  <iconify-icon icon="lucide:user" class="text-base"></iconify-icon>
+                </div>
+              </div>
+              <div class="text-xl font-bold tracking-tight text-foreground">
+                {{ metrics.totalClients | number }}
+              </div>
+              <p class="text-[10px] text-muted-foreground mt-1">Registered travelers</p>
+            </div>
 
-          <div class="bg-card p-5 rounded-xl border border-border/80 shadow-sm">
-            <span class="text-xs font-semibold text-muted-foreground block mb-1">Réservations</span>
-            <div class="text-2xl font-bold text-foreground">{{ metrics.totalReservations | number }}</div>
-            <span class="text-[10px] text-amber-600 font-semibold block mt-1">
-              {{ metrics.reservationsEnAttente }} en attente · {{ metrics.reservationsConfirmees }} confirmées
-            </span>
-          </div>
+            <div
+              class="bg-card p-4 rounded-xl border border-border/80 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5"
+            >
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-semibold text-muted-foreground">Guides</span>
+                <div
+                  class="w-7 h-7 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-800"
+                >
+                  <iconify-icon icon="lucide:shield" class="text-base"></iconify-icon>
+                </div>
+              </div>
+              <div class="text-xl font-bold tracking-tight text-foreground">
+                {{ metrics.totalGuides | number }}
+              </div>
+              <p class="text-[10px] text-emerald-600 font-semibold mt-1">
+                {{ metrics.guidesDisponibles }} available
+              </p>
+            </div>
 
+            <div
+              class="bg-card p-4 rounded-xl border border-border/80 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5"
+            >
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-semibold text-muted-foreground">Artisans</span>
+                <div
+                  class="w-7 h-7 bg-amber-100 rounded-lg flex items-center justify-center text-amber-800"
+                >
+                  <iconify-icon icon="lucide:layers" class="text-base"></iconify-icon>
+                </div>
+              </div>
+              <div class="text-xl font-bold tracking-tight text-foreground">
+                {{ metrics.totalArtisans | number }}
+              </div>
+              <p class="text-[10px] text-emerald-600 font-semibold mt-1">
+                {{ metrics.artisansEligiblesExport }} export eligible
+              </p>
+            </div>
+
+            <div
+              class="bg-card p-4 rounded-xl border border-border/80 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5"
+            >
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-semibold text-muted-foreground">Reservations</span>
+                <div
+                  class="w-7 h-7 bg-tertiary/10 rounded-lg flex items-center justify-center text-tertiary"
+                >
+                  <iconify-icon icon="lucide:calendar" class="text-base"></iconify-icon>
+                </div>
+              </div>
+              <div class="text-xl font-bold tracking-tight text-foreground">
+                {{ metrics.totalReservations | number }}
+              </div>
+              <p class="text-[10px] text-amber-600 font-semibold mt-1">
+                {{ metrics.reservationsEnAttente }} pending ·
+                {{ metrics.reservationsConfirmees }} confirmed
+              </p>
+            </div>
+          </section>
+
+          <!-- Charts -->
+          <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="bg-card border border-border/80 rounded-xl p-5 shadow-sm lg:col-span-2">
+              <h3 class="font-bold text-sm mb-4">Client Nationalities (Top Origins)</h3>
+              <div class="h-64"><canvas #growthChart height="160"></canvas></div>
+            </div>
+            <div class="bg-card border border-border/80 rounded-xl p-5 shadow-sm">
+              <h3 class="font-bold text-sm mb-4">Artisan Categories</h3>
+              <div class="h-64"><canvas #destinationChart height="160"></canvas></div>
+            </div>
+          </section>
         </section>
 
-        <!-- ── CHARTS ────────────────────────────────────────────────────────── -->
-        <section *ngIf="!isLoading" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- ═══ TAB 2 : NATIONALITIES ═══════════════════════════════════════ -->
+        <section *ngIf="!isLoading && activeTab === 'nationalities'" class="flex flex-col gap-6">
+          <div>
+            <h2 class="text-xl font-heading font-bold text-foreground">Client Origins</h2>
+            <p class="text-xs text-muted-foreground">
+              Top nationalities across {{ clients.length }} registered clients.
+            </p>
+          </div>
 
-          <div class="bg-card border border-border/80 rounded-xl p-5 shadow-sm lg:col-span-2">
-            <h3 class="font-bold text-sm mb-1">Nationalités des Clients (Top origines)</h3>
-            <p class="text-xs text-muted-foreground mb-4">Basé sur {{ clients.length }} clients enregistrés.</p>
+          <div class="bg-card border border-border/80 rounded-xl p-5 shadow-sm">
+            <h3 class="font-bold text-sm mb-1">Client Nationalities Distribution</h3>
+            <p class="text-xs text-muted-foreground mb-4">
+              Based on {{ clients.length }} registered clients.
+            </p>
             <div class="h-64"><canvas #growthChart height="160"></canvas></div>
           </div>
 
           <div class="bg-card border border-border/80 rounded-xl p-5 shadow-sm">
-            <h3 class="font-bold text-sm mb-1">Catégories d'Artisanat</h3>
-            <p class="text-xs text-muted-foreground mb-4">Répartition sur {{ artisans.length }} artisans.</p>
-            <div class="h-64"><canvas #destinationChart height="160"></canvas></div>
-          </div>
-
-        </section>
-
-        <!-- ── DETAIL PANELS ─────────────────────────────────────────────────── -->
-        <section *ngIf="!isLoading" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-          <!-- Top Guides by Score -->
-          <div class="bg-card border border-border/80 rounded-xl p-5 shadow-sm">
-            <h3 class="font-bold text-sm mb-4">Top Guides (Score Certification)</h3>
-            <div *ngIf="topGuidesByScore.length === 0" class="text-xs text-muted-foreground">Aucun guide.</div>
-            <div class="space-y-3">
-              <div *ngFor="let g of topGuidesByScore; let i = index"
-                class="flex items-center justify-between text-xs border-b border-border/60 pb-2 last:border-0">
-                <div class="flex items-center gap-2">
-                  <span class="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-[10px]">
-                    {{ i + 1 }}
-                  </span>
-                  <div>
-                    <div class="font-semibold text-foreground">{{ g.prenom }} {{ g.nom }}</div>
-                    <div class="text-muted-foreground">{{ g.languePreferee ?? '—' }}</div>
-                  </div>
-                </div>
-                <div class="text-right">
-                  <span class="font-bold text-foreground">{{ g.scoreCertification | number:'1.1-1' }} ★</span>
-                  <div [class.text-emerald-600]="g.disponible" [class.text-muted-foreground]="!g.disponible" class="text-[10px]">
-                    {{ g.disponible ? 'Disponible' : 'Indisponible' }}
-                  </div>
-                </div>
-              </div>
+            <h3 class="font-bold text-sm mb-4">Client Origins — Top Nationalities</h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr
+                    class="bg-muted/40 border-b border-border text-muted-foreground uppercase font-bold"
+                  >
+                    <th class="p-3">Rank</th>
+                    <th class="p-3">Nationality</th>
+                    <th class="p-3">Number of Clients</th>
+                    <th class="p-3">Share (%)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    *ngFor="let n of topClientNationalities; let i = index; trackBy: trackByLabel"
+                    class="border-b border-border/60 hover:bg-muted/20 transition-all"
+                  >
+                    <td class="p-3 font-bold text-primary">#{{ i + 1 }}</td>
+                    <td class="p-3 font-semibold text-foreground">{{ n.label }}</td>
+                    <td class="p-3 text-foreground">{{ n.count }}</td>
+                    <td class="p-3">
+                      <div class="flex items-center gap-2">
+                        <div class="w-24 bg-muted rounded-full h-1.5">
+                          <div
+                            class="h-1.5 bg-primary rounded-full"
+                            [style.width.%]="clients.length ? (n.count / clients.length) * 100 : 0"
+                          ></div>
+                        </div>
+                        <span
+                          >{{
+                            clients.length
+                              ? ((n.count / clients.length) * 100 | number: '1.0-1')
+                              : 0
+                          }}%</span
+                        >
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
+        </section>
+        <!-- ═══ TAB 4 : RESERVATIONS ═══════════════════════════════════════ -->
+        <section *ngIf="!isLoading && activeTab === 'reservations'" class="flex flex-col gap-6">
+          <div>
+            <h2 class="text-xl font-heading font-bold text-foreground">Reservation Status</h2>
+            <p class="text-xs text-muted-foreground">
+              {{ reservations.length }} total reservations tracked.
+            </p>
+          </div>
 
-          <!-- Reservation Status Breakdown -->
+          <div
+            *ngIf="reservationByStatus.length === 0"
+            class="text-center py-12 text-muted-foreground text-sm"
+          >
+            No reservations found.
+          </div>
+
           <div class="bg-card border border-border/80 rounded-xl p-5 shadow-sm">
-            <h3 class="font-bold text-sm mb-4">Statuts des Réservations</h3>
-            <div *ngIf="reservationByStatus.length === 0" class="text-xs text-muted-foreground">Aucune réservation.</div>
-            <div class="space-y-3">
-              <div *ngFor="let s of reservationByStatus; trackBy: trackByStatut"
-                class="space-y-1">
-                <div class="flex justify-between text-xs">
+            <div class="space-y-4">
+              <div *ngFor="let s of reservationByStatus; trackBy: trackByStatut" class="space-y-2">
+                <div class="flex justify-between text-sm">
                   <span class="font-semibold text-foreground">{{ s.statut }}</span>
                   <span class="text-muted-foreground">{{ s.count }} ({{ s.pct }}%)</span>
                 </div>
-                <div class="w-full bg-muted rounded-full h-1.5">
-                  <div class="h-1.5 rounded-full"
+                <div class="w-full bg-muted rounded-full h-2">
+                  <div
+                    class="h-2 rounded-full transition-all"
                     [style.width.%]="s.pct"
                     [class.bg-emerald-500]="s.statut === 'CONFIRMEE'"
                     [class.bg-amber-500]="s.statut === 'EN_ATTENTE'"
                     [class.bg-red-500]="s.statut === 'ANNULEE'"
-                    [class.bg-primary]="!['CONFIRMEE','EN_ATTENTE','ANNULEE'].includes(s.statut)">
-                  </div>
+                    [class.bg-primary]="!['CONFIRMEE', 'EN_ATTENTE', 'ANNULEE'].includes(s.statut)"
+                  ></div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Artisan Categories & Key Indicators -->
-          <div class="bg-card border border-border/80 rounded-xl p-5 shadow-sm flex flex-col justify-between">
-            <div>
-              <h3 class="font-bold text-sm mb-4">Indicateurs Clés</h3>
-              <div class="space-y-3 text-xs">
-                <div class="flex justify-between items-center border-b border-border/60 pb-2">
-                  <span class="text-muted-foreground">Total Clients :</span>
-                  <span class="font-semibold text-foreground">{{ metrics.totalClients | number }}</span>
-                </div>
-                <div class="flex justify-between items-center border-b border-border/60 pb-2">
-                  <span class="text-muted-foreground">Guides disponibles :</span>
-                  <span class="font-semibold text-emerald-600">{{ metrics.guidesDisponibles | number }}</span>
-                </div>
-                <div class="flex justify-between items-center border-b border-border/60 pb-2">
-                  <span class="text-muted-foreground">Artisans éligibles export :</span>
-                  <span class="font-semibold text-foreground">{{ metrics.artisansEligiblesExport | number }}</span>
-                </div>
-                <div class="flex justify-between items-center border-b border-border/60 pb-2">
-                  <span class="text-muted-foreground">DMCs actifs :</span>
-                  <span class="font-semibold text-foreground">{{ metrics.totalDmcs | number }}</span>
-                </div>
-                <div class="flex justify-between items-center">
-                  <span class="text-muted-foreground">Résas confirmées :</span>
-                  <span class="font-semibold text-emerald-600">{{ metrics.reservationsConfirmees | number }}</span>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div class="bg-card p-4 rounded-xl border border-border/80 shadow-sm">
+              <span class="text-xs font-semibold text-muted-foreground block mb-1">Confirmed</span>
+              <div class="text-2xl font-bold text-emerald-600">
+                {{ metrics.reservationsConfirmees | number }}
+              </div>
+            </div>
+            <div class="bg-card p-4 rounded-xl border border-border/80 shadow-sm">
+              <span class="text-xs font-semibold text-muted-foreground block mb-1">Pending</span>
+              <div class="text-2xl font-bold text-amber-600">
+                {{ metrics.reservationsEnAttente | number }}
+              </div>
+            </div>
+            <div class="bg-card p-4 rounded-xl border border-border/80 shadow-sm">
+              <span class="text-xs font-semibold text-muted-foreground block mb-1">Total</span>
+              <div class="text-2xl font-bold text-foreground">
+                {{ metrics.totalReservations | number }}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ═══ TAB 5 : ARTISAN CATEGORIES ══════════════════════════════════ -->
+        <section *ngIf="!isLoading && activeTab === 'artisans'" class="flex flex-col gap-6">
+          <div>
+            <h2 class="text-xl font-heading font-bold text-foreground">Artisan Categories</h2>
+            <p class="text-xs text-muted-foreground">
+              {{ artisans.length }} artisans across {{ topArtisanCategories.length }} categories.
+            </p>
+          </div>
+
+          <div class="bg-card border border-border/80 rounded-xl p-5 shadow-sm">
+            <h3 class="font-bold text-sm mb-1">Artisan Categories Distribution</h3>
+            <p class="text-xs text-muted-foreground mb-4">
+              Distribution across {{ artisans.length }} artisans.
+            </p>
+            <div class="h-64"><canvas #destinationChart height="160"></canvas></div>
+          </div>
+
+          <div class="bg-card border border-border/80 rounded-xl p-5 shadow-sm">
+            <h3 class="font-bold text-sm mb-4">Artisan Categories — Detail</h3>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+              <div
+                *ngFor="let cat of topArtisanCategories; trackBy: trackByLabel"
+                class="p-3 bg-muted/40 rounded-lg text-center"
+              >
+                <div class="text-lg font-bold text-foreground">{{ cat.count }}</div>
+                <div class="text-xs text-muted-foreground mt-1 truncate" [title]="cat.label">
+                  {{ cat.label }}
                 </div>
               </div>
             </div>
-            <div class="p-3 bg-muted/40 rounded-lg text-[10px] text-muted-foreground mt-4">
-              * Données en temps réel depuis la base de données MarocSphere.
+          </div>
+        </section>
+
+        <!-- ═══ TAB 6 : FILTERS ═════════════════════════════════════════════ -->
+        <section *ngIf="!isLoading && activeTab === 'filters'" class="flex flex-col gap-6">
+          <div>
+            <h2 class="text-xl font-heading font-bold text-foreground">Filters</h2>
+            <p class="text-xs text-muted-foreground">
+              Adjust time range and region filters for analytics.
+            </p>
+          </div>
+
+          <div class="bg-card border border-border/80 rounded-xl p-5 shadow-sm">
+            <h3 class="font-bold text-sm mb-4">Time Range</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <button
+                *ngFor="let d of dateFilterOptions"
+                (click)="changeDateFilter(d)"
+                [class.bg-primary]="activeFilterDate === d"
+                [class.text-primary-foreground]="activeFilterDate === d"
+                [class.bg-muted]="activeFilterDate !== d"
+                class="px-4 py-2.5 rounded-lg text-xs font-semibold transition-all hover:bg-primary/90 hover:text-primary-foreground"
+              >
+                {{ d }}
+              </button>
             </div>
           </div>
 
-        </section>
-
-        <!-- ── TOP ARTISAN CATEGORIES TABLE ────────────────────────────────── -->
-        <section *ngIf="!isLoading && topArtisanCategories.length > 0"
-          class="bg-card border border-border/80 rounded-xl p-5 shadow-sm">
-          <h3 class="font-bold text-sm mb-4">Catégories d'Artisanat — Détail</h3>
-          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-            <div *ngFor="let cat of topArtisanCategories; trackBy: trackByLabel"
-              class="p-3 bg-muted/40 rounded-lg text-center">
-              <div class="text-lg font-bold text-foreground">{{ cat.count }}</div>
-              <div class="text-xs text-muted-foreground mt-1 truncate" [title]="cat.label">{{ cat.label }}</div>
+          <div class="bg-card border border-border/80 rounded-xl p-5 shadow-sm">
+            <h3 class="font-bold text-sm mb-4">Region</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <button
+                *ngFor="let c of cityFilterOptions"
+                (click)="changeCityFilter(c)"
+                [class.bg-primary]="activeFilterCity === c"
+                [class.text-primary-foreground]="activeFilterCity === c"
+                [class.bg-muted]="activeFilterCity !== c"
+                class="px-4 py-2.5 rounded-lg text-xs font-semibold transition-all hover:bg-primary/90 hover:text-primary-foreground"
+              >
+                {{ c }}
+              </button>
             </div>
           </div>
         </section>
-
-        <!-- ── TOP CLIENT NATIONALITIES TABLE ──────────────────────────────── -->
-        <section *ngIf="!isLoading && topClientNationalities.length > 0"
-          class="bg-card border border-border/80 rounded-xl p-5 shadow-sm">
-          <h3 class="font-bold text-sm mb-4">Origines des Clients — Top nationalités</h3>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr class="bg-muted/40 border-b border-border text-muted-foreground uppercase font-bold">
-                  <th class="p-3">Rang</th>
-                  <th class="p-3">Nationalité</th>
-                  <th class="p-3">Nombre de clients</th>
-                  <th class="p-3">Part (%)</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let n of topClientNationalities; let i = index; trackBy: trackByLabel"
-                  class="border-b border-border/60 hover:bg-muted/20 transition-all">
-                  <td class="p-3 font-bold text-primary">#{{ i + 1 }}</td>
-                  <td class="p-3 font-semibold text-foreground">{{ n.label }}</td>
-                  <td class="p-3 text-foreground">{{ n.count }}</td>
-                  <td class="p-3">
-                    <div class="flex items-center gap-2">
-                      <div class="w-24 bg-muted rounded-full h-1.5">
-                        <div class="h-1.5 bg-primary rounded-full"
-                          [style.width.%]="clients.length ? (n.count / clients.length * 100) : 0">
-                        </div>
-                      </div>
-                      <span>{{ clients.length ? (n.count / clients.length * 100 | number:'1.0-1') : 0 }}%</span>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
       </main>
-    </div><!-- end flex body -->
+    </div>
+    <!-- end flex body -->
 
-    <!-- ═══ TOAST ══════════════════════════════════════════════════════════════ -->
-    <div *ngIf="toastVisible"
+    <!-- ═══ TOAST ══════════════════════════════════════════════════════════ -->
+    <div
+      *ngIf="toastVisible"
       class="fixed bottom-6 right-6 z-50 bg-card border border-border rounded-xl shadow-xl px-4 py-3.5 flex items-center gap-3 max-w-sm transition-all duration-300 pointer-events-none"
       [class.border-emerald-200]="toastType === 'success'"
-      [class.border-red-200]="toastType === 'error'">
+      [class.border-red-200]="toastType === 'error'"
+    >
       <iconify-icon
         [icon]="toastType === 'success' ? 'lucide:circle-check' : 'lucide:circle-alert'"
         class="text-xl"
         [class.text-emerald-500]="toastType === 'success'"
-        [class.text-red-500]="toastType === 'error'">
+        [class.text-red-500]="toastType === 'error'"
+      >
       </iconify-icon>
       <p class="text-xs font-bold text-foreground">{{ toastMessage }}</p>
     </div>
-
   </div>
 </div>

@@ -9,6 +9,7 @@ import ma.marocsphere.service.ArtisanService;
 import ma.marocsphere.service.ClientService;
 import ma.marocsphere.service.CooperativeService;
 import ma.marocsphere.service.GuideService;
+import ma.marocsphere.service.TokenBlacklistService;
 import ma.marocsphere.util.JwtUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +37,20 @@ public class AuthController {
     private final GuideService guideService;
     private final ArtisanService artisanService;
     private final CooperativeService cooperativeService;
+    private final TokenBlacklistService tokenBlacklistService;
+
+    /**
+     * Déconnexion — blackliste le token JWT
+     * POST /api/auth/logout
+     */
+    @PostMapping("/logout")
+    public ResponseEntity<Map<String, String>> logout(@RequestHeader("Authorization") String authHeader) {
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            tokenBlacklistService.blacklist(token);
+        }
+        return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
+    }
 
     /**
      * Connexion — retourne un token JWT + le role
