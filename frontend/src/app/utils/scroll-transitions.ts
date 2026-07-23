@@ -73,6 +73,6 @@ export function initScrollTransitions(): () => void {
       el.style.zIndex   = '';
       el.style.position = '';
     });
-    ScrollTrigger.getAll().forEach(t => t.kill());
+    ScrollTrigger.getAll().forEach((trigger: ScrollTrigger) => trigger.kill());
   };
 }

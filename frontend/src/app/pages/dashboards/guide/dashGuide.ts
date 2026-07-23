@@ -10,7 +10,7 @@ import {
   PLATFORM_ID,
   inject,
 } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { GuideService } from '../../../services/guide.service';
 import { ExperienceService } from '../../../services/experience.service';
@@ -91,7 +91,7 @@ export interface Review {
 @Component({
   selector: 'app-dash-guide',
   standalone: true,
-  imports: [RouterLink, CommonModule],
+  imports: [RouterLink],
   templateUrl: './dashGuide.html',
   styleUrls: ['./dashGuide.css'],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
