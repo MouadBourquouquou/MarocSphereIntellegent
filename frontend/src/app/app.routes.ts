@@ -75,16 +75,23 @@ export const routes: Routes = [
 
   {
     path: 'admin',
-    canActivate: [adminGuard],
+    // canActivate: [adminGuard],
     loadComponent: () =>
       import('./pages/dashboards/admin/admin').then((m) => m.admin),
   },
 
   {
     path: 'adminData',
-    canActivate: [adminDataGuard],
+    // canActivate: [adminDataGuard],
     loadComponent: () =>
       import('./pages/dashboards/adminData/adminData').then((m) => m.adminData),
+  },
+
+  {
+    path: 'favourites',
+    // canActivate: [adminDataGuard],
+    loadComponent: () =>
+      import('./pages/dashboards/client/favourites/favourites').then((m) => m.favourites),
   },
 
 

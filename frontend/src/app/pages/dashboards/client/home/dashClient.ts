@@ -57,6 +57,20 @@ export class DashboardClient implements OnInit, AfterViewInit, AfterViewChecked,
   chatInput = signal('');
   isSending = signal(false);
   private shouldScroll = false;
+  sidebarOpen = false;
+
+
+
+
+
+
+
+
+
+
+
+
+  
 
   landmarks = signal<LandmarkItem[]>([]);
   filteredLandmarks = signal<LandmarkItem[]>([]);

@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/reservations")
@@ -29,6 +30,11 @@ public class ReservationController {
     @GetMapping("/{id}")
     public ResponseEntity<ReservationResponseDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(reservationService.getById(id));
+    }
+
+    @GetMapping("/guide/{guideId}")
+    public ResponseEntity<List<ReservationResponseDTO>> getByGuideId(@PathVariable Long guideId) {
+        return ResponseEntity.ok(reservationService.getByGuideId(guideId));
     }
 
     @GetMapping("/client/{clientId}")
