@@ -17,4 +17,10 @@ public class ReservationResponseDTO {
     private Long guideId;
     private String statut;
     private LocalDateTime date;
+
+    private String clientNom;
+    private String clientPrenom;
+    private String clientEmail;
+    private String clientTelephone;
+    private String clientNationalite;
 }

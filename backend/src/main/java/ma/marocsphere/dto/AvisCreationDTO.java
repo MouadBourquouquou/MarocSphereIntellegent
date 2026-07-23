@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class AvisCreationDTO {
     private Long auteurId;
     private Long cibleId;
+    private Long artisanId;
     private Integer note;
     private String commentaire;
 }

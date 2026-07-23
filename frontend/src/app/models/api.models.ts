@@ -134,3 +134,76 @@ export interface Commande {
 export interface CommandeUpdateRequest {
   statut: string;
 }
+
+export interface Experience {
+  id: number;
+  guideId: number;
+  titre: string;
+  description: string;
+  localisation: string;
+  duree: string;
+  prix: string;
+  categorie: string;
+  image: string;
+  note: number;
+  nombreReservations: number;
+  statut: 'PUBLISHED' | 'DRAFT';
+  dateCreation: string;
+}
+
+export interface ExperienceCreationRequest {
+  titre: string;
+  description: string;
+  localisation: string;
+  duree: string;
+  prix: string;
+  categorie: string;
+  image: string;
+  statut: string;
+}
+
+export interface GuideReservation {
+  id: number;
+  clientId: number;
+  guideId: number;
+  statut: string;
+  date: string;
+  clientNom: string;
+  clientPrenom: string;
+  clientEmail: string;
+  clientTelephone: string;
+  clientNationalite: string;
+}
+
+export interface Avis {
+  id: number;
+  auteurId: number;
+  cibleId: number | null;
+  artisanId: number | null;
+  note: number;
+  commentaire: string;
+}
+
+export interface GuideConversation {
+  id: number;
+  guideId: number;
+  clientId: number;
+  clientNom: string;
+  clientPrenom: string;
+  dernierMessage: string;
+  dateDernierMessage: string;
+  messagesNonLus: number;
+}
+
+export interface GuideMessage {
+  id: number;
+  conversationId: number;
+  contenu: string;
+  role: 'USER' | 'AI';
+  dateEnvoi: string;
+}
+
+export interface GuideMessageCreationRequest {
+  conversationId: number;
+  contenu: string;
+}

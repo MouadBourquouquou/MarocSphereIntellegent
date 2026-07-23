@@ -13,6 +13,7 @@ public class AvisResponseDTO {
     private Long id;
     private Long auteurId;
     private Long cibleId;
+    private Long artisanId;
     private Integer note;
     private String commentaire;
 }

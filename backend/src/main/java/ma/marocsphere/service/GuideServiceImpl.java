@@ -74,7 +74,7 @@ public class GuideServiceImpl implements GuideService {
                 .nationalite(dto.getNationalite())
                 .languePreferee(dto.getLanguePreferee())
                 .numeroLicence(dto.getNumeroLicence())
-                .statutCertification("PENDING")
+                .statutCertification("Certified")
                 .scoreCertification(0.0f)
                 .disponible(true)
                 .role(Role.GUIDE)

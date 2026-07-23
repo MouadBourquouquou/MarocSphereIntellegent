@@ -53,6 +53,24 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
+    public List<ReservationResponseDTO> getByGuideId(Long guideId) {
+        return reservationRepo.findByGuideIdWithClient(guideId).stream()
+                .map(this::toResponseDTO)
+                .toList();
+    }
+
+    @Override
+    @Transactional
+    public ReservationResponseDTO updateStatut(Long id, String statut) {
+        Reservation reservation = reservationRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Réservation non trouvée avec l'id : " + id));
+        reservation.setStatut(statut);
+        Reservation saved = reservationRepo.save(reservation);
+        saved.getClient().getNom();
+        return toResponseDTO(saved);
+    }
+
+    @Override
     public ReservationResponseDTO create(ReservationCreationDTO dto) {
         Client client = clientRepo.findById(dto.getClientId())
                 .orElseThrow(() -> new RuntimeException("Client non trouvé : " + dto.getClientId()));
@@ -72,13 +90,19 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     private ReservationResponseDTO toResponseDTO(Reservation reservation) {
+        Client client = reservation.getClient();
         Long guideId = reservation.getGuide() != null ? reservation.getGuide().getId() : null;
         return ReservationResponseDTO.builder()
                 .id(reservation.getId())
-                .clientId(reservation.getClient().getId())
+                .clientId(client.getId())
                 .guideId(guideId)
                 .statut(reservation.getStatut())
                 .date(reservation.getDate())
+                .clientNom(client.getNom())
+                .clientPrenom(client.getPrenom())
+                .clientEmail(client.getEmail())
+                .clientTelephone(client.getTelephone())
+                .clientNationalite(client.getNationalite())
                 .build();
     }
 }
