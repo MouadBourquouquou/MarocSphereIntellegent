@@ -28,28 +28,28 @@ export const routes: Routes = [
 
   {
     path: 'dashboard-client',
-    // canActivate: [clientGuard],
+    canActivate: [clientGuard],
     loadComponent: () =>
       import('./pages/dashboards/client/home/dashClient').then((m) => m.DashboardClient),
   },
 
   {
     path: 'marketplace',
-    // canActivate: [clientGuard],
+    canActivate: [clientGuard],
     loadComponent: () =>
       import('./pages/dashboards/client/Artisan & Guides Marketplace/marketplace').then((m) => m.marketplace),
   },
 
   {
     path: 'client-profile',
-    // canActivate: [clientGuard],
+    canActivate: [clientGuard],
     loadComponent: () =>
       import('./pages/profiles/client/profileClient').then((m) => m.profileClient),
   },
 
   {
     path: 'artisan-profile/:id',
-    // canActivate: [clientGuard],
+    canActivate: [clientGuard],
     loadComponent: () =>
       import('./pages/profiles/artisan/profileArtisan').then((m) => m.profileArtisan),
   },
@@ -61,14 +61,14 @@ export const routes: Routes = [
   },
   {
     path: 'dashboard-artisan',
-    // canActivate: [authGuard],
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./pages/dashboards/artisan/dashArtisan').then((m) => m.dashboardArtisan),
   },
 
   {
     path: 'dashboard-guide',
-    // canActivate: [authGuard],
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./pages/dashboards/guide/dashGuide').then((m) => m.dashGuide),
   },

@@ -17,7 +17,11 @@ public class Reservation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String statut;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ReservationStatus statut;
+
+    @Column(nullable = false)
     private LocalDateTime date;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -25,8 +29,13 @@ public class Reservation {
     @ToString.Exclude
     private Client client;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "guide_id")
-    @ToString.Exclude
-    private Guide guide;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ReservationType resourceType;
+
+    @Column(nullable = false)
+    private Long resourceId;
+
+    @Column(nullable = false)
+    private String resourceName;
 }

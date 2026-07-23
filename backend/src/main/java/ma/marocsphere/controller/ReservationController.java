@@ -1,7 +1,9 @@
 package ma.marocsphere.controller;
 
+import jakarta.validation.Valid;
 import ma.marocsphere.dto.ReservationCreationDTO;
 import ma.marocsphere.dto.ReservationResponseDTO;
+import ma.marocsphere.dto.ReservationStatusDTO;
 import ma.marocsphere.service.ReservationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,14 +43,15 @@ public class ReservationController {
     }
 
     @PostMapping
-    public ResponseEntity<ReservationResponseDTO> create(@RequestBody ReservationCreationDTO dto) {
+    public ResponseEntity<ReservationResponseDTO> create(@Valid @RequestBody ReservationCreationDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(reservationService.create(dto));
     }
 
-    @PatchMapping("/{id}/statut")
-    public ResponseEntity<ReservationResponseDTO> updateStatut(@PathVariable Long id, @RequestBody Map<String, String> body) {
-        String statut = body.get("statut");
-        return ResponseEntity.ok(reservationService.updateStatut(id, statut));
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<ReservationResponseDTO> updateStatus(
+            @PathVariable Long id,
+            @Valid @RequestBody ReservationStatusDTO dto) {
+        return ResponseEntity.ok(reservationService.updateStatus(id, dto));
     }
 
     @DeleteMapping("/{id}")

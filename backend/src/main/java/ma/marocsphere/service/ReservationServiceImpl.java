@@ -3,15 +3,17 @@ package ma.marocsphere.service;
 import lombok.RequiredArgsConstructor;
 import ma.marocsphere.dto.ReservationCreationDTO;
 import ma.marocsphere.dto.ReservationResponseDTO;
+import ma.marocsphere.dto.ReservationStatusDTO;
 import ma.marocsphere.entity.Client;
-import ma.marocsphere.entity.Guide;
 import ma.marocsphere.entity.Reservation;
+import ma.marocsphere.entity.ReservationStatus;
+import ma.marocsphere.entity.ReservationType;
 import ma.marocsphere.repository.ClientRepo;
-import ma.marocsphere.repository.GuideRepo;
 import ma.marocsphere.repository.ReservationRepo;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 @Service
@@ -21,16 +23,17 @@ public class ReservationServiceImpl implements ReservationService {
 
     private final ReservationRepo reservationRepo;
     private final ClientRepo clientRepo;
-    private final GuideRepo guideRepo;
 
     @Override
+    @Transactional(readOnly = true)
     public List<ReservationResponseDTO> getAll() {
-        return reservationRepo.findAllWithClientAndGuide().stream()
+        return reservationRepo.findAllWithClient().stream()
                 .map(this::toResponseDTO)
                 .toList();
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
         if (!reservationRepo.existsById(id)) {
             throw new RuntimeException("Réservation non trouvée avec l'id : " + id);
@@ -39,6 +42,7 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ReservationResponseDTO getById(Long id) {
         Reservation reservation = reservationRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Réservation non trouvée avec l'id : " + id));
@@ -46,6 +50,7 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ReservationResponseDTO> getByClientId(Long clientId) {
         return reservationRepo.findByClientId(clientId).stream()
                 .map(this::toResponseDTO)
@@ -53,56 +58,65 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public List<ReservationResponseDTO> getByGuideId(Long guideId) {
-        return reservationRepo.findByGuideIdWithClient(guideId).stream()
-                .map(this::toResponseDTO)
-                .toList();
-    }
-
-    @Override
     @Transactional
-    public ReservationResponseDTO updateStatut(Long id, String statut) {
-        Reservation reservation = reservationRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Réservation non trouvée avec l'id : " + id));
-        reservation.setStatut(statut);
+    public ReservationResponseDTO create(ReservationCreationDTO dto) {
+        Client client = clientRepo.findById(dto.getClientId())
+                .orElseThrow(() -> new RuntimeException("Client non trouvé : " + dto.getClientId()));
+
+        ReservationType resourceType;
+        try {
+            resourceType = ReservationType.valueOf(dto.getResourceType().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Type de ressource invalide : " + dto.getResourceType());
+        }
+
+        String resourceName = dto.getResourceName();
+        if (resourceName == null || resourceName.isBlank()) {
+            resourceName = resourceType.name() + " #" + dto.getResourceId();
+        }
+
+        Reservation reservation = Reservation.builder()
+                .client(client)
+                .resourceType(resourceType)
+                .resourceId(dto.getResourceId())
+                .resourceName(resourceName)
+                .date(dto.getDate())
+                .statut(ReservationStatus.PENDING)
+                .build();
+
         Reservation saved = reservationRepo.save(reservation);
-        saved.getClient().getNom();
         return toResponseDTO(saved);
     }
 
     @Override
-    public ReservationResponseDTO create(ReservationCreationDTO dto) {
-        Client client = clientRepo.findById(dto.getClientId())
-                .orElseThrow(() -> new RuntimeException("Client non trouvé : " + dto.getClientId()));
-        Guide guide = null;
-        if (dto.getGuideId() != null) {
-            guide = guideRepo.findById(dto.getGuideId())
-                    .orElseThrow(() -> new RuntimeException("Guide non trouvé : " + dto.getGuideId()));
+    @Transactional
+    public ReservationResponseDTO updateStatus(Long id, ReservationStatusDTO dto) {
+        Reservation reservation = reservationRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Réservation non trouvée avec l'id : " + id));
+
+        ReservationStatus newStatus;
+        try {
+            newStatus = ReservationStatus.valueOf(dto.getStatut().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Statut invalide : " + dto.getStatut());
         }
-        Reservation reservation = Reservation.builder()
-                .client(client)
-                .guide(guide)
-                .date(dto.getDate())
-                .statut("PENDING")
-                .build();
+
+        reservation.setStatut(newStatus);
         Reservation saved = reservationRepo.save(reservation);
         return toResponseDTO(saved);
     }
 
     private ReservationResponseDTO toResponseDTO(Reservation reservation) {
-        Client client = reservation.getClient();
-        Long guideId = reservation.getGuide() != null ? reservation.getGuide().getId() : null;
+        String clientName = reservation.getClient().getPrenom() + " " + reservation.getClient().getNom();
         return ReservationResponseDTO.builder()
                 .id(reservation.getId())
-                .clientId(client.getId())
-                .guideId(guideId)
-                .statut(reservation.getStatut())
+                .clientId(reservation.getClient().getId())
+                .clientName(clientName)
+                .statut(reservation.getStatut().name())
                 .date(reservation.getDate())
-                .clientNom(client.getNom())
-                .clientPrenom(client.getPrenom())
-                .clientEmail(client.getEmail())
-                .clientTelephone(client.getTelephone())
-                .clientNationalite(client.getNationalite())
+                .resourceType(reservation.getResourceType().name())
+                .resourceId(reservation.getResourceId())
+                .resourceName(reservation.getResourceName())
                 .build();
     }
 }

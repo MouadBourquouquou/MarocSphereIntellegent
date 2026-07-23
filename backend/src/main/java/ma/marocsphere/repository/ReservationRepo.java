@@ -1,6 +1,8 @@
 package ma.marocsphere.repository;
 
 import ma.marocsphere.entity.Reservation;
+import ma.marocsphere.entity.ReservationStatus;
+import ma.marocsphere.entity.ReservationType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -10,15 +12,17 @@ import java.util.List;
 
 @Repository
 public interface ReservationRepo extends JpaRepository<Reservation, Long> {
+
     List<Reservation> findByClientId(Long clientId);
 
-    @Query("SELECT r FROM Reservation r LEFT JOIN FETCH r.client LEFT JOIN FETCH r.guide WHERE r.guide.id = :guideId")
-    List<Reservation> findByGuideIdWithClient(@Param("guideId") Long guideId);
+    List<Reservation> findByResourceType(ReservationType resourceType);
 
-    List<Reservation> findByGuideId(Long guideId);
-    List<Reservation> findByStatut(String statut);
-    long countByStatut(String statut);
+    List<Reservation> findByStatut(ReservationStatus statut);
 
-    @Query("SELECT r FROM Reservation r LEFT JOIN FETCH r.client LEFT JOIN FETCH r.guide")
-    List<Reservation> findAllWithClientAndGuide();
+    long countByStatut(ReservationStatus statut);
+
+    long countByResourceType(ReservationType resourceType);
+
+    @Query("SELECT r FROM Reservation r LEFT JOIN FETCH r.client")
+    List<Reservation> findAllWithClient();
 }

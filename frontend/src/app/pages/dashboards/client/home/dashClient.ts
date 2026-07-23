@@ -1,10 +1,29 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, computed, inject, OnInit, signal, ElementRef, ViewChild, AfterViewChecked } from '@angular/core';
+import {
+  Component,
+  CUSTOM_ELEMENTS_SCHEMA,
+  computed,
+  inject,
+  OnInit,
+  signal,
+  ElementRef,
+  ViewChild,
+  AfterViewInit,
+  AfterViewChecked,
+  OnDestroy,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
+import * as L from 'leaflet';
 import { ClientService } from '../../../../services/client.service';
 import { AuthService } from '../../../../services/auth.service';
 import { ChatService } from '../../../../services/chat.service';
-import { ClientProfile, Itineraire, Reservation, ChatMessage } from '../../../../models/api.models';
+import { LandmarkService, LandmarkItem } from '../../../../services/landmark.service';
+import {
+  ClientProfile,
+  Itineraire,
+  Reservation,
+  ChatMessage,
+} from '../../../../models/api.models';
 import {
   avatarUrl,
   fullName,
@@ -19,12 +38,14 @@ import {
   styleUrls: ['./dashClient.css'],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class DashboardClient implements OnInit, AfterViewChecked {
+export class DashboardClient implements OnInit, AfterViewInit, AfterViewChecked, OnDestroy {
   private clientService = inject(ClientService);
   private authService = inject(AuthService);
   private chatService = inject(ChatService);
+  private landmarkService = inject(LandmarkService);
 
   @ViewChild('chatContainer') chatContainer!: ElementRef<HTMLDivElement>;
+  @ViewChild('mapContainer') mapContainer!: ElementRef<HTMLDivElement>;
 
   isLoading = signal(true);
   errorMessage = signal('');
@@ -51,6 +72,17 @@ export class DashboardClient implements OnInit, AfterViewChecked {
 
   
 
+  landmarks = signal<LandmarkItem[]>([]);
+  filteredLandmarks = signal<LandmarkItem[]>([]);
+  landmarkCategories = signal<string[]>([]);
+  landmarkZones = signal<string[]>([]);
+  selectedCategorie = signal<string | null>(null);
+  selectedZone = signal<string | null>(null);
+
+  private map: L.Map | null = null;
+  private markers: L.Marker[] = [];
+  private mapInitialized = false;
+
   displayName = computed(() => {
     const profile = this.client();
     return profile ? fullName(profile.prenom, profile.nom) : 'Client';
@@ -68,6 +100,11 @@ export class DashboardClient implements OnInit, AfterViewChecked {
 
   ngOnInit(): void {
     this.loadDashboard();
+    this.loadLandmarks();
+  }
+
+  ngAfterViewInit(): void {
+    this.initMap();
   }
 
   ngAfterViewChecked(): void {
@@ -75,6 +112,145 @@ export class DashboardClient implements OnInit, AfterViewChecked {
       this.scrollToBottom();
       this.shouldScroll = false;
     }
+  }
+
+  ngOnDestroy(): void {
+    this.map?.remove();
+    this.map = null;
+  }
+
+  private loadLandmarks(): void {
+    this.landmarkService.getAllPublic().subscribe({
+      next: (data) => {
+        this.landmarks.set(data);
+        this.filteredLandmarks.set(data);
+        this.landmarkCategories.set([...new Set(data.map((l) => l.categorie))].sort());
+        this.landmarkZones.set([...new Set(data.map((l) => l.zone))].sort());
+        this.addMarkers(data);
+      },
+      error: () => {},
+    });
+  }
+
+  private initMap(): void {
+    if (this.mapInitialized || !this.mapContainer) return;
+
+    const center: L.LatLngExpression = [31.6295, -7.9811];
+
+    this.map = L.map(this.mapContainer.nativeElement, {
+      center,
+      zoom: 11,
+      zoomControl: false,
+      attributionControl: true,
+    });
+
+    L.control.zoom({ position: 'bottomleft' }).addTo(this.map);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap',
+      maxZoom: 18,
+    }).addTo(this.map);
+
+    this.mapInitialized = true;
+    setTimeout(() => this.map?.invalidateSize(), 200);
+  }
+
+  private addMarkers(landmarks: LandmarkItem[]): void {
+    if (!this.map) return;
+    this.clearMarkers();
+
+    landmarks.forEach((l) => {
+      const icon = L.divIcon({
+        className: 'landmark-marker',
+        html: `<div class="landmark-marker__pin">📍</div>`,
+        iconSize: [32, 40],
+        iconAnchor: [16, 40],
+        popupAnchor: [0, -42],
+      });
+
+      const popup = [
+        `<strong>${l.nom}</strong>`,
+        `${l.categorie} · ${l.zone}`,
+        l.prixEntree > 0 ? `${l.prixEntree} MAD` : 'Gratuit',
+        l.description ? `<br/>${l.description}` : '',
+      ].join('<br/>');
+
+      const marker = L.marker([l.latitude, l.longitude], { icon })
+        .addTo(this.map!)
+        .bindPopup(popup, { maxWidth: 260 });
+
+      this.markers.push(marker);
+    });
+  }
+
+  private clearMarkers(): void {
+    this.markers.forEach((m) => m.remove());
+    this.markers = [];
+  }
+
+  private applyFilters(): void {
+    const cat = this.selectedCategorie();
+    const zone = this.selectedZone();
+    const result = this.landmarks().filter(
+      (l) => (!cat || l.categorie === cat) && (!zone || l.zone === zone),
+    );
+    this.filteredLandmarks.set(result);
+    this.addMarkers(result);
+
+    if (result.length > 0 && this.map) {
+      const bounds = L.latLngBounds(result.map((l) => [l.latitude, l.longitude] as L.LatLngExpression));
+      this.map.fitBounds(bounds, { padding: [40, 40], maxZoom: 12 });
+    }
+  }
+
+  filterByCategorie(categorie: string | null): void {
+    this.selectedCategorie.set(categorie);
+    this.applyFilters();
+  }
+
+  filterByZone(zone: string | null): void {
+    this.selectedZone.set(zone);
+    this.applyFilters();
+  }
+
+  flyToLandmark(landmark: LandmarkItem): void {
+    if (this.map) {
+      this.map.flyTo([landmark.latitude, landmark.longitude], 14, { duration: 1.2 });
+      const marker = this.markers.find(
+        (m) => m.getLatLng().lat === landmark.latitude && m.getLatLng().lng === landmark.longitude,
+      );
+      marker?.openPopup();
+    }
+  }
+
+  centerOnUserLocation(): void {
+    if (!this.map) return;
+
+    if (!navigator.geolocation) {
+      this.map.flyTo([31.6295, -7.9811], 11, { duration: 1 });
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        this.map!.flyTo([pos.coords.latitude, pos.coords.longitude], 12, { duration: 1.2 });
+
+        L.marker([pos.coords.latitude, pos.coords.longitude], {
+          icon: L.divIcon({
+            className: 'user-location-marker',
+            html: '<div class="user-dot"></div>',
+            iconSize: [16, 16],
+            iconAnchor: [8, 8],
+          }),
+        })
+          .addTo(this.map!)
+          .bindPopup('You are here')
+          .openPopup();
+      },
+      () => {
+        this.map!.flyTo([31.6295, -7.9811], 11, { duration: 1 });
+      },
+    );
   }
 
   loadDashboard(): void {

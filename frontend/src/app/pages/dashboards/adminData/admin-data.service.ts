@@ -67,7 +67,10 @@ export interface DmcDTO {
 export interface ReservationDTO {
   id: number;
   clientId: number;
-  guideId: number | null;
+  clientName: string;
+  resourceType: string;
+  resourceId: number;
+  resourceName: string;
   statut: string;
   date: string;
 }
