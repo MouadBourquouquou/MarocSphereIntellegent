@@ -54,7 +54,7 @@
       </div>
     </header>
         <main class="flex-1">
-          <section class="hero-landing" aria-label="Hero">
+          <section class="hero-landing" aria-label="Hero" data-panel data-section-bg="#0a0705">
 
             <!-- Full-bleed Koutoubia Tower background image -->
             <div class="hero-bg" aria-hidden="true">
@@ -123,7 +123,7 @@
           </section>
 
           <!-- ─── Statistics — own section, clean white background, never overlapping hero ─── -->
-          <section class="trust-stats" #statsSection>
+          <section class="trust-stats" #statsSection data-panel data-section-bg="#ffffff">
             <div class="trust-stats__inner">
               <div class="trust-stats__item">
                 <span class="trust-stats__value">4.9</span>
@@ -153,7 +153,7 @@
           </section>
 
           <!-- Featured Experiences — Premium Editorial Showcase -->
-          <section class="editorial-section py-28 relative" id="experiences">
+          <section class="editorial-section py-28 relative" id="experiences" data-panel data-section-bg="#faf7f2">
             <div class="max-w-7xl mx-auto px-6">
 
               <!-- Two-Column Layout -->
@@ -277,7 +277,7 @@
             </div>
           </section>
 
-          <section class="py-20 border-b border-border bg-card relative" id="identity-section">
+          <section class="py-20 border-b border-border bg-card relative" id="identity-section" data-panel data-section-bg="#fffcf8">
             <div class="absolute top-0 right-0 w-48 h-48 opacity-5 bg-no-repeat bg-contain zellige-pattern pointer-events-none"></div>
 
             <div class="max-w-7xl mx-auto px-6 space-y-12">
@@ -334,7 +334,7 @@
             </div>
           </section>
 
-          <section class="py-24 border-b border-border bg-card relative overflow-hidden" id="reviews">
+          <section class="py-24 border-b border-border bg-card relative overflow-hidden" id="reviews" data-panel data-section-bg="#fffcf8">
             <div class="absolute top-0 left-0 w-64 h-64 opacity-[0.03] bg-no-repeat bg-contain zellige-pattern pointer-events-none"></div>
             <div class="absolute bottom-0 right-0 w-64 h-64 opacity-[0.03] bg-no-repeat bg-contain zellige-pattern pointer-events-none" style="filter: brightness(0) invert(1);"></div>
 
@@ -437,7 +437,7 @@
           </section>
 
           <!-- Latest Blogs Section -->
-          <section class="py-20 border-b border-border bg-background relative" id="blogs">
+          <section class="py-20 border-b border-border bg-background relative" id="blogs" data-panel data-section-bg="#f6f1e8">
             <div class="absolute top-1/2 left-0 w-24 h-48 opacity-5 bg-no-repeat bg-contain zellige-pattern pointer-events-none"></div>
 
             <div class="max-w-7xl mx-auto px-6 space-y-10 reveal-on-scroll">
@@ -562,7 +562,7 @@
           </section>
 
           <!-- What We Offer (Services) — Premium Editorial -->
-          <section class="services-section py-24 relative" id="services">
+          <section class="services-section py-24 relative" id="services" data-panel data-section-bg="#faf7f1">
 
             <div class="max-w-7xl mx-auto px-6 space-y-14">
 
@@ -949,116 +949,120 @@
             </div>
           </section>
         </main>
-        <footer class="bg-card border-t border-border relative overflow-hidden">
-          <!-- Large Background Wordmark -->
-          <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-0 overflow-hidden">
-            <span class="text-[15rem] font-heading font-bold text-foreground/5 whitespace-nowrap select-none">MarocSphere</span>
-          </div>
+        <footer class="ms-footer">
+          <!-- Subtle Moroccan motif -->
+          <div class="ms-footer__motif"></div>
 
-          <div class="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 md:grid-cols-4 gap-10 relative z-10">
-            <!-- Brand -->
-            <div class="space-y-4">
-              <div class="flex items-center gap-3">
-                <div class="w-12 h-12 rounded-xl bg-primary text-primary-foreground flex items-center justify-center font-heading font-bold shadow-md shadow-primary/20">
-                  <iconify-icon icon="lucide:tent" class="text-2xl"></iconify-icon>
+          <div class="ms-footer__inner">
+
+            <!-- ─── Row 1: Main Content ─── -->
+            <div class="ms-footer__grid">
+
+              <!-- Column 1: Brand -->
+              <div class="ms-footer__brand">
+                <div class="ms-footer__logo">
+                  <img src="/pics/LOGOPRINCIPALE.png" alt="MarocSphere" class="ms-footer__logo-img" />
                 </div>
-                <div>
-                  <p class="font-heading font-bold text-lg text-primary tracking-wide">MarocSphere</p>
-                  <p class="text-xs text-muted-foreground uppercase tracking-widest mt-0.5">
-                    Premium Travel Ecosystem
-                  </p>
+                <span class="ms-footer__subtitle">Premium Moroccan tourism ecosystem</span>
+                <p class="ms-footer__desc">
+                  A thoughtful travel ecosystem connecting conscious travellers with certified guides, authentic artisans, and trusted local partners.
+                </p>
+                <div class="ms-footer__location">
+                  <iconify-icon icon="lucide:map-pin"></iconify-icon>
+                  <span>Marrakech, Morocco</span>
                 </div>
               </div>
-              <p class="text-sm text-muted-foreground leading-relaxed">
-                A production-ready tourism ecosystem connecting conscious travelers with certified guides, authentic artisans, and premium DMC partners.
-              </p>
-            </div>
 
-            <!-- Quick Links -->
-            <div>
-              <h4 class="font-heading font-bold text-lg text-foreground">Explore</h4>
-              <ul class="mt-6 space-y-3 text-sm text-muted-foreground font-medium">
-                <li>
-                  <a href="#blogs" class="relative inline-block after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-primary after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left hover:text-foreground transition-colors">Stories &amp; Blogs</a>
-                </li>
-                <li>
-                  <a href="#services" class="relative inline-block after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-primary after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left hover:text-foreground transition-colors">Our Services</a>
-                </li>
-                <li>
-                  <a href="#experiences" class="relative inline-block after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-primary after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left hover:text-foreground transition-colors">Signature Experiences</a>
-                </li>
-                <li>
-                  <a href="#reviews" class="relative inline-block after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-primary after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left hover:text-foreground transition-colors">Traveler Reviews</a>
-                </li>
-              </ul>
-            </div>
-
-            <!-- Contact -->
-            <div>
-              <h4 class="font-heading font-bold text-lg text-foreground">Connect</h4>
-              <ul class="mt-6 space-y-3 text-sm text-muted-foreground font-medium">
-                <li class="flex items-center gap-2 hover:text-foreground transition-colors cursor-pointer"><iconify-icon icon="lucide:mail" class="text-primary"></iconify-icon> hello&#64;marocsphere.com</li>
-                <li class="flex items-center gap-2 hover:text-foreground transition-colors cursor-pointer"><iconify-icon icon="lucide:phone" class="text-primary"></iconify-icon> +212 5 24 00 00 00</li>
-                <li class="flex items-center gap-2 hover:text-foreground transition-colors cursor-pointer"><iconify-icon icon="lucide:map-pin" class="text-primary"></iconify-icon> Marrakech, Morocco</li>
-              </ul>
-              <div class="flex items-center gap-4 mt-6 text-xl text-primary">
-                <a href="#" class="hover:scale-110 hover:text-secondary transition-all"><iconify-icon icon="lucide:instagram"></iconify-icon></a>
-                <a href="#" class="hover:scale-110 hover:text-secondary transition-all"><iconify-icon icon="lucide:facebook"></iconify-icon></a>
-                <a href="#" class="hover:scale-110 hover:text-secondary transition-all"><iconify-icon icon="lucide:linkedin"></iconify-icon></a>
-                <a href="#" class="hover:scale-110 hover:text-secondary transition-all"><iconify-icon icon="lucide:youtube"></iconify-icon></a>
+              <!-- Column 2: Explore -->
+              <div class="ms-footer__col">
+                <h4 class="ms-footer__heading">Explore</h4>
+                <ul class="ms-footer__links">
+                  <li><a href="#blogs" class="ms-footer__link">Stories &amp; Blogs</a></li>
+                  <li><a href="#services" class="ms-footer__link">Our Services</a></li>
+                  <li><a href="#experiences" class="ms-footer__link">Signature Experiences</a></li>
+                  <li><a href="#reviews" class="ms-footer__link">Traveler Reviews</a></li>
+                </ul>
               </div>
-            </div>
 
-            <!-- Newsletter -->
-            <div>
-              <h4 class="font-heading font-bold text-lg text-foreground">Insider Access</h4>
-              <p class="text-sm text-muted-foreground mt-4 leading-relaxed">
-                Join our private list for secret medina spots, early artisan drops, and curated itineraries.
-              </p>
-              
-              <div class="mt-6 relative h-12 overflow-hidden rounded-xl">
-                <!-- Success State -->
-                <div 
-                  class="absolute inset-0 bg-secondary flex items-center justify-center text-secondary-foreground font-bold tracking-wide transition-transform duration-500 z-20"
-                  [class.translate-y-0]="newsletterSuccess()"
-                  [class.translate-y-full]="!newsletterSuccess()"
-                >
-                  <iconify-icon icon="lucide:check-circle-2" class="mr-2 text-lg"></iconify-icon> Welcome to the journey!
+              <!-- Column 3: Connect -->
+              <div class="ms-footer__col">
+                <h4 class="ms-footer__heading">Connect</h4>
+                <div class="ms-footer__contact-list">
+                  <a href="mailto:hello@marocsphere.com" class="ms-footer__contact-row">
+                    <iconify-icon icon="lucide:mail"></iconify-icon>
+                    <span>hello&#64;marocsphere.com</span>
+                  </a>
+                  <a href="tel:+212524000000" class="ms-footer__contact-row">
+                    <iconify-icon icon="lucide:phone"></iconify-icon>
+                    <span>+212 5 24 00 00 00</span>
+                  </a>
+                  <div class="ms-footer__contact-row">
+                    <iconify-icon icon="lucide:map-pin"></iconify-icon>
+                    <span>Marrakech, Morocco</span>
+                  </div>
                 </div>
+                <div class="ms-footer__divider"></div>
+                <div class="ms-footer__socials">
+                  <a href="#" class="ms-footer__social" aria-label="Instagram"><iconify-icon icon="lucide:instagram"></iconify-icon></a>
+                  <a href="#" class="ms-footer__social" aria-label="Facebook"><iconify-icon icon="lucide:facebook"></iconify-icon></a>
+                  <a href="#" class="ms-footer__social" aria-label="LinkedIn"><iconify-icon icon="lucide:linkedin"></iconify-icon></a>
+                  <a href="#" class="ms-footer__social" aria-label="YouTube"><iconify-icon icon="lucide:youtube"></iconify-icon></a>
+                </div>
+              </div>
 
-                <!-- Input Form -->
-                <div 
-                  class="absolute inset-0 flex transition-transform duration-500 z-10"
-                  [class.-translate-y-full]="newsletterSuccess()"
-                  [class.translate-y-0]="!newsletterSuccess()"
-                >
-                  <input
-                    type="email"
-                    [ngModel]="newsletterEmail()"
-                    (ngModelChange)="newsletterEmail.set($event)"
-                    (keydown.enter)="subscribeNewsletter()"
-                    placeholder="Enter your email address..."
-                    class="w-full h-full border border-border bg-background/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all rounded-l-xl"
-                  />
-                  <button
-                    (click)="subscribeNewsletter()"
-                    class="h-full px-5 bg-primary text-primary-foreground font-bold uppercase tracking-wider text-xs hover:bg-primary/95 transition-colors flex items-center justify-center rounded-r-xl cursor-pointer shadow-md shrink-0"
+              <!-- Column 4: Newsletter -->
+              <div class="ms-footer__col">
+                <h4 class="ms-footer__heading">Insider Access</h4>
+                <p class="ms-footer__newsletter-sub">
+                  Travel deeper. Receive curated journeys, local stories, and private Moroccan recommendations.
+                </p>
+                <div class="ms-footer__form-wrap">
+                  <!-- Success State -->
+                  <div
+                    class="ms-footer__success"
+                    [class.ms-footer__success--visible]="newsletterSuccess()"
                   >
-                    Join
-                  </button>
+                    <iconify-icon icon="lucide:check-circle-2"></iconify-icon>
+                    Welcome to the journey!
+                  </div>
+                  <!-- Input Form -->
+                  <div
+                    class="ms-footer__form"
+                    [class.ms-footer__form--hidden]="newsletterSuccess()"
+                  >
+                    <input
+                      type="email"
+                      [ngModel]="newsletterEmail()"
+                      (ngModelChange)="newsletterEmail.set($event)"
+                      (keydown.enter)="subscribeNewsletter()"
+                      placeholder="Your email address"
+                      class="ms-footer__input"
+                    />
+                    <button
+                      (click)="subscribeNewsletter()"
+                      class="ms-footer__btn"
+                    >
+                      Join
+                    </button>
+                  </div>
                 </div>
+                <p class="ms-footer__privacy">
+                  By subscribing, you agree to our
+                  <a href="#">Privacy Policy</a>.
+                </p>
               </div>
 
-              <div class="mt-6 flex flex-wrap gap-4 text-xs font-semibold text-muted-foreground">
-                <a href="#" class="hover:text-primary transition-colors">Terms of Service</a>
-                <span class="w-1 h-1 rounded-full bg-border"></span>
-                <a href="#" class="hover:text-primary transition-colors">Privacy Policy</a>
+            </div>
+
+            <!-- ─── Row 2: Bottom Bar ─── -->
+            <div class="ms-footer__bottom">
+              <span class="ms-footer__copy">&copy; 2026 MarocSphere. All rights reserved.</span>
+              <div class="ms-footer__legal">
+                <a href="#">Terms of Service</a>
+                <a href="#">Privacy Policy</a>
               </div>
             </div>
-          </div>
-          
-          <div class="relative z-10 border-t border-border/40 py-6 text-center text-xs font-semibold tracking-wider uppercase text-muted-foreground/60">
-            &copy; 2026 MarocSphere. All rights reserved.
+
           </div>
         </footer>
     </div>

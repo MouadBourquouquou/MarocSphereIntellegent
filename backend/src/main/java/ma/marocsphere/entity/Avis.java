@@ -27,4 +27,9 @@ public class Avis {
     @JoinColumn(name = "guide_id")
     @ToString.Exclude
     private Guide guide;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "artisan_id")
+    @ToString.Exclude
+    private Artisan artisan;
 }

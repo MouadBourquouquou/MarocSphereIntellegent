@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/reservations")
@@ -29,9 +30,25 @@ public class ReservationController {
         return ResponseEntity.ok(reservationService.getById(id));
     }
 
+    @GetMapping("/guide/{guideId}")
+    public ResponseEntity<List<ReservationResponseDTO>> getByGuideId(@PathVariable Long guideId) {
+        return ResponseEntity.ok(reservationService.getByGuideId(guideId));
+    }
+
+    @GetMapping("/client/{clientId}")
+    public ResponseEntity<List<ReservationResponseDTO>> getByClientId(@PathVariable Long clientId) {
+        return ResponseEntity.ok(reservationService.getByClientId(clientId));
+    }
+
     @PostMapping
     public ResponseEntity<ReservationResponseDTO> create(@RequestBody ReservationCreationDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(reservationService.create(dto));
+    }
+
+    @PatchMapping("/{id}/statut")
+    public ResponseEntity<ReservationResponseDTO> updateStatut(@PathVariable Long id, @RequestBody Map<String, String> body) {
+        String statut = body.get("statut");
+        return ResponseEntity.ok(reservationService.updateStatut(id, statut));
     }
 
     @DeleteMapping("/{id}")

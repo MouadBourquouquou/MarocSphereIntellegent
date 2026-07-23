@@ -10,4 +10,5 @@ import java.util.List;
 public interface AvisRepo extends JpaRepository<Avis, Long> {
     List<Avis> findByClientId(Long clientId);
     List<Avis> findByGuideId(Long guideId);
+    List<Avis> findByArtisanId(Long artisanId);
 }
