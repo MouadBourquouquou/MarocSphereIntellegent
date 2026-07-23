@@ -9,11 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AvisResponseDTO {
-    private Long id;
-    private Long auteurId;
-    private Long cibleId;
-    private Long artisanId;
-    private Integer note;
-    private String commentaire;
+public class GuideMessageCreationDTO {
+    private Long conversationId;
+    private String contenu;
 }

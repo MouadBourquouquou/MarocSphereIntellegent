@@ -11,16 +11,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ReservationResponseDTO {
+public class GuideConversationResponseDTO {
     private Long id;
-    private Long clientId;
     private Long guideId;
-    private String statut;
-    private LocalDateTime date;
-
+    private Long clientId;
     private String clientNom;
     private String clientPrenom;
-    private String clientEmail;
-    private String clientTelephone;
-    private String clientNationalite;
+    private String dernierMessage;
+    private LocalDateTime dateDernierMessage;
+    private Integer messagesNonLus;
 }

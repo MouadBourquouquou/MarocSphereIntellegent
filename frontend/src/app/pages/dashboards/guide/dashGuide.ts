@@ -12,29 +12,80 @@ import {
 } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { Chart, registerables } from 'chart.js';
 import { GuideService } from '../../../services/guide.service';
-import { Guide } from '../../../models/api.models';
+import { ExperienceService } from '../../../services/experience.service';
+import { GuideReservationService } from '../../../services/guide-reservation.service';
+import { GuideMessageService } from '../../../services/guide-message.service';
+import { AvisService } from '../../../services/avis.service';
 import { AuthService } from '../../../services/auth.service';
+import { Guide, Experience as ApiExperience, GuideReservation, GuideConversation, GuideMessage, Avis } from '../../../models/api.models';
 
-interface ReservationRequest {
+export type WorkspacePage = 'profile' | 'experiences' | 'requests' | 'messages' | 'availability';
+
+export interface Experience {
   id: string;
-  name: string;
-  avatar: string;
-  date: string;
+  title: string;
+  description: string;
+  location: string;
   duration: string;
   price: string;
-  status: 'pending' | 'accepted' | 'rejected' | 'completed' | 'cancelled';
+  category: string;
+  image: string;
+  rating: number;
+  bookings: number;
+  status: 'published' | 'draft';
 }
 
-interface CalendarDay {
+export interface BookingRequest {
+  id: string;
+  travelerName: string;
+  travelerAvatar: string;
+  travelerCountry: string;
+  travelerEmail: string;
+  travelerPhone: string;
+  experience: string;
+  guests: number;
+  date: string;
+  specialNote: string;
+  paymentStatus: 'paid' | 'pending' | 'refunded';
+  status: 'pending' | 'accepted' | 'cancelled' | 'completed';
+}
+
+export interface Conversation {
+  id: string;
+  travelerName: string;
+  travelerAvatar: string;
+  lastMessage: string;
+  time: string;
+  unread: number;
+  online: boolean;
+}
+
+export interface Message {
+  id: string;
+  from: 'me' | 'them';
+  content: string;
+  time: string;
+  read: boolean;
+}
+
+export interface CalendarDay {
   date: Date;
   iso: string;
   label: string;
   day: number;
   weekday: number;
   status: 'past' | 'today' | 'available' | 'booked' | 'blocked' | 'selected';
-  reservations: ReservationRequest[];
+  reservations: BookingRequest[];
+}
+
+export interface Review {
+  id: string;
+  authorName: string;
+  authorAvatar: string;
+  rating: number;
+  text: string;
+  authorCountry: string;
 }
 
 @Component({
@@ -47,208 +98,228 @@ interface CalendarDay {
 })
 export class dashGuide implements AfterViewInit, OnDestroy {
   private guideService = inject(GuideService);
+  private experienceService = inject(ExperienceService);
+  private reservationService = inject(GuideReservationService);
+  private messageService = inject(GuideMessageService);
+  private avisService = inject(AvisService);
   private authService = inject(AuthService);
 
-  showAllServices = signal(false);
-  guide = signal<Guide | null>(null);
-  guideName = signal('Chargement...');
-  guidePrenom = signal('');
-  guideEmail = signal('');
-  telephone = signal('');
-  nationalite = signal('');
-  languePreferee = signal('');
-  numeroLicence = signal('');
+  activePage = signal<WorkspacePage>('profile');
+
+  guide               = signal<Guide | null>(null);
+  guideName           = signal('');
+  guidePrenom         = signal('');
+  guideEmail          = signal('');
+  telephone           = signal('');
+  nationalite         = signal('');
+  languePreferee      = signal('');
+  numeroLicence       = signal('');
   statutCertification = signal('PENDING');
-  scoreCertification = signal(0);
-  disponible = signal(true);
-  isLoading = signal(true);
-  isSaving = signal(false);
-  isEditing = signal(false);
+  scoreCertification  = signal(0);
+  disponible          = signal(true);
+  isLoading           = signal(true);
+  isSaving            = signal(false);
+  isEditing           = signal(false);
 
   notificationMessage = signal('');
-  notificationType = signal<'success' | 'error'>('success');
-  showNotification = signal(false);
-  currentPassword = '';
-  newPassword = '';
-  confirmPassword = '';
+  notificationType    = signal<'success' | 'error'>('success');
+  showNotification    = signal(false);
+
+  experienceFilter   = signal<'all' | 'published' | 'draft'>('all');
+  experienceSearch   = signal('');
+  showDropdownId     = signal<string | null>(null);
+
+  showCreateExperience = signal(false);
+  isCreatingExperience = signal(false);
+  newExpTitle       = signal('');
+  newExpDescription = signal('');
+  newExpLocation    = signal('');
+  newExpDuration    = signal('');
+  newExpPrice       = signal('');
+  newExpCategory    = signal('Cultural');
+  newExpImage       = signal('');
+  newExpStatus      = signal('DRAFT');
+
+  experiences = signal<Experience[]>([]);
+
+  filteredExperiences = computed(() => {
+    let list = this.experiences();
+    const filter = this.experienceFilter();
+    const search = this.experienceSearch().toLowerCase();
+    if (filter !== 'all') list = list.filter(e => e.status === filter);
+    if (search)           list = list.filter(e =>
+      e.title.toLowerCase().includes(search) ||
+      e.location.toLowerCase().includes(search)
+    );
+    return list;
+  });
+
+  requestFilter = signal<'all' | 'pending' | 'accepted' | 'completed' | 'cancelled'>('all');
+  requests = signal<BookingRequest[]>([]);
+
+  filteredRequests = computed(() => {
+    const filter = this.requestFilter();
+    if (filter === 'all') return this.requests();
+    return this.requests().filter(r => r.status === filter);
+  });
+
+  activeConversationId = signal<string | null>(null);
+  mobileChatOpen       = signal(false);
+  messageInput         = signal('');
+  conversationSearch   = signal('');
+
+  conversations = signal<Conversation[]>([]);
+  messages = signal<Record<string, Message[]>>({});
+
+  activeConversation = computed(() =>
+    this.conversations().find(c => c.id === this.activeConversationId()) ?? null
+  );
+
+  activeMessages = computed(() =>
+    this.messages()[this.activeConversationId() ?? ''] ?? []
+  );
+
+  activeConversationRequest = computed(() =>
+    this.requests().find(r =>
+      r.travelerName === this.activeConversation()?.travelerName
+    ) ?? null
+  );
+
+  filteredConversations = computed(() => {
+    const search = this.conversationSearch().toLowerCase();
+    if (!search) return this.conversations();
+    return this.conversations().filter(c =>
+      c.travelerName.toLowerCase().includes(search)
+    );
+  });
+
+  reviews = signal<Review[]>([]);
+
   currentMonthIndex = signal(0);
-  calendarFilter = signal<'all' | 'available' | 'booked' | 'blocked' | 'upcoming' | 'completed'>('all');
-  selectedDates = signal<string[]>([]);
-  selectedDate = signal<string | null>(null);
-  selectedNote = signal('');
-  workingHours = signal<Record<string, string>>({});
-  recurringAvailabilityEnabled = signal(false);
-  dateNotes = signal<Record<string, string>>({});
-  blockedDates = signal<string[]>(['2026-10-09']);
-  availableDates = signal<string[]>(['2026-10-16', '2026-10-18']);
-  calendarSynced = signal(false);
+  calendarFilter    = signal<'all' | 'available' | 'booked' | 'blocked' | 'upcoming' | 'completed'>('all');
+  selectedDates     = signal<string[]>([]);
+  selectedDate      = signal<string | null>(null);
+  selectedNote      = signal('');
+  dateNotes         = signal<Record<string, string>>({});
+  blockedDates      = signal<string[]>(['2026-10-09']);
+  availableDates    = signal<string[]>(['2026-10-16', '2026-10-18']);
+  calendarSynced    = signal(false);
 
-  reservationRequests = signal<ReservationRequest[]>([
-    {
-      id: '#RES-9482',
-      name: 'Youssef Alami',
-      avatar: 'https://randomuser.me/api/portraits/men/12.jpg',
-      date: 'Oct 20, 2026',
-      duration: '3 Hours',
-      price: '350 MAD/hr',
-      status: 'pending',
-    },
-    {
-      id: '#RES-9411',
-      name: 'Sarah Jenkins',
-      avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
-      date: 'Oct 22, 2026',
-      duration: 'Full Day',
-      price: '350 MAD/hr',
-      status: 'pending',
-    },
-  ]);
-
-  private toastTimeoutId: ReturnType<typeof setTimeout> | null = null;
-  private isBrowser: boolean;
-  private cleanupFns: Array<() => void> = [];
   private today = new Date();
-  private chart: Chart | null = null;
-  private chartTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  todayIso = computed(() => this.toIsoDate(this.today));
 
   months = computed(() => {
     const months: Date[] = [];
     const start = new Date(this.today.getFullYear(), this.today.getMonth(), 1);
-    for (let i = 0; i < 10; i += 1) {
-      months.push(new Date(start.getFullYear(), start.getMonth() + i, 1));
-    }
+    for (let i = 0; i < 10; i++) months.push(new Date(start.getFullYear(), start.getMonth() + i, 1));
     return months;
   });
 
   selectedMonth = computed(() => this.months()[this.currentMonthIndex()]);
 
   calendarReservations = computed(() => {
-    const reservations = new Map<string, ReservationRequest[]>();
-    this.reservationRequests().forEach((request) => {
-      const iso = this.toIsoDate(request.date);
-      if (!reservations.has(iso)) {
-        reservations.set(iso, []);
-      }
-      reservations.get(iso)?.push(request);
+    const map = new Map<string, BookingRequest[]>();
+    this.requests().forEach(r => {
+      const iso = this.toIsoDate(r.date);
+      if (!map.has(iso)) map.set(iso, []);
+      map.get(iso)!.push(r);
     });
-    return reservations;
+    return map;
   });
 
   bookedDateSet = computed(() => {
-    const set = new Set<string>();
-    this.reservationRequests().forEach((request) => {
-      if (request.status === 'accepted' || request.status === 'completed') {
-        set.add(this.toIsoDate(request.date));
-      }
+    const s = new Set<string>();
+    this.requests().forEach(r => {
+      if (r.status === 'accepted' || r.status === 'completed') s.add(this.toIsoDate(r.date));
     });
-    return set;
+    return s;
   });
 
-  filteredReservations = computed(() => {
-    const nowIso = this.toIsoDate(this.today);
-    return this.reservationRequests().filter((request) => {
-      if (this.calendarFilter() === 'all') return true;
-      if (this.calendarFilter() === 'available') return request.status === 'pending';
-      if (this.calendarFilter() === 'booked') return request.status === 'accepted';
-      if (this.calendarFilter() === 'blocked') return request.status === 'cancelled';
-      if (this.calendarFilter() === 'upcoming') return request.status === 'accepted' && this.toIsoDate(request.date) >= nowIso;
-      if (this.calendarFilter() === 'completed') return request.status === 'completed';
-      return true;
-    });
-  });
-
-  monthCalendar = computed(() => {
-    const monthStart = this.selectedMonth();
-    const year = monthStart.getFullYear();
-    const month = monthStart.getMonth();
+  monthCalendar = computed((): (CalendarDay | null)[] => {
+    const monthStart    = this.selectedMonth();
+    const year          = monthStart.getFullYear();
+    const month         = monthStart.getMonth();
     const firstDayOfWeek = (new Date(year, month, 1).getDay() + 6) % 7;
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const totalSlots = Math.ceil((firstDayOfWeek + daysInMonth) / 7) * 7;
+    const daysInMonth   = new Date(year, month + 1, 0).getDate();
+    const totalSlots    = Math.ceil((firstDayOfWeek + daysInMonth) / 7) * 7;
 
-    return Array.from({ length: totalSlots }, (_, index) => {
-      const dayNumber = index - firstDayOfWeek + 1;
-      if (dayNumber < 1 || dayNumber > daysInMonth) {
-        return null;
-      }
-
+    return Array.from({ length: totalSlots }, (_, idx) => {
+      const dayNumber = idx - firstDayOfWeek + 1;
+      if (dayNumber < 1 || dayNumber > daysInMonth) return null;
       const date = new Date(year, month, dayNumber);
-      const iso = this.toIsoDate(date);
+      const iso  = this.toIsoDate(date);
       const reservations = this.calendarReservations().get(iso) ?? [];
-      const status = this.calculateDayStatus(date, iso, reservations);
-
       return {
-        date,
-        iso,
+        date, iso,
         label: dayNumber.toString(),
         day: dayNumber,
         weekday: date.getDay(),
-        status,
+        status: this.calculateDayStatus(date, iso),
         reservations,
       } as CalendarDay;
     });
   });
 
+  private isBrowser: boolean;
+  private toastTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  private cleanupFns: Array<() => void> = [];
+
   constructor(
     private elRef: ElementRef<HTMLElement>,
-    @Inject(PLATFORM_ID) platformId: object
+    @Inject(PLATFORM_ID) platformId: object,
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
-  }
-
-  toggleServices(): void {
-    this.showAllServices.update((v) => !v);
-  }
-
-  toggleElement(selector: string): void {
-    if (!this.isBrowser) return;
-    const element = document.querySelector<HTMLElement>(selector);
-    if (element) {
-      element.style.display = element.style.display === 'none' ? '' : 'none';
-    }
   }
 
   ngAfterViewInit(): void {
     this.loadGuide();
     if (!this.isBrowser) return;
     this.setupSmoothScroll();
-    this.setupFormPreventDefault();
-    this.initAdminMetricsChart();
   }
 
   ngOnDestroy(): void {
-    this.cleanupFns.forEach((fn) => fn());
-    this.cleanupFns = [];
-    if (this.chartTimeoutId !== null) clearTimeout(this.chartTimeoutId);
+    this.cleanupFns.forEach(fn => fn());
     if (this.toastTimeoutId !== null) clearTimeout(this.toastTimeoutId);
-    this.chart?.destroy();
+  }
+
+  navigate(page: WorkspacePage): void {
+    this.activePage.set(page);
+    if (page === 'experiences') this.loadExperiences();
+    if (page === 'requests') this.loadRequests();
+    if (page === 'messages') this.loadConversations();
+    if (page === 'availability') this.loadRequests();
   }
 
   private loadGuide(): void {
     this.guideService.getMe().subscribe({
-      next: (guide) => {
-        this.guide.set(guide);
-        this.guideName.set(guide.nom ?? '');
-        this.guidePrenom.set(guide.prenom ?? '');
-        this.guideEmail.set(guide.email ?? '');
-        this.telephone.set(guide.telephone ?? '');
-        this.nationalite.set(guide.nationalite ?? '');
-        this.languePreferee.set(guide.languePreferee ?? '');
-        this.numeroLicence.set(guide.numeroLicence ?? '');
-        this.statutCertification.set(guide.statutCertification ?? 'PENDING');
-        this.scoreCertification.set(guide.scoreCertification ?? 0);
-        this.disponible.set(guide.disponible ?? true);
+      next: g => {
+        this.guide.set(g);
+        this.guideName.set(g.nom ?? '');
+        this.guidePrenom.set(g.prenom ?? '');
+        this.guideEmail.set(g.email ?? '');
+        this.telephone.set(g.telephone ?? '');
+        this.nationalite.set(g.nationalite ?? '');
+        this.languePreferee.set(g.languePreferee ?? '');
+        this.numeroLicence.set(g.numeroLicence ?? '');
+        this.statutCertification.set(g.statutCertification ?? 'PENDING');
+        this.scoreCertification.set(g.scoreCertification ?? 0);
+        this.disponible.set(g.disponible ?? true);
         this.isLoading.set(false);
+        this.loadExperiences();
+        this.loadRequests();
+        this.loadConversations();
+        this.loadReviews();
       },
       error: () => {
-        this.showNotificationMessage('Erreur lors du chargement du profil.', 'error');
+        this.notify('Failed to load profile.', 'error');
         this.isLoading.set(false);
       },
     });
   }
 
-  toggleEditMode(isEdit: boolean): void {
-    this.isEditing.set(isEdit);
-    if (!isEdit) {
+  toggleEditMode(edit: boolean): void {
+    this.isEditing.set(edit);
+    if (!edit) {
       const g = this.guide();
       if (g) {
         this.guideName.set(g.nom ?? '');
@@ -265,17 +336,13 @@ export class dashGuide implements AfterViewInit, OnDestroy {
     event.preventDefault();
     const g = this.guide();
     if (!g) return;
-
     this.isSaving.set(true);
     this.guideService.updateProfile(g.id!, {
-      nom: this.guideName(),
-      prenom: this.guidePrenom(),
-      telephone: this.telephone(),
-      nationalite: this.nationalite(),
-      languePreferee: this.languePreferee(),
-      numeroLicence: this.numeroLicence(),
+      nom: this.guideName(), prenom: this.guidePrenom(),
+      telephone: this.telephone(), nationalite: this.nationalite(),
+      languePreferee: this.languePreferee(), numeroLicence: this.numeroLicence(),
     }).subscribe({
-      next: (updated) => {
+      next: updated => {
         this.guide.set(updated);
         this.guideName.set(updated.nom ?? '');
         this.guidePrenom.set(updated.prenom ?? '');
@@ -285,140 +352,401 @@ export class dashGuide implements AfterViewInit, OnDestroy {
         this.numeroLicence.set(updated.numeroLicence ?? '');
         this.isEditing.set(false);
         this.isSaving.set(false);
-        this.showNotificationMessage('Profil mis a jour avec succes.', 'success');
+        this.notify('Profile updated.', 'success');
+      },
+      error: () => { this.isSaving.set(false); this.notify('Update failed.', 'error'); },
+    });
+  }
+
+  toggleAvailability(): void {
+    const g = this.guide();
+    if (!g) return;
+    const newVal = !this.disponible();
+    this.guideService.updateProfile(g.id!, { disponible: newVal }).subscribe({
+      next: () => {
+        this.disponible.set(newVal);
+        this.notify(newVal ? 'You are now available for bookings.' : 'You are now unavailable.', 'success');
+      },
+      error: () => this.notify('Failed to update availability.', 'error'),
+    });
+  }
+
+  logout(): void { this.authService.logout(); }
+
+  // ── Experiences ───────────────────────────────────────────────────────────
+  private loadExperiences(): void {
+    this.experienceService.getMyExperiences().subscribe({
+      next: list => this.experiences.set(list.map(e => this.mapExperience(e))),
+      error: () => this.notify('Failed to load experiences.', 'error'),
+    });
+  }
+
+  private mapExperience(e: ApiExperience): Experience {
+    return {
+      id: e.id.toString(),
+      title: e.titre ?? '',
+      description: e.description ?? '',
+      location: e.localisation ?? '',
+      duration: e.duree ?? '',
+      price: e.prix ?? '',
+      category: e.categorie ?? '',
+      image: e.image ?? '/images/Unique Marrakech Itinerary_ Hidden Gems & Highlights.jpg',
+      rating: e.note ?? 0,
+      bookings: e.nombreReservations ?? 0,
+      status: e.statut === 'PUBLISHED' ? 'published' : 'draft',
+    };
+  }
+
+  toggleExperienceStatus(id: string): void {
+    const numId = parseInt(id, 10);
+    this.experienceService.toggleStatus(numId).subscribe({
+      next: updated => {
+        this.experiences.update(list => list.map(e =>
+          e.id === id ? { ...e, status: updated.statut === 'PUBLISHED' ? 'published' : 'draft' } : e
+        ));
+        this.notify('Status updated.', 'success');
+      },
+      error: () => this.notify('Failed to update status.', 'error'),
+    });
+  }
+
+  deleteExperience(id: string): void {
+    const numId = parseInt(id, 10);
+    this.experienceService.delete(numId).subscribe({
+      next: () => {
+        this.experiences.update(list => list.filter(e => e.id !== id));
+        this.notify('Experience deleted.', 'success');
+      },
+      error: () => this.notify('Failed to delete experience.', 'error'),
+    });
+  }
+
+  toggleDropdown(id: string): void {
+    this.showDropdownId.update(v => v === id ? null : id);
+  }
+
+  openCreateExperience(): void {
+    this.newExpTitle.set('');
+    this.newExpDescription.set('');
+    this.newExpLocation.set('');
+    this.newExpDuration.set('');
+    this.newExpPrice.set('');
+    this.newExpCategory.set('Cultural');
+    this.newExpImage.set('');
+    this.newExpStatus.set('DRAFT');
+    this.showCreateExperience.set(true);
+  }
+
+  closeCreateExperience(): void {
+    this.showCreateExperience.set(false);
+  }
+
+  createExperience(event: Event): void {
+    event.preventDefault();
+    if (!this.newExpTitle().trim() || !this.newExpDescription().trim()) {
+      this.notify('Title and description are required.', 'error');
+      return;
+    }
+    this.isCreatingExperience.set(true);
+    this.experienceService.create({
+      titre: this.newExpTitle(),
+      description: this.newExpDescription(),
+      localisation: this.newExpLocation(),
+      duree: this.newExpDuration(),
+      prix: this.newExpPrice(),
+      categorie: this.newExpCategory(),
+      image: this.newExpImage(),
+      statut: this.newExpStatus(),
+    }).subscribe({
+      next: (created) => {
+        this.experiences.update(list => [this.mapExperience(created), ...list]);
+        this.closeCreateExperience();
+        this.isCreatingExperience.set(false);
+        this.notify('Experience created.', 'success');
       },
       error: () => {
-        this.isSaving.set(false);
-        this.showNotificationMessage('Erreur lors de la mise a jour du profil.', 'error');
+        this.isCreatingExperience.set(false);
+        this.notify('Failed to create experience.', 'error');
       },
     });
   }
 
+  // ── Requests ──────────────────────────────────────────────────────────────
+  private loadRequests(): void {
+    const g = this.guide();
+    if (!g) return;
+    this.reservationService.getByGuideId(g.id!).subscribe({
+      next: list => this.requests.set(list.map(r => this.mapReservation(r))),
+      error: () => this.notify('Failed to load requests.', 'error'),
+    });
+  }
+
+  private mapReservation(r: GuideReservation): BookingRequest {
+    const firstName = r.clientPrenom ?? '';
+    const lastName = r.clientNom ?? '';
+    const fullName = `${firstName} ${lastName}`.trim() || `Client #${r.clientId}`;
+    const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase() || 'CL';
+    return {
+      id: r.id.toString(),
+      travelerName: fullName,
+      travelerAvatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=B03A22&color=fff&size=128`,
+      travelerCountry: r.clientNationalite ?? 'Morocco',
+      travelerEmail: r.clientEmail ?? '',
+      travelerPhone: r.clientTelephone ?? '',
+      experience: 'Guided Experience',
+      guests: 1,
+      date: r.date ? new Date(r.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'TBD',
+      specialNote: '',
+      paymentStatus: r.statut === 'CONFIRMED' ? 'paid' : 'pending',
+      status: this.mapReservationStatus(r.statut),
+    };
+  }
+
+  private mapReservationStatus(statut: string): BookingRequest['status'] {
+    switch (statut?.toUpperCase()) {
+      case 'CONFIRMED': return 'accepted';
+      case 'COMPLETED': return 'completed';
+      case 'CANCELLED': return 'cancelled';
+      default: return 'pending';
+    }
+  }
+
+  acceptRequest(id: string): void {
+    const numId = parseInt(id, 10);
+    this.reservationService.updateStatut(numId, 'CONFIRMED').subscribe({
+      next: () => {
+        this.requests.update(list => list.map(r => r.id === id ? { ...r, status: 'accepted' } : r));
+        this.notify('Request accepted.', 'success');
+      },
+      error: () => this.notify('Failed to accept request.', 'error'),
+    });
+  }
+
+  declineRequest(id: string): void {
+    const numId = parseInt(id, 10);
+    this.reservationService.updateStatut(numId, 'CANCELLED').subscribe({
+      next: () => {
+        this.requests.update(list => list.map(r => r.id === id ? { ...r, status: 'cancelled' } : r));
+        this.notify('Request declined.', 'success');
+      },
+      error: () => this.notify('Failed to decline request.', 'error'),
+    });
+  }
+
+  completeRequest(id: string): void {
+    const numId = parseInt(id, 10);
+    this.reservationService.updateStatut(numId, 'COMPLETED').subscribe({
+      next: () => {
+        this.requests.update(list => list.map(r => r.id === id ? { ...r, status: 'completed' } : r));
+        this.notify('Marked as completed.', 'success');
+      },
+      error: () => this.notify('Failed to complete request.', 'error'),
+    });
+  }
+
+  messageGuest(req: BookingRequest): void {
+    const conv = this.conversations().find(c => c.travelerName === req.travelerName);
+    if (conv) {
+      this.activeConversationId.set(conv.id);
+      this.navigate('messages');
+    }
+  }
+
+  // ── Messages ──────────────────────────────────────────────────────────────
+  private loadConversations(): void {
+    this.messageService.getConversations().subscribe({
+      next: list => {
+        const convs = list.map(c => this.mapConversation(c));
+        this.conversations.set(convs);
+        if (convs.length > 0 && !this.activeConversationId()) {
+          this.activeConversationId.set(convs[0].id);
+          this.loadMessages(convs[0].id);
+        }
+      },
+      error: () => this.notify('Failed to load conversations.', 'error'),
+    });
+  }
+
+  private mapConversation(c: GuideConversation): Conversation {
+    const fullName = `${c.clientPrenom ?? ''} ${c.clientNom ?? ''}`.trim() || `Client #${c.clientId}`;
+    return {
+      id: c.id.toString(),
+      travelerName: fullName,
+      travelerAvatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=B03A22&color=fff&size=128`,
+      lastMessage: c.dernierMessage ?? '',
+      time: c.dateDernierMessage
+        ? new Date(c.dateDernierMessage).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+        : '',
+      unread: c.messagesNonLus ?? 0,
+      online: false,
+    };
+  }
+
+  selectConversation(id: string): void {
+    this.activeConversationId.set(id);
+    this.mobileChatOpen.set(true);
+    this.conversations.update(list => list.map(c => c.id === id ? { ...c, unread: 0 } : c));
+    this.loadMessages(id);
+  }
+
+  backToConversations(): void {
+    this.mobileChatOpen.set(false);
+  }
+
+  private loadMessages(conversationId: string): void {
+    const numId = parseInt(conversationId, 10);
+    this.messageService.getMessages(numId).subscribe({
+      next: list => {
+        const msgs = list.map(m => ({
+          id: m.id.toString(),
+          from: m.role === 'USER' ? 'me' as const : 'them' as const,
+          content: m.contenu ?? '',
+          time: m.dateEnvoi
+            ? new Date(m.dateEnvoi).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+            : '',
+          read: true,
+        }));
+        this.messages.update(all => ({ ...all, [conversationId]: msgs }));
+      },
+      error: () => this.notify('Failed to load messages.', 'error'),
+    });
+  }
+
+  sendMessage(): void {
+    const text = this.messageInput().trim();
+    if (!text) return;
+    const convId = this.activeConversationId();
+    if (!convId) return;
+    const numConvId = parseInt(convId, 10);
+
+    this.messageService.sendMessage({ conversationId: numConvId, contenu: text }).subscribe({
+      next: (saved) => {
+        const msg: Message = {
+          id: saved.id.toString(),
+          from: 'me',
+          content: text,
+          time: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
+          read: true,
+        };
+        this.messages.update(all => ({
+          ...all,
+          [convId]: [...(all[convId] ?? []), msg],
+        }));
+        this.conversations.update(list => list.map(c =>
+          c.id === convId ? { ...c, lastMessage: text, time: msg.time } : c
+        ));
+        this.messageInput.set('');
+      },
+      error: () => this.notify('Failed to send message.', 'error'),
+    });
+  }
+
+  onMessageKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      this.sendMessage();
+    }
+  }
+
+  // ── Reviews ──────────────────────────────────────────────────────────────
+  private loadReviews(): void {
+    const g = this.guide();
+    if (!g) return;
+    this.avisService.getByGuideId(g.id!).subscribe({
+      next: list => {
+        this.reviews.set(list.map(a => ({
+          id: a.id.toString(),
+          authorName: `Traveler #${a.auteurId}`,
+          authorAvatar: 'https://randomuser.me/api/portraits/lego/1.jpg',
+          rating: a.note ?? 5,
+          text: a.commentaire ?? '',
+          authorCountry: 'Morocco',
+        })));
+      },
+      error: () => {},
+    });
+  }
+
+  // ── Calendar ──────────────────────────────────────────────────────────────
+  onMonthPrev(): void { this.currentMonthIndex.update(v => Math.max(0, v - 1)); }
+  onMonthNext(): void { this.currentMonthIndex.update(v => Math.min(this.months().length - 1, v + 1)); }
+
+  toggleDateSelection(iso: string): void {
+    if (this.toIsoDate(this.today) > iso) return;
+    this.selectedDates.update(curr =>
+      curr.includes(iso) ? curr.filter(i => i !== iso) : [...curr, iso]
+    );
+  }
+
+  clearSelection(): void { this.selectedDates.set([]); this.selectedDate.set(null); }
+
+  markSelectedAsBlocked(): void {
+    const sel = this.selectedDates();
+    if (!sel.length) { this.notify('Select dates first.', 'error'); return; }
+    this.blockedDates.update(d => Array.from(new Set([...d, ...sel])));
+    this.selectedDates.set([]);
+    this.notify('Dates blocked.', 'success');
+  }
+
+  markSelectedAsAvailable(): void {
+    const sel = this.selectedDates();
+    if (!sel.length) { this.notify('Select dates first.', 'error'); return; }
+    this.blockedDates.update(d => d.filter(i => !sel.includes(i)));
+    this.availableDates.update(d => Array.from(new Set([...d, ...sel])));
+    this.selectedDates.set([]);
+    this.notify('Dates marked available.', 'success');
+  }
+
+  syncCalendar(): void {
+    this.calendarSynced.update(v => !v);
+    this.notify(this.calendarSynced() ? 'Calendar synced.' : 'Sync paused.', 'success');
+  }
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
   toIsoDate(value: string | Date): string {
-    const date = typeof value === 'string' ? new Date(value) : value;
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    const d = typeof value === 'string' ? new Date(value) : value;
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
+
+  getBookingsForDate(iso: string): BookingRequest[] {
+    return this.calendarReservations().get(iso) ?? [];
   }
 
   formatMonthLabel(date: Date): string {
     return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
   }
 
-  calculateDayStatus(date: Date, iso: string, reservations: ReservationRequest[]): 'past' | 'today' | 'available' | 'booked' | 'blocked' | 'selected' {
+  calculateDayStatus(date: Date, iso: string): CalendarDay['status'] {
     const todayIso = this.toIsoDate(this.today);
-    const isToday = iso === todayIso;
-    const isSelected = this.selectedDates().includes(iso);
-    const isPast = iso < todayIso;
-
-    if (isPast) return 'past';
-    if (isSelected) return 'selected';
-    if (this.blockedDates().includes(iso)) return 'blocked';
-    if (this.bookedDateSet().has(iso)) return 'booked';
-    if (isToday) return 'today';
+    if (iso < todayIso)                           return 'past';
+    if (this.selectedDates().includes(iso))       return 'selected';
+    if (this.blockedDates().includes(iso))        return 'blocked';
+    if (this.bookedDateSet().has(iso))            return 'booked';
+    if (iso === todayIso)                         return 'today';
     return 'available';
   }
 
-  onMonthPrev(): void {
-    this.currentMonthIndex.update((value) => Math.max(0, value - 1));
-  }
+  guideInitials = computed(() =>
+    `${this.guidePrenom().charAt(0)}${this.guideName().charAt(0)}`.toUpperCase() || 'MG'
+  );
 
-  onMonthNext(): void {
-    this.currentMonthIndex.update((value) => Math.min(this.months().length - 1, value + 1));
-  }
+  pendingCount = computed(() => this.requests().filter(r => r.status === 'pending').length);
+  unreadTotal  = computed(() => this.conversations().reduce((sum, c) => sum + c.unread, 0));
+  averageRating = computed(() => {
+    const revs = this.reviews();
+    if (revs.length === 0) return 0;
+    return revs.reduce((sum, r) => sum + r.rating, 0) / revs.length;
+  });
 
-  addAvailableDates(): void {
-    const current = this.selectedMonth();
-    const monthKey = this.toIsoDate(new Date(current.getFullYear(), current.getMonth(), 1));
-    const lastDay = new Date(current.getFullYear(), current.getMonth() + 1, 0).getDate();
-    const existing = this.availableDates().filter((iso) => iso.startsWith(monthKey.substring(0, 7)));
-    const nextDayNumber = existing.length > 0 ? Number(existing[existing.length - 1].split('-')[2]) + 1 : 1;
-    const nextDay = Math.min(nextDayNumber, lastDay);
-    const nextIso = this.toIsoDate(new Date(current.getFullYear(), current.getMonth(), nextDay));
-    this.availableDates.update((dates) => Array.from(new Set([...dates, nextIso])));
-    this.showNotificationMessage('Added another available date for the current month.', 'success');
-  }
+  nextUpcomingBooking = computed(() => {
+    const today = this.toIsoDate(this.today);
+    return this.requests()
+      .filter(r => (r.status === 'accepted' || r.status === 'pending') && this.toIsoDate(r.date) >= today)
+      .sort((a, b) => this.toIsoDate(a.date).localeCompare(this.toIsoDate(b.date)))
+      [0] ?? null;
+  });
 
-  syncCalendar(): void {
-    this.calendarSynced.update((value) => !value);
-    const message = this.calendarSynced() ? 'Calendar synced successfully.' : 'Calendar sync paused.';
-    this.showNotificationMessage(message, 'success');
-  }
-
-  toggleReservationStatus(id: string, status: ReservationRequest['status']): void {
-    this.reservationRequests.update((requests) =>
-      requests.map((request) => request.id === id ? { ...request, status } : request)
-    );
-  }
-
-  acceptReservation(id: string): void {
-    this.toggleReservationStatus(id, 'accepted');
-    this.showNotificationMessage('Reservation accepted. The calendar has been updated.', 'success');
-  }
-
-  rejectReservation(id: string): void {
-    this.toggleReservationStatus(id, 'rejected');
-    this.showNotificationMessage('Reservation rejected. The date is available again.', 'success');
-  }
-
-  cancelReservation(id: string): void {
-    this.toggleReservationStatus(id, 'cancelled');
-    this.showNotificationMessage('Reservation cancelled and the date has been returned to availability.', 'success');
-  }
-
-  completeReservation(id: string): void {
-    this.toggleReservationStatus(id, 'completed');
-    this.showNotificationMessage('Reservation completed. Booking remains visible in history.', 'success');
-  }
-
-  toggleDateSelection(iso: string): void {
-    if (this.toIsoDate(this.today) > iso) return;
-    this.selectedDates.update((current) => {
-      if (current.includes(iso)) return current.filter((item) => item !== iso);
-      return [...current, iso];
-    });
-  }
-
-  clearSelection(): void {
-    this.selectedDates.set([]);
-    this.selectedDate.set(null);
-  }
-
-  markSelectedAsBlocked(): void {
-    const selection = this.selectedDates();
-    if (!selection.length) {
-      this.showNotificationMessage('Select dates first to block them.', 'error');
-      return;
-    }
-    this.blockedDates.update((dates) => Array.from(new Set([...dates, ...selection])));
-    this.selectedDates.set([]);
-    this.showNotificationMessage('Selected dates are now blocked.', 'success');
-  }
-
-  markSelectedAsAvailable(): void {
-    const selection = this.selectedDates();
-    if (!selection.length) {
-      this.showNotificationMessage('Select dates first to mark them available.', 'error');
-      return;
-    }
-    this.blockedDates.update((dates) => dates.filter((iso) => !selection.includes(iso)));
-    this.availableDates.update((dates) => Array.from(new Set([...dates, ...selection])));
-    this.selectedDates.set([]);
-    this.showNotificationMessage('Selected dates are now available.', 'success');
-  }
-
-  updateNoteForSelectedDate(): void {
-    const iso = this.selectedDate();
-    if (!iso) {
-      this.showNotificationMessage('Pick a calendar date first.', 'error');
-      return;
-    }
-    this.dateNotes.update((notes) => ({ ...notes, [iso]: this.selectedNote() }));
-    this.showNotificationMessage('Note saved for the selected date.', 'success');
-  }
-
-  private showNotificationMessage(message: string, type: 'success' | 'error'): void {
+  notify(message: string, type: 'success' | 'error'): void {
     this.notificationMessage.set(message);
     this.notificationType.set(type);
     this.showNotification.set(true);
@@ -427,85 +755,13 @@ export class dashGuide implements AfterViewInit, OnDestroy {
   }
 
   private setupSmoothScroll(): void {
-    const anchors = this.elRef.nativeElement.querySelectorAll<HTMLAnchorElement>('a[href^="#"]');
-    anchors.forEach((anchor) => {
-      const onClick = (event: Event): void => {
-        const href = anchor.getAttribute('href');
-        if (!href) return;
-        const target = this.elRef.nativeElement.querySelector<HTMLElement>(href);
-        if (target) {
-          event.preventDefault();
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+    this.elRef.nativeElement.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach(a => {
+      const fn = (e: Event) => {
+        const target = this.elRef.nativeElement.querySelector<HTMLElement>(a.getAttribute('href')!);
+        if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
       };
-      anchor.addEventListener('click', onClick);
-      this.cleanupFns.push(() => anchor.removeEventListener('click', onClick));
+      a.addEventListener('click', fn);
+      this.cleanupFns.push(() => a.removeEventListener('click', fn));
     });
-  }
-
-  private setupFormPreventDefault(): void {
-    const forms = this.elRef.nativeElement.querySelectorAll<HTMLFormElement>('form');
-    forms.forEach((form) => {
-      const onSubmit = (event: Event): void => event.preventDefault();
-      form.addEventListener('submit', onSubmit);
-      this.cleanupFns.push(() => form.removeEventListener('submit', onSubmit));
-    });
-  }
-
-  private initAdminMetricsChart(): void {
-    this.chartTimeoutId = setTimeout(() => {
-      const canvas = this.elRef.nativeElement.querySelector<HTMLCanvasElement>('#adminMetricsChart');
-      if (!canvas) return;
-      Chart.register(...registerables);
-      this.chart = new Chart(canvas, {
-        type: 'line',
-        data: {
-          labels: ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
-          datasets: [
-            {
-              label: 'Secure Escrow Volume',
-              data: [800000, 1100000, 1300000, 1500000, 1700000, 1800000],
-              borderColor: '#B63739',
-              backgroundColor: 'rgba(182,55,57,0.1)',
-              borderWidth: 2,
-              fill: true,
-              tension: 0.4,
-            },
-            {
-              label: 'Released Payouts',
-              data: [600000, 850000, 1000000, 1200000, 1350000, 1500000],
-              borderColor: '#006233',
-              backgroundColor: 'rgba(0,98,51,0.1)',
-              borderWidth: 2,
-              fill: true,
-              tension: 0.4,
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'bottom',
-              labels: {
-                font: { size: 11, family: 'Plus Jakarta Sans' },
-                color: '#665E54',
-              },
-            },
-          },
-          scales: {
-            y: {
-              grid: { color: '#EFEAE2' },
-              ticks: { color: '#665E54', font: { size: 10 } },
-            },
-            x: {
-              grid: { display: false },
-              ticks: { color: '#665E54', font: { size: 10 } },
-            },
-          },
-        },
-      });
-    }, 50);
   }
 }

@@ -5,15 +5,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AvisResponseDTO {
+public class GuideMessageResponseDTO {
     private Long id;
-    private Long auteurId;
-    private Long cibleId;
-    private Long artisanId;
-    private Integer note;
-    private String commentaire;
+    private Long conversationId;
+    private String contenu;
+    private String role;
+    private LocalDateTime dateEnvoi;
 }

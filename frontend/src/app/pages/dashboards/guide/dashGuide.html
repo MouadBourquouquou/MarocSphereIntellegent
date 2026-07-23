@@ -1,428 +1,842 @@
-<div data-page="guide-profile-agenda-workspace">
+<div data-page="guide-dashboard" class="gd-root">
 
-    <div class="min-h-screen w-full bg-background flex flex-col relative font-sans text-foreground">
-        <!-- Top Navigation Bar -->
-        <header
-            class="bg-card border-b border-border px-6 py-3 flex items-center justify-between sticky top-0 z-50 shadow-sm">
-            <div class="flex items-center gap-3">
-                <a class="navbar-brand" routerLink="/">
-                    <img src="/pics/LOGOPRINCIPALE.png" alt="MarocSphere" class="logo" />
-                </a>
-                <div>
-                    <span class="font-heading font-bold text-lg tracking-wide text-foreground">MarocSphere</span>
-                    <span class="block text-[10px] text-muted-foreground uppercase tracking-wider">Professional Guide
-                        Workspace</span>
-                </div>
-            </div>
-
-            <div class="flex items-center gap-4">
-                <div
-                    class="flex items-center gap-2 px-3.5 py-1.5 rounded-full border"
-                    [class]="disponible()
-                        ? 'bg-secondary/15 text-secondary border-secondary/20'
-                        : 'bg-muted text-muted-foreground border-border'">
-                    <span class="w-2 h-2 rounded-full animate-pulse"
-                        [class]="disponible() ? 'bg-secondary' : 'bg-muted-foreground'"></span>
-                    <span class="text-xs font-bold uppercase tracking-wider">
-                        {{ disponible() ? 'Available For Bookings' : 'Unavailable' }}
-                    </span>
-                </div>
-                <div class="flex items-center gap-3 border-l border-border pl-4">
-                    <div class="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-bold border-2 border-primary shadow-sm">
-                        {{ guideName() | slice:0:1 }}{{ guidePrenom() | slice:0:1 }}
-                    </div>
-                    <div class="hidden sm:block text-left">
-                        <p class="text-xs font-bold text-foreground leading-tight">{{ guidePrenom() }} {{ guideName() }}</p>
-                        <p class="text-[10px] text-muted-foreground">
-                            @if (statutCertification() === 'CERTIFIED') {
-                                Certified Guide
-                            } @else if (statutCertification() === 'PENDING') {
-                                Certification Pending
-                            } @else {
-                                Guide
-                            }
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <!-- Profile Workspace Grid -->
-        <div class="flex-1 flex flex-col lg:flex-row">
-            <!-- Left Column: Guide Profile & Professional Info -->
-            <aside
-                class="w-full lg:w-96 bg-card border-r border-border p-6 flex flex-col gap-6 shrink-0 overflow-y-auto">
-                <!-- Profile Header Hero -->
-                <div class="text-center">
-                    <div class="relative w-28 h-28 mx-auto mb-4">
-                        <div class="w-full h-full rounded-full bg-primary/10 text-primary flex items-center justify-center text-3xl font-bold border-4 border-card shadow-lg">
-                            {{ guideName() | slice:0:1 }}{{ guidePrenom() | slice:0:1 }}
-                        </div>
-                        @if (statutCertification() === 'CERTIFIED') {
-                            <span
-                                class="absolute bottom-1 right-1 w-6 h-6 bg-tertiary text-card rounded-full flex items-center justify-center shadow-md"
-                                title="Certified Expert">
-                                <iconify-icon icon="lucide:shield" class="text-sm"></iconify-icon>
-                            </span>
-                        }
-                    </div>
-                    <h2 class="font-heading font-bold text-xl text-foreground">{{ guidePrenom() }} {{ guideName() }}</h2>
-                    <p class="text-xs text-muted-foreground mt-1">{{ nationalite() }}</p>
-
-                    <!-- Certification Status Badge -->
-                    <div class="flex justify-center gap-1.5 mt-3">
-                        <span
-                            class="text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1"
-                            [class]="statutCertification() === 'CERTIFIED'
-                                ? 'bg-tertiary/10 text-tertiary'
-                                : statutCertification() === 'PENDING'
-                                    ? 'bg-yellow-500/10 text-yellow-600'
-                                    : 'bg-muted text-muted-foreground'">
-                            <iconify-icon icon="lucide:star"></iconify-icon>
-                            Score: {{ scoreCertification() }}
-                        </span>
-                        @if (numeroLicence()) {
-                            <span
-                                class="bg-secondary/10 text-secondary text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                                Lic. #{{ numeroLicence() }}
-                            </span>
-                        }
-                    </div>
-                </div>
-
-                <div id="details-view-grid" class="flex flex-col gap-6" [class.hidden]="isEditing()">
-                    <!-- Languages -->
-                    <div class="border-t border-border pt-5">
-                        <h3 class="font-heading font-bold text-sm text-foreground mb-2">Languages</h3>
-                        <p class="text-xs text-muted-foreground leading-relaxed">{{ languePreferee() }}</p>
-                    </div>
-
-                    <!-- Telephone -->
-                    <div class="border-t border-border pt-5">
-                        <h3 class="font-heading font-bold text-sm text-foreground mb-2">Telephone</h3>
-                        <p class="text-xs text-muted-foreground leading-relaxed">{{ telephone() }}</p>
-                    </div>
-
-                    <!-- Stats Grid -->
-                    <div class="border-t border-border pt-5 grid grid-cols-2 gap-3 text-center">
-                        <div class="bg-muted/50 p-3 rounded-lg border border-border">
-                            <p class="text-[10px] text-muted-foreground uppercase font-bold">Certification</p>
-                            <p class="text-sm font-bold mt-0.5"
-                                [class]="statutCertification() === 'CERTIFIED'
-                                    ? 'text-secondary'
-                                    : statutCertification() === 'PENDING'
-                                        ? 'text-yellow-600'
-                                        : 'text-muted-foreground'">
-                                {{ statutCertification() }}
-                            </p>
-                        </div>
-                        <div class="bg-muted/50 p-3 rounded-lg border border-border">
-                            <p class="text-[10px] text-muted-foreground uppercase font-bold">Status</p>
-                            <p class="text-sm font-bold mt-0.5"
-                                [class]="disponible() ? 'text-secondary' : 'text-muted-foreground'">
-                                {{ disponible() ? 'Available' : 'Unavailable' }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Guide Actions -->
-                    <div class="border-t border-border pt-5 flex flex-col gap-2">
-                        <button type="button" (click)="toggleEditMode(true)"
-                            class="mt-5 w-full py-2.5 bg-primary text-primary-foreground rounded-lg font-bold text-xs py-3 shadow-md shadow-primary/10 hover:bg-primary/95 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
-                            <iconify-icon icon="lucide:pencil" class="text-sm"></iconify-icon>
-                            Edit Profile Details
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Edit Form -->
-                <form id="details-edit-form" class="flex flex-col gap-4 border-t border-border pt-5"
-                    [class.hidden]="!isEditing()"
-                    (submit)="saveDetails($event)">
-                    <div class="grid grid-cols-1 gap-4">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="text-xs font-semibold text-muted-foreground">Prenom</label>
-                                <input
-                                    type="text"
-                                    [value]="guidePrenom()"
-                                    (input)="guidePrenom.set($any($event.target).value)"
-                                    class="w-full mt-2 px-4 py-2.5 rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-accent text-sm">
-                            </div>
-                            <div>
-                                <label class="text-xs font-semibold text-muted-foreground">Nom</label>
-                                <input
-                                    type="text"
-                                    [value]="guideName()"
-                                    (input)="guideName.set($any($event.target).value)"
-                                    class="w-full mt-2 px-4 py-2.5 rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-accent text-sm">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="text-xs font-semibold text-muted-foreground">Telephone</label>
-                            <input
-                                type="text"
-                                [value]="telephone()"
-                                (input)="telephone.set($any($event.target).value)"
-                                class="w-full mt-2 px-4 py-2.5 rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-accent text-sm">
-                        </div>
-                        <div>
-                            <label class="text-xs font-semibold text-muted-foreground">Nationalite</label>
-                            <input
-                                type="text"
-                                [value]="nationalite()"
-                                (input)="nationalite.set($any($event.target).value)"
-                                class="w-full mt-2 px-4 py-2.5 rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-accent text-sm">
-                        </div>
-                        <div>
-                            <label class="text-xs font-semibold text-muted-foreground">Langue Preferee</label>
-                            <input
-                                type="text"
-                                [value]="languePreferee()"
-                                (input)="languePreferee.set($any($event.target).value)"
-                                class="w-full mt-2 px-4 py-2.5 rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-accent text-sm">
-                        </div>
-                        <div>
-                            <label class="text-xs font-semibold text-muted-foreground">Numero de Licence</label>
-                            <input
-                                type="text"
-                                [value]="numeroLicence()"
-                                (input)="numeroLicence.set($any($event.target).value)"
-                                class="w-full mt-2 px-4 py-2.5 rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-accent text-sm">
-                        </div>
-                    </div>
-
-                    <div class="flex justify-end gap-3 pt-4 border-t border-border/40">
-                        <button type="button" (click)="toggleEditMode(false)"
-                            class="px-4 py-2.5 rounded-xl border border-border text-xs font-semibold text-foreground hover:bg-muted transition-all">Cancel</button>
-                        <button type="submit"
-                            [disabled]="isSaving()"
-                            class="px-5 py-2.5 rounded-xl bg-primary text-primary-foreground text-xs font-semibold shadow-md shadow-primary/15 hover:bg-primary/95 transition-all disabled:opacity-50">
-                            {{ isSaving() ? 'Saving...' : 'Save Changes' }}
-                        </button>
-                    </div>
-                </form>
-
-                <!-- Notification Toast -->
-                @if (showNotification()) {
-                    <div
-                        class="mt-4 p-3 rounded-xl flex items-center gap-2.5 text-xs font-semibold animate-pulse border"
-                        [class]="notificationType() === 'success'
-                            ? 'bg-secondary/15 border-secondary/30 text-secondary'
-                            : 'bg-destructive/10 border-destructive/30 text-destructive'">
-                        <iconify-icon icon="lucide:circle-check" class="text-lg"></iconify-icon>
-                        {{ notificationMessage() }}
-                    </div>
-                }
-            </aside>
-
-            <!-- Right Column: Interactive Agenda & Schedule Workspace -->
-            <main class="flex-1 bg-background p-6 flex flex-col gap-6 overflow-y-auto">
-                <!-- Agenda Header -->
-                <div
-                    class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
-                    <div>
-                        <h1 class="font-heading font-bold text-2xl text-foreground">Guide Agenda &amp; Availability</h1>
-                        <p class="text-xs text-muted-foreground mt-0.5">Manage your availability, review bookings, and keep every reservation in sync with your calendar.</p>
-                    </div>
-                    <div class="flex flex-wrap gap-2">
-                        <button
-                            type="button"
-                            (click)="syncCalendar()"
-                            class="border border-border hover:bg-card text-foreground font-semibold text-xs px-4 py-2.5 rounded-lg transition-all">
-                            Sync Calendar
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Calendar & Reservations Grid -->
-                <div class="grid grid-cols-1 gap-6 xl:grid-cols-[1.6fr_1fr]">
-                    <section class="bg-card border border-border rounded-xl p-5 shadow-sm">
-                        <div class="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4 mb-4">
-                            <div>
-                                <p class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-2">Availability window</p>
-                                <h2 class="font-heading text-xl font-bold text-foreground">{{ formatMonthLabel(selectedMonth()) }}</h2>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <button
-                                    type="button"
-                                    (click)="onMonthPrev()"
-                                    [disabled]="currentMonthIndex() === 0"
-                                    class="rounded-full border border-border bg-card p-2 text-foreground hover:bg-muted transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-                                    <iconify-icon icon="lucide:chevron-left" class="text-lg"></iconify-icon>
-                                </button>
-                                <button
-                                    type="button"
-                                    (click)="onMonthNext()"
-                                    [disabled]="currentMonthIndex() === months().length - 1"
-                                    class="rounded-full border border-border bg-card p-2 text-foreground hover:bg-muted transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-                                    <iconify-icon icon="lucide:chevron-right" class="text-lg"></iconify-icon>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="flex flex-wrap gap-2 mb-4">
-                            <button type="button" (click)="calendarFilter.set('all')"
-                                [class]="calendarFilter() === 'all' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-foreground'"
-                                class="rounded-full px-3 py-2 text-[11px] font-semibold transition-all">All Dates</button>
-                            <button type="button" (click)="calendarFilter.set('available')"
-                                [class]="calendarFilter() === 'available' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-foreground'"
-                                class="rounded-full px-3 py-2 text-[11px] font-semibold transition-all">Available</button>
-                            <button type="button" (click)="calendarFilter.set('booked')"
-                                [class]="calendarFilter() === 'booked' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-foreground'"
-                                class="rounded-full px-3 py-2 text-[11px] font-semibold transition-all">Booked</button>
-                            <button type="button" (click)="calendarFilter.set('blocked')"
-                                [class]="calendarFilter() === 'blocked' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-foreground'"
-                                class="rounded-full px-3 py-2 text-[11px] font-semibold transition-all">Blocked</button>
-                            <button type="button" (click)="calendarFilter.set('upcoming')"
-                                [class]="calendarFilter() === 'upcoming' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-foreground'"
-                                class="rounded-full px-3 py-2 text-[11px] font-semibold transition-all">Upcoming</button>
-                            <button type="button" (click)="calendarFilter.set('completed')"
-                                [class]="calendarFilter() === 'completed' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-foreground'"
-                                class="rounded-full px-3 py-2 text-[11px] font-semibold transition-all">Completed</button>
-                        </div>
-
-                        <div class="grid grid-cols-7 gap-2 text-[10px] font-semibold text-muted-foreground mb-2">
-                            <div class="text-center">Mon</div>
-                            <div class="text-center">Tue</div>
-                            <div class="text-center">Wed</div>
-                            <div class="text-center">Thu</div>
-                            <div class="text-center">Fri</div>
-                            <div class="text-center">Sat</div>
-                            <div class="text-center">Sun</div>
-                        </div>
-
-                        <div class="grid grid-cols-7 gap-2">
-                            @for (day of monthCalendar(); track $index) {
-                                @if (day) {
-                                    <button
-                                        type="button"
-                                        (click)="toggleDateSelection(day.iso); selectedDate.set(day.iso); selectedNote.set(dateNotes()[day.iso] ?? '')"
-                                        [disabled]="day.status === 'past'"
-                                        [class]="{
-                                            'bg-card border border-border text-foreground hover:border-primary': day.status === 'available',
-                                            'bg-secondary/15 border border-secondary/30 text-secondary': day.status === 'booked',
-                                            'bg-destructive/10 border border-destructive/20 text-destructive': day.status === 'blocked',
-                                            'bg-primary/10 border border-primary text-primary': day.status === 'selected',
-                                            'bg-accent/30 border border-primary text-foreground': day.status === 'today',
-                                            'bg-muted/70 text-muted-foreground cursor-not-allowed': day.status === 'past'
-                                        }"
-                                        class="aspect-square rounded-3xl p-3 text-left transition-all duration-200 group flex flex-col justify-between">
-                                        <div class="flex items-center justify-between gap-2">
-                                            <span class="text-sm font-semibold">{{ day.label }}</span>
-                                            @if (day.reservations.length) {
-                                                <span class="rounded-full bg-primary/10 text-primary text-[10px] px-2 py-0.5">{{ day.reservations.length }} Booking</span>
-                                            }
-                                        </div>
-                                        <div class="text-[10px] leading-snug">
-                                            @if (day.status === 'booked') { <span>Booked</span> }
-                                            @if (day.status === 'blocked') { <span>Blocked</span> }
-                                            @if (day.status === 'selected') { <span>Selected</span> }
-                                            @if (day.status === 'today') { <span>Today</span> }
-                                        </div>
-                                    </button>
-                                } @else {
-                                    <div class="aspect-square rounded-3xl bg-transparent"></div>
-                                }
-                            }
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3 mt-5 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                            <div class="flex items-center gap-2">
-                                <span class="w-3 h-3 rounded-full bg-primary"></span> Available
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <span class="w-3 h-3 rounded-full bg-secondary"></span> Booked
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <span class="w-3 h-3 rounded-full bg-destructive"></span> Blocked
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <span class="w-3 h-3 rounded-full bg-accent border border-primary"></span> Today
-                            </div>
-                        </div>
-
-                        <div class="flex flex-wrap gap-2 mt-5">
-                            <button type="button" (click)="markSelectedAsAvailable()"
-                                class="rounded-full bg-primary text-primary-foreground px-4 py-2 text-[11px] font-semibold transition-all hover:bg-primary/90">
-                                Mark Available
-                            </button>
-                            <button type="button" (click)="markSelectedAsBlocked()"
-                                class="rounded-full border border-border bg-card text-foreground px-4 py-2 text-[11px] font-semibold transition-all hover:bg-muted">
-                                Block Selected
-                            </button>
-                            <button type="button" (click)="clearSelection()"
-                                class="rounded-full bg-muted text-foreground px-4 py-2 text-[11px] font-semibold transition-all hover:bg-border">
-                                Clear Selection
-                            </button>
-                        </div>
-                    </section>
-
-                    <!-- Incoming Reservations & Requests -->
-                    <div class="xl:col-span-5 flex flex-col gap-4">
-                        <div class="bg-card border border-border rounded-xl p-5 shadow-sm">
-                            <h3 class="font-heading font-bold text-base text-foreground mb-4">Pending Reservations</h3>
-
-                            <div class="flex flex-col gap-3">
-                                @for (request of reservationRequests(); track request.id) {
-                                    <div class="border border-border rounded-lg p-4 bg-accent/30 relative">
-                                        <div class="flex justify-between items-start mb-2">
-                                            <span
-                                                class="text-[9px] bg-tertiary/10 text-tertiary px-2 py-0.5 rounded font-bold uppercase">ID:
-                                                {{ request.id }}</span>
-                                            <span class="text-xs font-bold text-primary">{{ request.price }}</span>
-                                        </div>
-                                        <div class="flex items-center gap-2.5 mb-3">
-                                            <img [src]="request.avatar" class="w-7 h-7 rounded-full" [alt]="'Client ' + request.name">
-                                            <div>
-                                                <p class="text-xs font-bold text-foreground">{{ request.name }}</p>
-                                                <p class="text-[10px] text-muted-foreground">{{ request.date }} - {{ request.duration }}</p>
-                                            </div>
-                                        </div>
-                                        <div class="flex items-center gap-2 mb-3">
-                                            <span [class]="{
-                                                'bg-secondary/10 text-secondary': request.status === 'accepted',
-                                                'bg-destructive/10 text-destructive': request.status === 'rejected',
-                                                'bg-muted text-muted-foreground': request.status === 'pending'
-                                            }"
-                                                class="px-2 py-1 rounded-full text-[10px] font-semibold uppercase">
-                                                {{ request.status === 'pending' ? 'Awaiting decision' : request.status === 'accepted' ? 'Accepted' : 'Rejected' }}
-                                            </span>
-                                        </div>
-                                        <div class="flex items-center gap-2">
-                                            <button
-                                                type="button"
-                                                (click)="acceptReservation(request.id)"
-                                                [disabled]="request.status !== 'pending'"
-                                                class="bg-secondary hover:bg-secondary/95 text-secondary-foreground font-bold text-[11px] px-3 py-1.5 rounded flex-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-                                                Accept
-                                            </button>
-                                            <button
-                                                type="button"
-                                                (click)="rejectReservation(request.id)"
-                                                [disabled]="request.status !== 'pending'"
-                                                class="border border-border hover:bg-destructive/10 hover:text-destructive text-muted-foreground font-semibold text-[11px] px-3 py-1.5 rounded flex-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-                                                Reject
-                                            </button>
-                                        </div>
-                                    </div>
-                                } @empty {
-                                    <p class="text-xs text-muted-foreground text-center py-4">No pending reservations.</p>
-                                }
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- Chart Section -->
-                <section class="bg-card border border-border rounded-xl p-5 shadow-sm">
-                    <h3 class="font-heading font-bold text-base text-foreground mb-4">Financial Overview</h3>
-                    <div class="relative h-64">
-                        <canvas id="adminMetricsChart"></canvas>
-                    </div>
-                </section>
-            </main>
-        </div>
+  <!-- Toast Notification -->
+  @if (showNotification()) {
+    <div class="gd-toast" [class.gd-toast--error]="notificationType() === 'error'">
+      <iconify-icon [icon]="notificationType() === 'success' ? 'lucide:check-circle-2' : 'lucide:alert-circle'"></iconify-icon>
+      {{ notificationMessage() }}
     </div>
+  }
+
+  <!-- HEADER / NAVBAR -->
+  <header class="gd-header">
+    <a routerLink="/" class="gd-header__logo">
+      <img src="/pics/LOGOPRINCIPALE.png" alt="MarocSphere" />
+
+    </a>
+
+    <nav class="gd-nav">
+      <button class="gd-nav__item" [class.gd-nav__item--active]="activePage() === 'profile'" (click)="navigate('profile')">
+        <iconify-icon icon="lucide:user-circle"></iconify-icon>
+        <span>Profile</span>
+      </button>
+      <button class="gd-nav__item" [class.gd-nav__item--active]="activePage() === 'experiences'" (click)="navigate('experiences')">
+        <iconify-icon icon="lucide:compass"></iconify-icon>
+        <span>Experiences</span>
+      </button>
+      <button class="gd-nav__item" [class.gd-nav__item--active]="activePage() === 'requests'" (click)="navigate('requests')">
+        <iconify-icon icon="lucide:calendar-check-2"></iconify-icon>
+        <span>Requests</span>
+        @if (pendingCount() > 0) { <span class="gd-nav__badge">{{ pendingCount() }}</span> }
+      </button>
+      <button class="gd-nav__item" [class.gd-nav__item--active]="activePage() === 'messages'" (click)="navigate('messages')">
+        <iconify-icon icon="lucide:message-circle"></iconify-icon>
+        <span>Messages</span>
+        @if (unreadTotal() > 0) { <span class="gd-nav__badge">{{ unreadTotal() }}</span> }
+      </button>
+    </nav>
+
+    <div class="gd-header__right">
+      @if (statutCertification() === 'CERTIFIED') {
+        <span class="gd-header__licensed">
+          <iconify-icon icon="lucide:shield-check"></iconify-icon>
+          <span>Licensed</span>
+        </span>
+      }
+      <button class="gd-header__icon-btn" aria-label="Notifications">
+        <iconify-icon icon="lucide:bell"></iconify-icon>
+        @if (pendingCount() > 0) { <span class="gd-badge">{{ pendingCount() }}</span> }
+      </button>
+      <div class="gd-header__avatar-wrap">
+        <button class="gd-header__avatar" aria-label="Account menu">
+          {{ guideInitials() }}
+          @if (disponible()) { <span class="gd-avatar-dot"></span> }
+        </button>
+        <div class="gd-header__dropdown">
+          <div class="gd-dropdown__info">
+            <span class="gd-dropdown__name">{{ guidePrenom() }} {{ guideName() }}</span>
+            <span class="gd-dropdown__role">Professional Guide</span>
+          </div>
+          <hr class="gd-dropdown__sep" />
+          <button class="gd-dropdown__item" (click)="navigate('profile')">
+            <iconify-icon icon="lucide:user"></iconify-icon> Profile
+          </button>
+          <button class="gd-dropdown__item" (click)="toggleAvailability()">
+            <iconify-icon [icon]="disponible() ? 'lucide:toggle-right' : 'lucide:toggle-left'"></iconify-icon>
+            {{ disponible() ? 'Go Unavailable' : 'Go Available' }}
+          </button>
+          <hr class="gd-dropdown__sep" />
+          <button class="gd-dropdown__item gd-dropdown__item--danger" (click)="logout()">
+            <iconify-icon icon="lucide:log-out"></iconify-icon> Log out
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="gd-main">
+
+    <!-- PROFILE PAGE -->
+    @if (activePage() === 'profile') {
+      <div class="gp">
+
+        <!-- ─── Hero Banner ─── -->
+        <section class="gp-hero gd-animate-in">
+          <div class="gp-hero__bg">
+            <span class="gp-hero__overlay"></span>
+          </div>
+          <div class="gp-hero__content">
+            <span class="gp-hero__eyebrow">Certified Heritage Guide</span>
+            <h1 class="gp-hero__name">{{ guidePrenom() }} {{ guideName() }}</h1>
+            <p class="gp-hero__sub">Marrakech, Morocco</p>
+          </div>
+        </section>
+
+        <!-- ─── Profile Overview Strip ─── -->
+        <section class="gp-overview gd-animate-in gd-animate-in--delay-1">
+          <div class="gp-overview__card">
+            <div class="gp-overview__left">
+              <div class="gp-overview__avatar">
+                {{ guideInitials() }}
+                @if (statutCertification() === 'CERTIFIED') {
+                  <span class="gp-overview__badge">
+                    <iconify-icon icon="lucide:shield-check"></iconify-icon>
+                  </span>
+                }
+              </div>
+            </div>
+            <div class="gp-overview__center">
+              <span class="gp-overview__role">Professional Guide</span>
+              <div class="gp-overview__rating">
+                <span class="gp-stars">★★★★★</span>
+                <span class="gp-rating-val">{{ averageRating().toFixed(1) }}</span>
+                <span class="gp-rating-count">({{ reviews().length }} reviews)</span>
+              </div>
+              <span class="gp-overview__pill">{{ nationalite() || 'Morocco' }}</span>
+            </div>
+            <div class="gp-overview__right">
+              <button class="gd-avail-toggle" [class.gd-avail-toggle--on]="disponible()" (click)="toggleAvailability()">
+                <span class="gd-avail-toggle__dot"></span>
+                {{ disponible() ? 'Available for bookings' : 'Currently unavailable' }}
+              </button>
+              @if (!isEditing()) {
+                <button class="gd-btn gd-btn--primary" (click)="toggleEditMode(true)">
+                  <iconify-icon icon="lucide:pencil"></iconify-icon> Edit profile
+                </button>
+              }
+            </div>
+          </div>
+        </section>
+
+        <!-- ─── Main Content Grid ─── -->
+        <div class="gp-body gd-animate-in gd-animate-in--delay-2">
+
+          <!-- LEFT: Guide Story Card -->
+          <div class="gp-main">
+            @if (!isEditing()) {
+              <div class="gp-story-card">
+                <h2 class="gp-card-title">Guide Story</h2>
+
+                <div class="gp-story-section">
+                  <h3 class="gp-story-heading">About</h3>
+                  <p class="gp-story-text">Passionate Moroccan guide with deep knowledge of the country's history, culture and hidden gems. Specialised in cultural immersion, adventure treks and authentic culinary experiences.</p>
+                </div>
+
+                <div class="gp-divider"></div>
+
+                <div class="gp-story-section">
+                  <h3 class="gp-story-heading">Specialties</h3>
+                  <div class="gp-specialties">
+                    <span class="gp-chip gp-chip--terracotta">
+                      <iconify-icon icon="lucide:landmark"></iconify-icon> Cultural Heritage
+                    </span>
+                    <span class="gp-chip gp-chip--green">
+                      <iconify-icon icon="lucide:utensils"></iconify-icon> Culinary Tours
+                    </span>
+                    <span class="gp-chip gp-chip--gold">
+                      <iconify-icon icon="lucide:mountain"></iconify-icon> Adventure Treks
+                    </span>
+                    <span class="gp-chip gp-chip--sand">
+                      <iconify-icon icon="lucide:image"></iconify-icon> Photography Walks
+                    </span>
+                  </div>
+                </div>
+
+                <div class="gp-divider"></div>
+
+                <div class="gp-story-section">
+                  <h3 class="gp-story-heading">Languages</h3>
+                  <div class="gp-langs">
+                    @for (lang of (languePreferee() || 'French, Arabic, English').split(','); track lang) {
+                      <span class="gp-lang-chip">{{ lang.trim() }}</span>
+                    }
+                  </div>
+                </div>
+
+                <div class="gp-divider"></div>
+
+                <div class="gp-story-section">
+                  <h3 class="gp-story-heading">Contact</h3>
+                  <div class="gp-contact-list">
+                    <div class="gp-contact-row">
+                      <iconify-icon icon="lucide:phone"></iconify-icon>
+                      <span>{{ telephone() || 'Not provided' }}</span>
+                    </div>
+                    <div class="gp-contact-row">
+                      <iconify-icon icon="lucide:mail"></iconify-icon>
+                      <span>{{ guideEmail() }}</span>
+                    </div>
+                    <div class="gp-contact-row">
+                      <iconify-icon icon="lucide:file-text"></iconify-icon>
+                      <span>Licence: {{ numeroLicence() || 'Not provided' }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            } @else {
+              <div class="gp-story-card">
+                <h2 class="gp-card-title">Edit Profile</h2>
+                <form class="gd-form" (submit)="saveDetails($event)">
+                  <div class="gd-form__row">
+                    <div class="gd-form__field">
+                      <label>First name</label>
+                      <input type="text" [value]="guidePrenom()" (input)="guidePrenom.set($any($event.target).value)" />
+                    </div>
+                    <div class="gd-form__field">
+                      <label>Last name</label>
+                      <input type="text" [value]="guideName()" (input)="guideName.set($any($event.target).value)" />
+                    </div>
+                  </div>
+                  <div class="gd-form__field">
+                    <label>Phone</label>
+                    <input type="text" [value]="telephone()" (input)="telephone.set($any($event.target).value)" />
+                  </div>
+                  <div class="gd-form__row">
+                    <div class="gd-form__field">
+                      <label>Nationality</label>
+                      <input type="text" [value]="nationalite()" (input)="nationalite.set($any($event.target).value)" />
+                    </div>
+                    <div class="gd-form__field">
+                      <label>Language</label>
+                      <input type="text" [value]="languePreferee()" (input)="languePreferee.set($any($event.target).value)" />
+                    </div>
+                  </div>
+                  <div class="gd-form__field">
+                    <label>Licence Number</label>
+                    <input type="text" [value]="numeroLicence()" (input)="numeroLicence.set($any($event.target).value)" />
+                  </div>
+                  <div class="gd-form__actions">
+                    <button type="button" class="gd-btn gd-btn--ghost" (click)="toggleEditMode(false)">Cancel</button>
+                    <button type="submit" class="gd-btn gd-btn--primary" [disabled]="isSaving()">
+                      {{ isSaving() ? 'Saving...' : 'Save Changes' }}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            }
+          </div>
+
+          <!-- RIGHT: Guide at a Glance Card -->
+          <div class="gp-aside">
+            <div class="gp-glance-card">
+
+              <h2 class="gp-card-title">Guide at a glance</h2>
+
+              <div class="gp-stats-grid">
+                <div class="gp-stat-block">
+                  <span class="gp-stat-num">{{ experiences().length }}</span>
+                  <span class="gp-stat-lbl">Experiences</span>
+                </div>
+                <div class="gp-stat-block">
+                  <span class="gp-stat-num">{{ requests().length }}</span>
+                  <span class="gp-stat-lbl">Bookings</span>
+                </div>
+                <div class="gp-stat-block">
+                  <span class="gp-stat-num">{{ reviews().length }}</span>
+                  <span class="gp-stat-lbl">Reviews</span>
+                </div>
+                <div class="gp-stat-block">
+                  <span class="gp-stat-num">{{ averageRating().toFixed(1) }}</span>
+                  <span class="gp-stat-lbl">Avg. Rating</span>
+                </div>
+              </div>
+
+              <div class="gp-divider"></div>
+
+              <div class="gp-glance-section">
+                <h3 class="gp-glance-heading">Next experience</h3>
+                @if (nextUpcomingBooking(); as booking) {
+                  <div class="gp-next-exp">
+                    <div class="gp-next-exp__icon">
+                      <iconify-icon icon="lucide:map-pin"></iconify-icon>
+                    </div>
+                    <div class="gp-next-exp__info">
+                      <span class="gp-next-exp__title">{{ booking.experience }}</span>
+                      <span class="gp-next-exp__meta">
+                        <iconify-icon icon="lucide:calendar"></iconify-icon> {{ booking.date }} &middot; {{ booking.guests }} guest{{ booking.guests > 1 ? 's' : '' }}
+                      </span>
+                    </div>
+                    <button class="gd-btn gd-btn--ghost gd-btn--sm" (click)="navigate('requests')">View</button>
+                  </div>
+                } @else {
+                  <div class="gp-empty-inline">
+                    <iconify-icon icon="lucide:calendar-off"></iconify-icon>
+                    <p>No upcoming experiences</p>
+                    <span>Your next confirmed experience will appear here.</span>
+                  </div>
+                }
+              </div>
+
+              <div class="gp-divider"></div>
+
+              <div class="gp-glance-section">
+                <h3 class="gp-glance-heading">Recent reviews</h3>
+                <div class="gp-reviews-mini">
+                  @for (review of reviews().slice(0, 2); track review.id) {
+                    <div class="gp-review-mini">
+                      <div class="gp-review-mini__avatar">{{ review.authorName.charAt(0) }}</div>
+                      <div class="gp-review-mini__body">
+                        <div class="gp-review-mini__stars">
+                          @for (s of [1,2,3,4,5]; track s) {
+                            <span [class.gp-star--filled]="s <= review.rating">★</span>
+                          }
+                        </div>
+                        <p class="gp-review-mini__text">"{{ review.text }}"</p>
+                        <span class="gp-review-mini__author">{{ review.authorName }} &middot; {{ review.authorCountry }}</span>
+                      </div>
+                    </div>
+                  } @empty {
+                    <div class="gp-empty-inline">
+                      <iconify-icon icon="lucide:star"></iconify-icon>
+                      <p>No reviews yet</p>
+                    </div>
+                  }
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- ─── Availability Calendar ─── -->
+        <div class="gp-calendar gd-animate-in gd-animate-in--delay-3">
+          <div class="gd-page-header">
+            <div>
+              <h1 class="gd-page-header__title">Availability Calendar</h1>
+              <p class="gd-page-header__subtitle">Manage your bookings and availability.</p>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+            <div style="background:var(--gd-card); border:1px solid var(--gd-border); border-radius:14px; padding:1.1rem 1.25rem; display:flex; align-items:center; gap:0.85rem;">
+              <div style="width:40px;height:40px;border-radius:10px;background:var(--gd-blush);display:flex;align-items:center;justify-content:center;">
+                <iconify-icon icon="lucide:calendar-check" style="color:var(--gd-terra);font-size:1.1rem;"></iconify-icon>
+              </div>
+              <div>
+                <div style="font-size:1.15rem;font-weight:700;color:var(--gd-ink);">{{ getBookingsForDate(todayIso()).length }}</div>
+                <div style="font-size:0.72rem;color:var(--gd-subtle);font-weight:500;">Today's Bookings</div>
+              </div>
+            </div>
+            <div style="background:var(--gd-card); border:1px solid var(--gd-border); border-radius:14px; padding:1.1rem 1.25rem; display:flex; align-items:center; gap:0.85rem;">
+              <div style="width:40px;height:40px;border-radius:10px;background:var(--gd-green-soft);display:flex;align-items:center;justify-content:center;">
+                <iconify-icon icon="lucide:calendar-days" style="color:var(--gd-green);font-size:1.1rem;"></iconify-icon>
+              </div>
+              <div>
+                <div style="font-size:1.15rem;font-weight:700;color:var(--gd-ink);">{{ requests().filter(r => r.status === 'accepted').length }}</div>
+                <div style="font-size:0.72rem;color:var(--gd-subtle);font-weight:500;">This Week</div>
+              </div>
+            </div>
+            <div style="background:var(--gd-card); border:1px solid var(--gd-border); border-radius:14px; padding:1.1rem 1.25rem; display:flex; align-items:center; gap:0.85rem;">
+              <div style="width:40px;height:40px;border-radius:10px;background:rgba(200,154,59,0.1);display:flex;align-items:center;justify-content:center;">
+                <iconify-icon icon="lucide:bell" style="color:var(--gd-gold);font-size:1.1rem;"></iconify-icon>
+              </div>
+              <div>
+                <div style="font-size:1.15rem;font-weight:700;color:var(--gd-ink);">{{ pendingCount() }}</div>
+                <div style="font-size:0.72rem;color:var(--gd-subtle);font-weight:500;">Pending Requests</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 2fr 1fr; gap: 1.25rem; align-items:start;">
+            <div style="background:var(--gd-card); border:1px solid var(--gd-border); border-radius:16px; padding:1.75rem;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+                <button class="gd-btn gd-btn--ghost gd-btn--sm" (click)="onMonthPrev()" [disabled]="currentMonthIndex() === 0">
+                  <iconify-icon icon="lucide:chevron-left"></iconify-icon>
+                </button>
+                <h3 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:1.35rem;font-weight:500;color:var(--gd-ink);margin:0;">{{ formatMonthLabel(selectedMonth()) }}</h3>
+                <button class="gd-btn gd-btn--ghost gd-btn--sm" (click)="onMonthNext()" [disabled]="currentMonthIndex() === months().length - 1">
+                  <iconify-icon icon="lucide:chevron-right"></iconify-icon>
+                </button>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:0.6rem;text-align:center;margin-bottom:1rem;">
+                @for (d of ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']; track d) {
+                  <span style="font-size:0.78rem;font-weight:600;color:var(--gd-subtle);text-transform:uppercase;letter-spacing:0.06em;">{{ d }}</span>
+                }
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:0.6rem;">
+                @for (day of monthCalendar(); track $index) {
+                  @if (day) {
+                    <button (click)="toggleDateSelection(day.iso); selectedDate.set(day.iso)" [disabled]="day.status === 'past'" class="gd-cal-day" style="aspect-ratio:1;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:600;font-size:1rem;border:1px solid var(--gd-border);background:var(--gd-card);cursor:pointer;transition:all 200ms;position:relative;" [style.background]="day.status === 'selected' ? 'var(--gd-terra)' : (day.status === 'past' ? 'var(--gd-bg)' : 'var(--gd-card)')" [style.color]="day.status === 'selected' ? 'white' : (day.status === 'past' ? '#B8AFA6' : 'var(--gd-ink)')" [style.border-color]="day.status === 'today' ? 'var(--gd-terra)' : 'var(--gd-border)'">
+                      {{ day.label }}
+                      @if (day.reservations.length > 0) {
+                        <span style="position:absolute;bottom:6px;width:5px;height:5px;border-radius:50%;background:var(--gd-gold);"></span>
+                      }
+                    </button>
+                  } @else {
+                    <div style="aspect-ratio:1;"></div>
+                  }
+                }
+              </div>
+            </div>
+
+            <div style="background:var(--gd-card); border:1px solid var(--gd-border); border-radius:16px; min-height:400px; display:flex; flex-direction:column; overflow:hidden;">
+              @if (selectedDate() && getBookingsForDate(selectedDate()!).length > 0) {
+                @for (req of getBookingsForDate(selectedDate()!); track req.id) {
+                  <div style="padding:1.5rem; flex:1; display:flex; flex-direction:column;">
+                    <span class="gd-status-badge gd-status-badge--{{ req.status }}">{{ req.status }}</span>
+                    <h4 style="font-weight:600;color:var(--gd-ink);margin:0.75rem 0 0.4rem;font-size:1.1rem;">{{ req.experience }}</h4>
+                    <p style="font-size:0.82rem;color:var(--gd-subtle);margin-bottom:1.25rem;display:flex;align-items:center;gap:0.4rem;">
+                      <iconify-icon icon="lucide:calendar"></iconify-icon> {{ req.date }}
+                    </p>
+                    <div style="display:flex;flex-direction:column;gap:0.85rem;margin-bottom:1.25rem;">
+                      <div style="display:flex;align-items:center;gap:0.65rem;">
+                        <div style="width:34px;height:34px;border-radius:50%;background:var(--gd-blush);display:flex;align-items:center;justify-content:center;color:var(--gd-terra);font-weight:600;font-size:0.8rem;">{{ req.travelerName.charAt(0) }}</div>
+                        <div>
+                          <div style="font-size:0.72rem;color:var(--gd-subtle);">Traveler</div>
+                          <div style="font-weight:600;color:var(--gd-ink);font-size:0.85rem;">{{ req.travelerName }}</div>
+                        </div>
+                      </div>
+                      <div style="display:flex;align-items:center;gap:0.65rem;">
+                        <div style="width:34px;height:34px;border-radius:50%;background:var(--gd-sand);display:flex;align-items:center;justify-content:center;color:var(--gd-subtle);"><iconify-icon icon="lucide:users" style="font-size:0.9rem;"></iconify-icon></div>
+                        <div>
+                          <div style="font-size:0.72rem;color:var(--gd-subtle);">Guests</div>
+                          <div style="font-weight:600;color:var(--gd-ink);font-size:0.85rem;">{{ req.guests }} people</div>
+                        </div>
+                      </div>
+                      <div style="display:flex;align-items:center;gap:0.65rem;">
+                        <div style="width:34px;height:34px;border-radius:50%;background:var(--gd-sand);display:flex;align-items:center;justify-content:center;color:var(--gd-subtle);"><iconify-icon icon="lucide:map-pin" style="font-size:0.9rem;"></iconify-icon></div>
+                        <div>
+                          <div style="font-size:0.72rem;color:var(--gd-subtle);">Meeting Point</div>
+                          <div style="font-weight:600;color:var(--gd-ink);font-size:0.85rem;">Jemaa el-Fnaa</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div style="margin-top:auto; display:flex; flex-direction:column; gap:0.5rem;">
+                      <button class="gd-btn gd-btn--primary gd-btn--full" (click)="navigate('messages')">
+                        <iconify-icon icon="lucide:message-circle"></iconify-icon> Message Guest
+                      </button>
+                      <button class="gd-btn gd-btn--ghost gd-btn--full" (click)="navigate('requests')">View Full Details</button>
+                    </div>
+                  </div>
+                }
+              } @else {
+                <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2.5rem;text-align:center;">
+                  <div style="width:64px;height:64px;border-radius:50%;background:var(--gd-blush);display:flex;align-items:center;justify-content:center;margin-bottom:1rem;">
+                    <iconify-icon icon="lucide:calendar-search" style="font-size:1.75rem;color:var(--gd-terra);"></iconify-icon>
+                  </div>
+                  <h3 style="font-size:1rem;color:var(--gd-ink);font-weight:600;margin:0 0 0.4rem;">No Bookings Found</h3>
+                  <p style="color:var(--gd-subtle);text-align:center;max-width:220px;font-size:0.82rem;line-height:1.5;margin:0 0 1.5rem;">Select a highlighted date on the calendar to view its booking details.</p>
+                  @if (selectedDate()) {
+                    <button class="gd-btn gd-btn--ghost gd-btn--sm" (click)="markSelectedAsBlocked()">
+                      <iconify-icon icon="lucide:ban"></iconify-icon> Block This Date
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+
+          <div style="margin-top:2rem;">
+            <h2 class="gd-section__title">Availability Management</h2>
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:1rem;">
+              <div style="background:var(--gd-card); border:1px solid var(--gd-border); border-radius:14px; padding:1.25rem; display:flex; flex-direction:column; justify-content:space-between;">
+                <div>
+                  <div style="display:flex;align-items:center;gap:0.5rem;color:var(--gd-subtle);font-size:0.85rem;margin-bottom:0.4rem;"><iconify-icon icon="lucide:refresh-cw"></iconify-icon> Calendar Sync</div>
+                  <h3 style="font-size:1rem;color:var(--gd-ink);margin:0 0 0.75rem;">External Calendars</h3>
+                  <p style="font-size:0.8rem;color:var(--gd-subtle);line-height:1.5;">Keep your availability in sync across all platforms.</p>
+                </div>
+                <button class="gd-btn gd-btn--ghost gd-btn--full" style="margin-top:0.75rem;" (click)="syncCalendar()">
+                  <iconify-icon icon="lucide:refresh-cw"></iconify-icon> {{ calendarSynced() ? 'Synced Just Now' : 'Sync Now' }}
+                </button>
+              </div>
+              <div style="background:var(--gd-card); border:1px solid var(--gd-border); border-radius:14px; padding:1.25rem; display:flex; flex-direction:column; justify-content:space-between;">
+                <div>
+                  <div style="display:flex;align-items:center;gap:0.5rem;color:var(--gd-subtle);font-size:0.85rem;margin-bottom:0.4rem;"><iconify-icon icon="lucide:power"></iconify-icon> Status</div>
+                  <h3 style="font-size:1rem;color:var(--gd-ink);margin:0 0 0.75rem;">Accepting Bookings</h3>
+                  <p style="font-size:0.8rem;color:var(--gd-subtle);line-height:1.5;">Toggle whether your profile appears in search results.</p>
+                </div>
+                <button class="gd-avail-toggle" style="margin-top:0.75rem;" [class.gd-avail-toggle--on]="disponible()" (click)="toggleAvailability()">
+                  <span class="gd-avail-toggle__dot"></span> {{ disponible() ? 'Currently Available' : 'Currently Unavailable' }}
+                </button>
+              </div>
+              <div style="background:var(--gd-card); border:1px solid var(--gd-border); border-radius:14px; padding:1.25rem; display:flex; flex-direction:column; justify-content:space-between; grid-column: span 2;">
+                <div>
+                  <div style="display:flex;align-items:center;gap:0.5rem;color:var(--gd-subtle);font-size:0.85rem;margin-bottom:0.4rem;"><iconify-icon icon="lucide:zap"></iconify-icon> Quick Actions</div>
+                  <h3 style="font-size:1rem;color:var(--gd-ink);margin:0 0 0.75rem;">Manage Selected Dates</h3>
+                  <p style="font-size:0.8rem;color:var(--gd-subtle);line-height:1.5;">Select dates on the calendar above, then apply bulk actions.</p>
+                </div>
+                <div style="display:flex;gap:0.75rem;margin-top:0.75rem;">
+                  <button class="gd-btn gd-btn--primary" style="flex:1;" (click)="markSelectedAsAvailable()"><iconify-icon icon="lucide:check"></iconify-icon> Mark Available</button>
+                  <button class="gd-btn gd-btn--ghost" style="flex:1;" (click)="markSelectedAsBlocked()"><iconify-icon icon="lucide:ban"></iconify-icon> Block Dates</button>
+                  <button class="gd-btn gd-btn--ghost" style="flex:1;" (click)="clearSelection()">Clear</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- EXPERIENCES PAGE -->
+    @if (activePage() === 'experiences') {
+      <div class="gd-page gd-page--products">
+        <div class="gd-page-header gd-animate-in">
+          <div>
+            <h1 class="gd-page-header__title">Your Experiences</h1>
+            <p class="gd-page-header__subtitle">Manage your portfolio of Moroccan travel experiences</p>
+          </div>
+          <button class="gd-btn gd-btn--primary" (click)="openCreateExperience()">
+            <iconify-icon icon="lucide:plus"></iconify-icon> Create Experience
+          </button>
+        </div>
+        <div class="gd-toolbar gd-animate-in gd-animate-in--delay-1">
+          <div class="gd-filter-pills">
+            <button class="gd-filter-pill" [class.gd-filter-pill--active]="experienceFilter() === 'all'" (click)="experienceFilter.set('all')">All</button>
+            <button class="gd-filter-pill" [class.gd-filter-pill--active]="experienceFilter() === 'published'" (click)="experienceFilter.set('published')">Published</button>
+            <button class="gd-filter-pill" [class.gd-filter-pill--active]="experienceFilter() === 'draft'" (click)="experienceFilter.set('draft')">
+              Draft
+              @if (experiences().filter(e => e.status === 'draft').length > 0) { <span class="gd-inline-badge">{{ experiences().filter(e => e.status === 'draft').length }}</span> }
+            </button>
+          </div>
+          <div class="gd-search">
+            <iconify-icon icon="lucide:search"></iconify-icon>
+            <input type="text" placeholder="Search experiences..." [value]="experienceSearch()" (input)="experienceSearch.set($any($event.target).value)" />
+          </div>
+        </div>
+        <div class="gd-prod-grid gd-animate-in gd-animate-in--delay-2">
+          @for (exp of filteredExperiences(); track exp.id; let i = $index) {
+            <article class="gd-prod-card" [class.gd-prod-card--featured]="i === 0 && experienceFilter() === 'all' && !experienceSearch()">
+              <div class="gd-prod-card__img-wrap">
+                <img [src]="exp.image" [alt]="exp.title" class="gd-prod-card__img" />
+                <span class="gd-prod-card__status" [class.gd-prod-card__status--draft]="exp.status === 'draft'">{{ exp.status === 'published' ? 'Published' : 'Draft' }}</span>
+                <span class="gd-prod-card__category">{{ exp.category }}</span>
+                <div class="gd-prod-card__menu-wrap">
+                  <button class="gd-prod-card__menu-btn" (click)="toggleDropdown(exp.id)"><iconify-icon icon="lucide:more-horizontal"></iconify-icon></button>
+                  @if (showDropdownId() === exp.id) {
+                    <div class="gd-prod-card__dropdown">
+                      <button (click)="toggleExperienceStatus(exp.id); toggleDropdown(exp.id)">
+                        <iconify-icon [icon]="exp.status === 'published' ? 'lucide:eye-off' : 'lucide:eye'"></iconify-icon> {{ exp.status === 'published' ? 'Unpublish' : 'Publish' }}
+                      </button>
+                      <button class="gd-prod-card__dropdown-danger" (click)="deleteExperience(exp.id); toggleDropdown(exp.id)">
+                        <iconify-icon icon="lucide:archive"></iconify-icon> Delete
+                      </button>
+                    </div>
+                  }
+                </div>
+              </div>
+              <div class="gd-prod-card__body">
+                <h3 class="gd-prod-card__title">{{ exp.title }}</h3>
+                <p class="gd-prod-card__desc">{{ exp.description }}</p>
+                <div class="gd-prod-card__meta">
+                  <span><iconify-icon icon="lucide:map-pin"></iconify-icon> {{ exp.location }}</span>
+                  <span><iconify-icon icon="lucide:clock"></iconify-icon> {{ exp.duration }}</span>
+                  <span><iconify-icon icon="lucide:calendar-check-2"></iconify-icon> {{ exp.bookings }} bookings</span>
+                </div>
+                <div class="gd-prod-card__footer">
+                  <span class="gd-prod-card__price">{{ exp.price }}<small>MAD</small></span>
+                  <div class="gd-prod-card__kpis"><span><iconify-icon icon="lucide:star"></iconify-icon> {{ exp.rating }}</span></div>
+                </div>
+              </div>
+            </article>
+          } @empty {
+            <div class="gd-empty-state">
+              <iconify-icon icon="lucide:compass"></iconify-icon>
+              <p>No experiences found.</p>
+              <button class="gd-btn gd-btn--primary" (click)="openCreateExperience()">Create your first experience</button>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- REQUESTS PAGE -->
+    @if (activePage() === 'requests') {
+      <div class="gd-page gd-page--orders">
+        <div class="gd-page-header gd-animate-in">
+          <div>
+            <h1 class="gd-page-header__title">Booking Requests</h1>
+            <p class="gd-page-header__subtitle">Review and manage your incoming travel requests</p>
+          </div>
+        </div>
+        <div class="gd-filter-pills gd-animate-in" style="margin-bottom:1.5rem; border-bottom:1px solid var(--gd-border); padding-bottom:1rem;">
+          <button class="gd-btn gd-btn--sm" [class.gd-btn--primary]="requestFilter() === 'all'" [class.gd-btn--ghost]="requestFilter() !== 'all'" (click)="requestFilter.set('all')">All</button>
+          <button class="gd-btn gd-btn--sm" [class.gd-btn--primary]="requestFilter() === 'pending'" [class.gd-btn--ghost]="requestFilter() !== 'pending'" (click)="requestFilter.set('pending')">Pending</button>
+          <button class="gd-btn gd-btn--sm" [class.gd-btn--primary]="requestFilter() === 'accepted'" [class.gd-btn--ghost]="requestFilter() !== 'accepted'" (click)="requestFilter.set('accepted')">Upcoming</button>
+          <button class="gd-btn gd-btn--sm" [class.gd-btn--primary]="requestFilter() === 'completed'" [class.gd-btn--ghost]="requestFilter() !== 'completed'" (click)="requestFilter.set('completed')">Completed</button>
+        </div>
+
+        @if ((requestFilter() === 'all' || requestFilter() === 'pending') && requests().filter(r => r.status === 'pending').length > 0) {
+          <section class="gd-order-group gd-animate-in">
+            <div class="gd-order-group__header">
+              <div class="gd-order-group__dot gd-order-group__dot--terra"></div>
+              <h2 class="gd-order-group__title">Pending Requests</h2>
+              <span class="gd-order-group__count">{{ requests().filter(r => r.status === 'pending').length }}</span>
+            </div>
+            <div class="gd-order-group__list">
+              @for (req of requests(); track req.id) {
+                @if (req.status === 'pending') {
+                  <div class="gd-production-card gd-production-card--urgent">
+                    <div class="gd-production-card__header">
+                      <div class="gd-production-card__customer">
+                        <img [src]="req.travelerAvatar" [alt]="req.travelerName" class="gd-production-card__avatar" />
+                        <div>
+                          <span class="gd-production-card__name">{{ req.travelerName }}</span>
+                          <span class="gd-production-card__country"><iconify-icon icon="lucide:globe-2"></iconify-icon> {{ req.travelerCountry }}</span>
+                        </div>
+                      </div>
+                      <div class="gd-production-card__badges">
+                        <span class="gd-status-badge gd-status-badge--pending">{{ req.status }}</span>
+                        <span class="gd-payment-badge" [class.gd-payment-badge--paid]="req.paymentStatus === 'paid'" [class.gd-payment-badge--pending]="req.paymentStatus === 'pending'">{{ req.paymentStatus }}</span>
+                      </div>
+                    </div>
+                    <div class="gd-production-card__body">
+                      <div class="gd-production-card__product"><iconify-icon icon="lucide:compass"></iconify-icon> <strong>{{ req.experience }}</strong> × {{ req.guests }} guest(s)</div>
+                      <div class="gd-production-card__meta">
+                        <span><iconify-icon icon="lucide:calendar"></iconify-icon> Date: {{ req.date }}</span>
+                        <span><iconify-icon icon="lucide:mail"></iconify-icon> {{ req.travelerEmail }}</span>
+                      </div>
+                      @if (req.specialNote) {
+                        <p class="gd-production-card__note"><iconify-icon icon="lucide:message-square-quote"></iconify-icon> {{ req.specialNote }}</p>
+                      }
+                    </div>
+                    <div class="gd-production-card__actions">
+                      <button class="gd-btn gd-btn--primary gd-btn--sm" (click)="acceptRequest(req.id)"><iconify-icon icon="lucide:check"></iconify-icon> Accept</button>
+                      <button class="gd-btn gd-btn--ghost gd-btn--sm" (click)="declineRequest(req.id)"><iconify-icon icon="lucide:x"></iconify-icon> Decline</button>
+                    </div>
+                  </div>
+                }
+              }
+            </div>
+          </section>
+        }
+
+        @if ((requestFilter() === 'all' || requestFilter() === 'accepted') && requests().filter(r => r.status === 'accepted').length > 0) {
+          <section class="gd-order-group gd-animate-in gd-animate-in--delay-1">
+            <div class="gd-order-group__header">
+              <div class="gd-order-group__dot gd-order-group__dot--gold"></div>
+              <h2 class="gd-order-group__title">Upcoming Experiences</h2>
+              <span class="gd-order-group__count">{{ requests().filter(r => r.status === 'accepted').length }}</span>
+            </div>
+            <div class="gd-order-group__list">
+              @for (req of requests(); track req.id) {
+                @if (req.status === 'accepted') {
+                  <div class="gd-production-card">
+                    <div class="gd-production-card__header">
+                      <div class="gd-production-card__customer">
+                        <img [src]="req.travelerAvatar" [alt]="req.travelerName" class="gd-production-card__avatar" />
+                        <div>
+                          <span class="gd-production-card__name">{{ req.travelerName }}</span>
+                          <span class="gd-production-card__country"><iconify-icon icon="lucide:globe-2"></iconify-icon> {{ req.travelerCountry }}</span>
+                        </div>
+                      </div>
+                      <div class="gd-production-card__badges">
+                        <span class="gd-status-badge gd-status-badge--accepted">upcoming</span>
+                        <span class="gd-payment-badge" [class.gd-payment-badge--paid]="req.paymentStatus === 'paid'" [class.gd-payment-badge--pending]="req.paymentStatus === 'pending'">{{ req.paymentStatus }}</span>
+                      </div>
+                    </div>
+                    <div class="gd-production-card__body">
+                      <div class="gd-production-card__product"><iconify-icon icon="lucide:compass"></iconify-icon> <strong>{{ req.experience }}</strong> × {{ req.guests }} guest(s)</div>
+                      <div class="gd-production-card__meta">
+                        <span><iconify-icon icon="lucide:calendar"></iconify-icon> Date: {{ req.date }}</span>
+                        <span><iconify-icon icon="lucide:phone"></iconify-icon> {{ req.travelerPhone }}</span>
+                      </div>
+                      @if (req.specialNote) {
+                        <p class="gd-production-card__note"><iconify-icon icon="lucide:message-square-quote"></iconify-icon> {{ req.specialNote }}</p>
+                      }
+                    </div>
+                    <div class="gd-production-card__actions">
+                      <button class="gd-btn gd-btn--secondary gd-btn--sm" (click)="completeRequest(req.id)"><iconify-icon icon="lucide:check-circle-2"></iconify-icon> Mark as Completed</button>
+                      <button class="gd-btn gd-btn--ghost gd-btn--sm" (click)="messageGuest(req)"><iconify-icon icon="lucide:message-circle"></iconify-icon> Message Guest</button>
+                    </div>
+                  </div>
+                }
+              }
+            </div>
+          </section>
+        }
+
+        @if ((requestFilter() === 'all' || requestFilter() === 'completed') && requests().filter(r => r.status === 'completed' || r.status === 'cancelled').length > 0) {
+          <section class="gd-order-group gd-order-group--completed gd-animate-in gd-animate-in--delay-3">
+            <div class="gd-order-group__header">
+              <div class="gd-order-group__dot gd-order-group__dot--green"></div>
+              <h2 class="gd-order-group__title">History</h2>
+              <span class="gd-order-group__count">{{ requests().filter(r => r.status === 'completed' || r.status === 'cancelled').length }}</span>
+            </div>
+            <div class="gd-order-group__list">
+              @for (req of requests(); track req.id) {
+                @if (req.status === 'completed' || req.status === 'cancelled') {
+                  <div class="gd-production-card gd-production-card--muted">
+                    <div class="gd-production-card__header">
+                      <div class="gd-production-card__customer">
+                        <img [src]="req.travelerAvatar" [alt]="req.travelerName" class="gd-production-card__avatar" />
+                        <div>
+                          <span class="gd-production-card__name">{{ req.travelerName }}</span>
+                          <span class="gd-production-card__country"><iconify-icon icon="lucide:globe-2"></iconify-icon> {{ req.travelerCountry }}</span>
+                        </div>
+                      </div>
+                      <span class="gd-status-badge gd-status-badge--{{ req.status }}">{{ req.status }}</span>
+                    </div>
+                    <div class="gd-production-card__body">
+                      <div class="gd-production-card__product"><iconify-icon icon="lucide:compass"></iconify-icon> <strong>{{ req.experience }}</strong> × {{ req.guests }} guest(s)</div>
+                    </div>
+                  </div>
+                }
+              }
+            </div>
+          </section>
+        }
+
+        @if ((requestFilter() === 'all' && requests().length === 0) || (requestFilter() === 'pending' && requests().filter(r => r.status === 'pending').length === 0) || (requestFilter() === 'accepted' && requests().filter(r => r.status === 'accepted').length === 0) || (requestFilter() === 'completed' && requests().filter(r => r.status === 'completed' || r.status === 'cancelled').length === 0)) {
+          <div class="gd-empty-state">
+            <iconify-icon icon="lucide:calendar-check-2"></iconify-icon>
+            <p>No booking requests found for this filter.</p>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- MESSAGES PAGE -->
+    @if (activePage() === 'messages') {
+      <div class="gd-messages-layout gd-animate-in">
+        <aside class="gd-conv-sidebar" [class.gd-conv-sidebar--hidden]="mobileChatOpen() && activeConversationId()">
+          <div class="gd-conv-sidebar__search">
+            <div class="gd-search">
+              <iconify-icon icon="lucide:search"></iconify-icon>
+              <input type="text" placeholder="Search conversations..." [value]="conversationSearch()" (input)="conversationSearch.set($any($event.target).value)" />
+            </div>
+          </div>
+          <div class="gd-conv-sidebar__list">
+            @for (conv of filteredConversations(); track conv.id) {
+              <button class="gd-conv-item" [class.gd-conv-item--active]="activeConversationId() === conv.id" (click)="selectConversation(conv.id)">
+                <div class="gd-conv-item__avatar">
+                  {{ conv.travelerName.charAt(0) }}
+                  @if (conv.unread > 0) { <span class="gd-conv-item__unread-dot"></span> }
+                </div>
+                <div class="gd-conv-item__info">
+                  <div class="gd-conv-item__top">
+                    <span class="gd-conv-item__name">{{ conv.travelerName }}</span>
+                    <span class="gd-conv-item__time">{{ conv.time }}</span>
+                  </div>
+                  <div class="gd-conv-item__preview">{{ conv.lastMessage }}</div>
+                </div>
+              </button>
+            } @empty {
+              <div class="gd-conv-empty">
+                <iconify-icon icon="lucide:message-circle"></iconify-icon>
+                <p>No conversations</p>
+              </div>
+            }
+          </div>
+        </aside>
+
+        <section class="gd-chat-panel" [class.gd-chat-panel--hidden]="mobileChatOpen() && !activeConversationId()">
+          @if (activeConversation()) {
+            <div class="gd-chat-header">
+              <div class="gd-chat-header__left">
+                <button class="gd-chat-header__back" (click)="backToConversations()"><iconify-icon icon="lucide:arrow-left"></iconify-icon> Back</button>
+                <div class="gd-chat-header__avatar">{{ activeConversation()!.travelerName.charAt(0) }}</div>
+                <div>
+                  <h3 class="gd-chat-header__name">{{ activeConversation()!.travelerName }}</h3>
+                  <span class="gd-chat-header__status">Active today</span>
+                </div>
+              </div>
+              @if (activeConversationRequest()) {
+                <button class="gd-btn gd-btn--ghost gd-btn--sm" (click)="navigate('requests')"><iconify-icon icon="lucide:calendar-check-2"></iconify-icon> View request</button>
+              }
+            </div>
+            <div class="gd-chat-messages">
+              @for (msg of activeMessages(); track msg.id) {
+                <div class="gd-msg" [class.gd-msg--me]="msg.from === 'me'" [class.gd-msg--them]="msg.from !== 'me'">
+                  <div class="gd-msg__bubble">{{ msg.content }}</div>
+                  <span class="gd-msg__time">{{ msg.time }}</span>
+                </div>
+              }
+            </div>
+            <div class="gd-chat-composer">
+              <input type="text" class="gd-chat-composer__input" placeholder="Type your message..." [value]="messageInput()" (input)="messageInput.set($any($event.target).value)" (keydown)="onMessageKeydown($event)" />
+              <button class="gd-chat-composer__send" (click)="sendMessage()" [disabled]="!messageInput().trim()" aria-label="Send message">
+                <iconify-icon icon="lucide:send"></iconify-icon>
+              </button>
+            </div>
+          } @else {
+            <div class="gd-chat-empty">
+              <div class="gd-chat-empty__icon-wrap"><iconify-icon icon="lucide:message-circle"></iconify-icon></div>
+              <h3 class="gd-chat-empty__title">Select a conversation to start messaging</h3>
+              <p class="gd-chat-empty__desc">Connect with travelers who have questions about your experiences or want to customize their trip.</p>
+            </div>
+          }
+        </section>
+      </div>
+    }
+
+  </main>
+
+  <!-- CREATE EXPERIENCE MODAL -->
+  @if (showCreateExperience()) {
+    <div class="gd-modal-backdrop" (click)="closeCreateExperience()">
+      <div class="gd-modal" (click)="$event.stopPropagation()">
+        <div class="gd-modal__header">
+          <h2 class="gd-modal__title">Create New Experience</h2>
+          <button class="gd-modal__close" (click)="closeCreateExperience()"><iconify-icon icon="lucide:x"></iconify-icon></button>
+        </div>
+        <form class="gd-form" (submit)="createExperience($event)">
+          <div class="gd-form__field">
+            <label>Experience Title</label>
+            <input type="text" placeholder="e.g. Medina Walking Tour" [value]="newExpTitle()" (input)="newExpTitle.set($any($event.target).value)" required />
+          </div>
+          <div class="gd-form__field">
+            <label>Description</label>
+            <textarea rows="3" placeholder="Describe the experience..." [value]="newExpDescription()" (input)="newExpDescription.set($any($event.target).value)" required></textarea>
+          </div>
+          <div class="gd-form__row">
+            <div class="gd-form__field">
+              <label>Location</label>
+              <input type="text" placeholder="e.g. Fez, Morocco" [value]="newExpLocation()" (input)="newExpLocation.set($any($event.target).value)" />
+            </div>
+            <div class="gd-form__field">
+              <label>Duration</label>
+              <input type="text" placeholder="e.g. 4 hours" [value]="newExpDuration()" (input)="newExpDuration.set($any($event.target).value)" />
+            </div>
+          </div>
+          <div class="gd-form__row">
+            <div class="gd-form__field">
+              <label>Price (MAD)</label>
+              <input type="text" [value]="newExpPrice()" (input)="newExpPrice.set($any($event.target).value)" />
+            </div>
+            <div class="gd-form__field">
+              <label>Category</label>
+              <select [value]="newExpCategory()" (change)="newExpCategory.set($any($event.target).value)" style="width:100%;padding:0.7rem 0.95rem;border:1px solid var(--gd-border);border-radius:10px;font-family:inherit;font-size:0.875rem;background:var(--gd-input);outline:none;">
+                <option value="Cultural">Cultural</option>
+                <option value="Adventure">Adventure</option>
+                <option value="Culinary">Culinary</option>
+                <option value="Nature">Nature</option>
+                <option value="Wellness">Wellness</option>
+                <option value="Historical">Historical</option>
+              </select>
+            </div>
+          </div>
+          <div class="gd-form__field">
+            <label>Image URL</label>
+            <input type="text" placeholder="https://..." [value]="newExpImage()" (input)="newExpImage.set($any($event.target).value)" />
+          </div>
+          <div class="gd-form__actions">
+            <button type="button" class="gd-btn gd-btn--ghost" (click)="closeCreateExperience()">Cancel</button>
+            <button type="submit" class="gd-btn gd-btn--primary" [disabled]="isCreatingExperience()">{{ isCreatingExperience() ? 'Creating...' : 'Create Experience' }}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
 </div>
