@@ -17,11 +17,17 @@ export interface Itineraire {
   jours: string;
 }
 
+export type ReservationStatus = 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED';
+export type ReservationType = 'GUIDE' | 'HOTEL' | 'RESTAURANT' | 'ACTIVITY' | 'EVENT' | 'TRANSPORT';
+
 export interface Reservation {
   id: number;
   clientId: number;
-  guideId: number | null;
-  statut: string;
+  clientName: string;
+  resourceType: ReservationType;
+  resourceId: number;
+  resourceName: string;
+  statut: ReservationStatus;
   date: string;
 }
 
@@ -60,7 +66,9 @@ export interface Artisan {
 
 export interface ReservationRequest {
   clientId: number;
-  guideId: number;
+  resourceType: ReservationType;
+  resourceId: number;
+  resourceName: string;
   date: string;
 }
 
@@ -133,4 +141,26 @@ export interface Commande {
 
 export interface CommandeUpdateRequest {
   statut: string;
+}
+
+export type MapLocationCategory =
+  | 'Hotel'
+  | 'Riad'
+  | 'Restaurant'
+  | 'Attraction'
+  | 'Guide'
+  | 'Artisan'
+  | 'Event'
+  | 'DMC';
+
+export interface MapLocation {
+  id: number;
+  name: string;
+  category: MapLocationCategory;
+  lat: number;
+  lng: number;
+  address: string;
+  rating: number;
+  imageUrl: string;
+  description: string;
 }

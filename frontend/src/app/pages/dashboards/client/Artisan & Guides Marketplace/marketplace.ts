@@ -114,7 +114,9 @@ export class marketplace implements OnInit {
     this.reservationService
       .create({
         clientId: profile.id,
-        guideId: guide.id,
+        resourceType: 'GUIDE',
+        resourceId: guide.id,
+        resourceName: `${guide.prenom} ${guide.nom}`,
         date: new Date().toISOString(),
       })
       .subscribe({

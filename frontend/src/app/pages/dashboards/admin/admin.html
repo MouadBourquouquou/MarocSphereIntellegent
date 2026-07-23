@@ -74,6 +74,16 @@
               <span class="bg-primary/10 text-primary text-[10px] font-bold px-2 py-0.5 rounded-full">{{ totalReservations }}</span>
             </button>
 
+            <button (click)="switchTab('landmarks')"
+              [ngClass]="activeTab==='landmarks' ? 'border-primary text-primary bg-accent/40' : 'text-muted-foreground'"
+              class="tab-btn flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg text-sm font-semibold border border-transparent transition-all">
+              <div class="flex items-center gap-3">
+                <iconify-icon icon="lucide:map-pin" class="text-lg"></iconify-icon>
+                <span>Landmarks</span>
+              </div>
+              <span class="bg-primary/10 text-primary text-[10px] font-bold px-2 py-0.5 rounded-full">{{ totalLandmarks }}</span>
+            </button>
+
           </nav>
         </div>
 
@@ -409,7 +419,8 @@
                   <tr class="bg-muted/40 border-b border-border text-xs font-bold text-muted-foreground uppercase">
                     <th class="p-4">ID</th>
                     <th class="p-4">Client</th>
-                    <th class="p-4">Guide</th>
+                    <th class="p-4">Type</th>
+                    <th class="p-4">Ressource</th>
                     <th class="p-4">Date</th>
                     <th class="p-4">Statut</th>
                     <th class="p-4 text-right">Actions</th>
@@ -419,13 +430,14 @@
                   <tr *ngFor="let r of reservations; trackBy: trackRes"
                     class="border-b border-border/60 hover:bg-muted/20 transition-all">
                     <td class="p-4 font-bold text-primary">#{{ r.id }}</td>
-                    <td class="p-4 text-sm text-foreground">{{ getClientName(r.clientId) }}</td>
-                    <td class="p-4 text-sm text-muted-foreground">{{ getGuideName(r.guideId) }}</td>
+                    <td class="p-4 text-sm text-foreground">{{ r.clientName || getClientName(r.clientId) }}</td>
+                    <td class="p-4 text-sm text-muted-foreground">{{ r.resourceType }}</td>
+                    <td class="p-4 text-sm text-muted-foreground">{{ r.resourceName }}</td>
                     <td class="p-4 text-sm text-muted-foreground">{{ r.date | date:'dd/MM/yyyy HH:mm' }}</td>
                     <td class="p-4">
                       <span class="px-2.5 py-1 rounded-full text-xs font-semibold"
                         [ngClass]="reservationStatusClass(r.statut)">
-                        {{ r.statut }}
+                        {{ r.statut === 'CONFIRMED' ? 'Confirmée' : r.statut === 'PENDING' ? 'En attente' : r.statut === 'CANCELLED' ? 'Annulée' : r.statut === 'COMPLETED' ? 'Terminée' : r.statut }}
                       </span>
                     </td>
                     <td class="p-4 text-right">
@@ -460,6 +472,275 @@
           </div>
         </section>
 
+        <!-- ═══ TAB 6 : LANDMARKS ═══════════════════════════════════════ -->
+        <section *ngIf="!loadingStats && activeTab === 'landmarks'" class="flex flex-col gap-6">
+
+          <!-- Landmark KPI -->
+          <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-card p-4 rounded-xl border border-border/80 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-semibold text-muted-foreground">Total Landmarks</span>
+                <div class="w-7 h-7 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
+                  <iconify-icon icon="lucide:map-pin" class="text-base"></iconify-icon>
+                </div>
+              </div>
+              <div class="text-xl font-bold tracking-tight text-foreground">{{ totalLandmarks | number }}</div>
+            </div>
+
+            <div class="bg-card p-4 rounded-xl border border-border/80 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-semibold text-muted-foreground">Catégories</span>
+                <div class="w-7 h-7 bg-secondary/10 rounded-lg flex items-center justify-center text-secondary">
+                  <iconify-icon icon="lucide:tag" class="text-base"></iconify-icon>
+                </div>
+              </div>
+              <div class="text-xl font-bold tracking-tight text-foreground">{{ landmarkCategories.length }}</div>
+            </div>
+
+            <div class="bg-card p-4 rounded-xl border border-border/80 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-semibold text-muted-foreground">Zones</span>
+                <div class="w-7 h-7 bg-amber-100 rounded-lg flex items-center justify-center text-amber-800">
+                  <iconify-icon icon="lucide:map" class="text-base"></iconify-icon>
+                </div>
+              </div>
+              <div class="text-xl font-bold tracking-tight text-foreground">{{ landmarkZones.length }}</div>
+            </div>
+
+            <div class="bg-card p-4 rounded-xl border border-border/80 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-semibold text-muted-foreground">Gratuits</span>
+                <div class="w-7 h-7 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-800">
+                  <iconify-icon icon="lucide:ticket" class="text-base"></iconify-icon>
+                </div>
+              </div>
+              <div class="text-xl font-bold tracking-tight text-foreground">{{ freeLandmarksCount }}</div>
+            </div>
+          </section>
+
+          <!-- Header + Actions -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-xl font-heading font-bold text-foreground">Gestion des Landmarks</h2>
+              <p class="text-xs text-muted-foreground">Région Marrakech-Safi — {{ filteredLandmarks.length }} landmark(s) affiché(s)</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <label class="flex items-center gap-2 px-4 py-2.5 bg-secondary text-secondary-foreground text-sm font-semibold rounded-lg hover:bg-secondary/90 transition-all shadow-md cursor-pointer">
+                <iconify-icon icon="lucide:upload" class="text-lg"></iconify-icon>
+                <span *ngIf="!csvImporting">Import CSV</span>
+                <span *ngIf="csvImporting">Importation...</span>
+                <input type="file" accept=".csv" class="hidden" (change)="onCsvFileSelected($event)" [disabled]="csvImporting" />
+              </label>
+              <button (click)="openLandmarkModal('add')"
+                class="flex items-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-lg hover:bg-primary/95 transition-all shadow-md">
+                <iconify-icon icon="lucide:plus" class="text-lg"></iconify-icon>
+                <span>Ajouter</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- CSV Import Result -->
+          <div *ngIf="csvImportResult" class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex items-center gap-3">
+            <iconify-icon icon="lucide:circle-check" class="text-xl text-emerald-600"></iconify-icon>
+            <div>
+              <p class="text-sm font-semibold text-emerald-800">{{ csvImportResult.message }}</p>
+            </div>
+            <button (click)="csvImportResult = null" class="ml-auto p-1 text-emerald-600 hover:text-emerald-800">
+              <iconify-icon icon="lucide:x" class="text-lg"></iconify-icon>
+            </button>
+          </div>
+
+          <!-- Filters -->
+          <div class="bg-card p-4 rounded-xl border border-border/80 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+            <div class="flex items-center gap-3 flex-wrap">
+              <span class="text-xs font-bold text-muted-foreground uppercase">Catégorie :</span>
+              <div class="flex rounded-lg bg-muted p-1 gap-1 flex-wrap">
+                <button (click)="handleLandmarkCategoryFilter('All')"
+                  [class.bg-card]="landmarkFilterCategory === 'All'" [class.shadow-sm]="landmarkFilterCategory === 'All'"
+                  [class.text-primary]="landmarkFilterCategory === 'All'" [class.text-muted-foreground]="landmarkFilterCategory !== 'All'"
+                  class="px-3 py-1 rounded-md text-xs font-semibold transition-all hover:text-primary">
+                  Toutes
+                </button>
+                <button *ngFor="let cat of landmarkCategories" (click)="handleLandmarkCategoryFilter(cat)"
+                  [class.bg-card]="landmarkFilterCategory === cat" [class.shadow-sm]="landmarkFilterCategory === cat"
+                  [class.text-primary]="landmarkFilterCategory === cat" [class.text-muted-foreground]="landmarkFilterCategory !== cat"
+                  class="px-3 py-1 rounded-md text-xs font-semibold transition-all hover:text-primary">
+                  {{ cat }}
+                </button>
+              </div>
+            </div>
+            <div class="flex items-center gap-3 flex-wrap">
+              <span class="text-xs font-bold text-muted-foreground uppercase">Prix :</span>
+              <div class="flex rounded-lg bg-muted p-1 gap-1">
+                <button (click)="handleLandmarkPriceFilter('All')"
+                  [class.bg-card]="landmarkFilterPrice === 'All'" [class.shadow-sm]="landmarkFilterPrice === 'All'"
+                  [class.text-primary]="landmarkFilterPrice === 'All'" [class.text-muted-foreground]="landmarkFilterPrice !== 'All'"
+                  class="px-3 py-1 rounded-md text-xs font-semibold transition-all hover:text-primary">
+                  Tous
+                </button>
+                <button (click)="handleLandmarkPriceFilter('Gratuit')"
+                  [class.bg-card]="landmarkFilterPrice === 'Gratuit'" [class.shadow-sm]="landmarkFilterPrice === 'Gratuit'"
+                  [class.text-primary]="landmarkFilterPrice === 'Gratuit'" [class.text-muted-foreground]="landmarkFilterPrice !== 'Gratuit'"
+                  class="px-3 py-1 rounded-md text-xs font-semibold transition-all hover:text-primary">
+                  Gratuit
+                </button>
+                <button (click)="handleLandmarkPriceFilter('Payant')"
+                  [class.bg-card]="landmarkFilterPrice === 'Payant'" [class.shadow-sm]="landmarkFilterPrice === 'Payant'"
+                  [class.text-primary]="landmarkFilterPrice === 'Payant'" [class.text-muted-foreground]="landmarkFilterPrice !== 'Payant'"
+                  class="px-3 py-1 rounded-md text-xs font-semibold transition-all hover:text-primary">
+                  Payant
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Loading -->
+          <div *ngIf="loadingLandmarks" class="flex items-center justify-center py-12">
+            <iconify-icon icon="lucide:loader-circle" class="text-3xl text-primary animate-spin"></iconify-icon>
+          </div>
+
+          <!-- Map -->
+          <div *ngIf="!loadingLandmarks" class="landmark-map-card bg-card rounded-xl border border-border/80 shadow-sm overflow-hidden">
+            <div class="p-4 border-b border-border/60">
+              <h3 class="font-bold text-sm text-foreground">Carte des Landmarks — Marrakech-Safi</h3>
+            </div>
+            <div #landmarkMap class="h-80 w-full"></div>
+          </div>
+
+          <!-- Landmarks Table -->
+          <div *ngIf="!loadingLandmarks" class="bg-card rounded-xl border border-border/80 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-muted/40 border-b border-border text-xs font-bold text-muted-foreground uppercase">
+                    <th class="p-4 cursor-pointer select-none hover:text-primary transition-all" (click)="sortLandmarks('nom')">
+                      <div class="flex items-center gap-1">
+                        Nom
+                        <iconify-icon [icon]="landmarkSortIcon('nom')" class="text-sm"></iconify-icon>
+                      </div>
+                    </th>
+                    <th class="p-4 cursor-pointer select-none hover:text-primary transition-all" (click)="sortLandmarks('categorie')">
+                      <div class="flex items-center gap-1">
+                        Catégorie
+                        <iconify-icon [icon]="landmarkSortIcon('categorie')" class="text-sm"></iconify-icon>
+                      </div>
+                    </th>
+                    <th class="p-4 cursor-pointer select-none hover:text-primary transition-all" (click)="sortLandmarks('zone')">
+                      <div class="flex items-center gap-1">
+                        Zone
+                        <iconify-icon [icon]="landmarkSortIcon('zone')" class="text-sm"></iconify-icon>
+                      </div>
+                    </th>
+                    <th class="p-4 cursor-pointer select-none hover:text-primary transition-all" (click)="sortLandmarks('categoriePrix')">
+                      <div class="flex items-center gap-1">
+                        Cat. Prix
+                        <iconify-icon [icon]="landmarkSortIcon('categoriePrix')" class="text-sm"></iconify-icon>
+                      </div>
+                    </th>
+                    <th class="p-4 cursor-pointer select-none hover:text-primary transition-all" (click)="sortLandmarks('prixEntree')">
+                      <div class="flex items-center gap-1">
+                        Prix (MAD)
+                        <iconify-icon [icon]="landmarkSortIcon('prixEntree')" class="text-sm"></iconify-icon>
+                      </div>
+                    </th>
+                    <th class="p-4">Latitude</th>
+                    <th class="p-4">Longitude</th>
+                    <th class="p-4">Période Hist.</th>
+                    <th class="p-4">UNESCO</th>
+                    <th class="p-4">Patrimoine</th>
+                    <th class="p-4">Notes Arch.</th>
+                    <th class="p-4">Description</th>
+                    <th class="p-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngIf="paginatedLandmarks.length === 0" class="border-b border-border/60">
+                    <td colspan="13" class="p-6 text-center text-sm text-muted-foreground">Aucun landmark trouvé.</td>
+                  </tr>
+                  <tr *ngFor="let l of paginatedLandmarks; trackBy: trackLandmark" class="border-b border-border/60 hover:bg-muted/20 transition-all">
+                    <td class="p-4">
+                      <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                          <iconify-icon icon="lucide:map-pin" class="text-base"></iconify-icon>
+                        </div>
+                        <div class="font-semibold text-sm text-foreground">{{ l.nom }}</div>
+                      </div>
+                    </td>
+                    <td class="p-4">
+                      <span class="px-2 py-1 rounded-full text-xs font-semibold bg-accent text-primary">{{ l.categorie }}</span>
+                    </td>
+                    <td class="p-4 text-sm text-muted-foreground">{{ l.zone }}</td>
+                    <td class="p-4">
+                      <span class="px-2 py-1 rounded-full text-xs font-semibold"
+                        [class.bg-emerald-100]="l.categoriePrix === 'Gratuit'"
+                        [class.text-emerald-800]="l.categoriePrix === 'Gratuit'"
+                        [class.bg-amber-100]="l.categoriePrix === 'Moyen'"
+                        [class.text-amber-800]="l.categoriePrix === 'Moyen'"
+                        [class.bg-red-100]="l.categoriePrix === 'Élevé'"
+                        [class.text-red-800]="l.categoriePrix === 'Élevé'"
+                        [class.bg-blue-100]="l.categoriePrix === 'Gratuit pour les enfants'"
+                        [class.text-blue-800]="l.categoriePrix === 'Gratuit pour les enfants'">
+                        {{ l.categoriePrix }}
+                      </span>
+                    </td>
+                    <td class="p-4 text-sm font-semibold text-foreground">{{ l.prixEntree | number:'1.2-2' }} MAD</td>
+                    <td class="p-4 text-xs text-muted-foreground font-mono">{{ l.latitude | number:'1.4-4' }}</td>
+                    <td class="p-4 text-xs text-muted-foreground font-mono">{{ l.longitude | number:'1.4-4' }}</td>
+                    <td class="p-4 text-xs text-muted-foreground">{{ l.historicalPeriod ?? '—' }}</td>
+                    <td class="p-4">
+                      <span *ngIf="l.unesco" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">UNESCO</span>
+                      <span *ngIf="!l.unesco" class="text-xs text-muted-foreground">—</span>
+                    </td>
+                    <td class="p-4 text-xs text-muted-foreground max-w-[120px] truncate" [title]="l.intangibleHeritage ?? ''">{{ l.intangibleHeritage ?? '—' }}</td>
+                    <td class="p-4 text-xs text-muted-foreground max-w-[120px] truncate" [title]="l.architecturalNotes ?? ''">{{ l.architecturalNotes ?? '—' }}</td>
+                    <td class="p-4 text-xs text-muted-foreground max-w-[150px] truncate" [title]="l.description ?? ''">{{ l.description ?? '—' }}</td>
+                    <td class="p-4 text-right">
+                      <div class="flex items-center justify-end gap-2">
+                        <button (click)="openLandmarkModal('edit', l)"
+                          class="px-3 py-1.5 bg-accent text-primary text-xs font-semibold rounded-lg hover:bg-accent/80 transition-all">Modifier</button>
+                        <button (click)="deleteLandmarkById(l.id)"
+                          class="px-3 py-1.5 border border-border text-muted-foreground text-xs font-semibold rounded-lg hover:bg-muted transition-all">Supprimer</button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="flex items-center justify-between px-4 py-3 border-t border-border/60">
+              <div class="text-xs text-muted-foreground">
+                Page <strong class="text-foreground">{{ landmarkPage }}</strong> sur <strong class="text-foreground">{{ landmarkTotalPages }}</strong>
+                ({{ filteredLandmarks.length }} résultat(s))
+              </div>
+              <div class="flex items-center gap-1">
+                <button (click)="landmarkGoPage(1)" [disabled]="landmarkPage <= 1"
+                  class="px-2 py-1 rounded text-xs font-semibold bg-muted text-muted-foreground hover:bg-muted/80 disabled:opacity-40 transition-all">
+                  ««
+                </button>
+                <button (click)="landmarkGoPage(landmarkPage - 1)" [disabled]="landmarkPage <= 1"
+                  class="px-2 py-1 rounded text-xs font-semibold bg-muted text-muted-foreground hover:bg-muted/80 disabled:opacity-40 transition-all">
+                  «
+                </button>
+                <button *ngFor="let p of landmarkPageNumbers" (click)="landmarkGoPage(p)"
+                  [ngClass]="landmarkPageClass(p)"
+                  class="px-2.5 py-1 rounded text-xs font-semibold transition-all">
+                  {{ p }}
+                </button>
+                <button (click)="landmarkGoPage(landmarkPage + 1)" [disabled]="landmarkPage >= landmarkTotalPages"
+                  class="px-2 py-1 rounded text-xs font-semibold bg-muted text-muted-foreground hover:bg-muted/80 disabled:opacity-40 transition-all">
+                  »
+                </button>
+                <button (click)="landmarkGoPage(landmarkTotalPages)" [disabled]="landmarkPage >= landmarkTotalPages"
+                  class="px-2 py-1 rounded text-xs font-semibold bg-muted text-muted-foreground hover:bg-muted/80 disabled:opacity-40 transition-all">
+                  »»
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
       </main>
     </div><!-- end flex body -->
 
@@ -477,7 +758,7 @@
       <p class="text-xs font-bold text-foreground">{{ toastMessage }}</p>
     </div>
 
-    <!-- ═══ MODAL ADD/EDIT ═════════════════════════════════════════════════ -->
+    <!-- ═══ MODAL ADD/EDIT USER ════════════════════════════════════════════ -->
     <div *ngIf="showModal"
       class="fixed inset-0 z-50 bg-foreground/40 backdrop-blur-sm flex items-center justify-center p-4">
       <div class="bg-card border border-border rounded-2xl max-w-md w-full p-6 shadow-2xl relative overflow-hidden">
@@ -548,6 +829,108 @@
             <button type="submit" [disabled]="modalSaving"
               class="flex-1 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-lg hover:bg-primary/95 transition-all shadow-md disabled:opacity-50">
               {{ modalSaving ? 'Enregistrement...' : 'Sauvegarder' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ═══ MODAL ADD/EDIT LANDMARK ════════════════════════════════════════ -->
+    <div *ngIf="showLandmarkModal"
+      class="fixed inset-0 z-50 bg-foreground/40 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="bg-card border border-border rounded-2xl max-w-md w-full p-6 shadow-2xl relative overflow-hidden">
+        <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-primary via-tertiary to-secondary"></div>
+        <div class="flex items-center justify-between mb-5">
+          <h3 class="font-heading font-extrabold text-lg text-foreground">{{ landmarkModalTitle }}</h3>
+          <button (click)="closeLandmarkModal()" class="p-1.5 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-all">
+            <iconify-icon icon="lucide:x" class="text-xl"></iconify-icon>
+          </button>
+        </div>
+        <form (ngSubmit)="submitLandmarkModal()" class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-muted-foreground uppercase mb-1.5">Nom</label>
+            <input type="text" name="fLandmarkName" required [(ngModel)]="fLandmarkName" placeholder="Ex: Jemaa el-Fna"
+              class="w-full px-3.5 py-2 border border-border rounded-lg text-sm bg-muted/20 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all" />
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-muted-foreground uppercase mb-1.5">Catégorie</label>
+              <input type="text" name="fLandmarkCategory" required [(ngModel)]="fLandmarkCategory" placeholder="Ex: Monument"
+                class="w-full px-3.5 py-2 border border-border rounded-lg text-sm bg-muted/20 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-muted-foreground uppercase mb-1.5">Zone</label>
+              <input type="text" name="fLandmarkZone" required [(ngModel)]="fLandmarkZone" placeholder="Ex: Marrakech Médina"
+                class="w-full px-3.5 py-2 border border-border rounded-lg text-sm bg-muted/20 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all" />
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-muted-foreground uppercase mb-1.5">Latitude</label>
+              <input type="number" step="0.0001" name="fLandmarkLatitude" required [(ngModel)]="fLandmarkLatitude"
+                class="w-full px-3.5 py-2 border border-border rounded-lg text-sm bg-muted/20 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-muted-foreground uppercase mb-1.5">Longitude</label>
+              <input type="number" step="0.0001" name="fLandmarkLongitude" required [(ngModel)]="fLandmarkLongitude"
+                class="w-full px-3.5 py-2 border border-border rounded-lg text-sm bg-muted/20 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all" />
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-muted-foreground uppercase mb-1.5">Catégorie Prix</label>
+              <select name="fLandmarkPriceCategory" [(ngModel)]="fLandmarkPriceCategory"
+                class="w-full px-3.5 py-2 border border-border rounded-lg text-sm bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all">
+                <option value="Gratuit">Gratuit</option>
+                <option value="Gratuit pour les enfants">Gratuit pour les enfants</option>
+                <option value="Moyen">Moyen</option>
+                <option value="Élevé">Élevé</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-muted-foreground uppercase mb-1.5">Prix Entrée (MAD)</label>
+              <input type="number" step="0.01" name="fLandmarkEntryPrice" [(ngModel)]="fLandmarkEntryPrice"
+                class="w-full px-3.5 py-2 border border-border rounded-lg text-sm bg-muted/20 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all" />
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-muted-foreground uppercase mb-1.5">Période Historique</label>
+            <input type="text" name="fLandmarkHistoricalPeriod" [(ngModel)]="fLandmarkHistoricalPeriod" placeholder="Ex: Almohade, Saadien..."
+              class="w-full px-3.5 py-2 border border-border rounded-lg text-sm bg-muted/20 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all" />
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-muted-foreground uppercase mb-1.5">Site UNESCO</label>
+              <select name="fLandmarkUnesco" [(ngModel)]="fLandmarkUnesco"
+                class="w-full px-3.5 py-2 border border-border rounded-lg text-sm bg-card focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all">
+                <option [ngValue]="false">Non</option>
+                <option [ngValue]="true">Oui</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-muted-foreground uppercase mb-1.5">Patrimoine Immatériel</label>
+              <input type="text" name="fLandmarkIntangibleHeritage" [(ngModel)]="fLandmarkIntangibleHeritage" placeholder="Ex: Gnawa, Poterie..."
+                class="w-full px-3.5 py-2 border border-border rounded-lg text-sm bg-muted/20 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all" />
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-muted-foreground uppercase mb-1.5">Notes Architecturales</label>
+            <input type="text" name="fLandmarkArchitecturalNotes" [(ngModel)]="fLandmarkArchitecturalNotes" placeholder="Ex: Style islamique, zellige..."
+              class="w-full px-3.5 py-2 border border-border rounded-lg text-sm bg-muted/20 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-muted-foreground uppercase mb-1.5">Description</label>
+            <textarea name="fLandmarkDescription" [(ngModel)]="fLandmarkDescription" rows="3" placeholder="Description détaillée du landmark..."
+              class="w-full px-3.5 py-2 border border-border rounded-lg text-sm bg-muted/20 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all resize-none"></textarea>
+          </div>
+          <div class="pt-4 flex gap-3">
+            <button type="button" (click)="closeLandmarkModal()"
+              class="flex-1 py-2.5 border border-border text-muted-foreground hover:text-foreground text-sm font-semibold rounded-lg hover:bg-muted transition-all">
+              Annuler
+            </button>
+            <button type="submit" [disabled]="landmarkModalSaving"
+              class="flex-1 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-lg hover:bg-primary/95 transition-all shadow-md disabled:opacity-50">
+              {{ landmarkModalSaving ? 'Enregistrement...' : 'Sauvegarder' }}
             </button>
           </div>
         </form>

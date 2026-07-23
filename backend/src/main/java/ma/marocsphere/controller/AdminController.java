@@ -4,6 +4,7 @@ import ma.marocsphere.dto.AdminCreationDTO;
 import ma.marocsphere.dto.AdminResponseDTO;
 import ma.marocsphere.dto.AdminUpdateDTO;
 import ma.marocsphere.dto.PlatformStatsDTO;
+import ma.marocsphere.entity.ReservationStatus;
 import ma.marocsphere.repository.AdminRepo;
 import ma.marocsphere.repository.ArtisanRepo;
 import ma.marocsphere.repository.ClientRepo;
@@ -62,8 +63,8 @@ public class AdminController {
                 .totalDmcs(dmcRepo.count())
                 .totalAdmins(adminRepo.count())
                 .totalReservations(reservationRepo.count())
-                .reservationsConfirmees(reservationRepo.countByStatut("CONFIRMEE"))
-                .reservationsEnAttente(reservationRepo.countByStatut("EN_ATTENTE"))
+                .reservationsConfirmees(reservationRepo.countByStatut(ReservationStatus.CONFIRMED))
+                .reservationsEnAttente(reservationRepo.countByStatut(ReservationStatus.PENDING))
                 .guidesDisponibles(guideRepo.countByDisponibleTrue())
                 .artisansEligiblesExport(artisanRepo.countByEligibleExportTrue())
                 .build();

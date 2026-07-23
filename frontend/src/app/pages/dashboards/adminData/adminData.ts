@@ -271,8 +271,9 @@ export class adminData implements AfterViewInit, OnDestroy, OnInit {
     if (this.reservations.length) {
       const resRows = this.reservations.map(r => ({
         ID: r.id,
-        'Client ID': r.clientId,
-        'Guide ID': r.guideId ?? '—',
+        'Client': r.clientName || `Client #${r.clientId}`,
+        'Type': r.resourceType,
+        'Ressource': r.resourceName,
         Status: r.statut,
         Date: r.date
       }));

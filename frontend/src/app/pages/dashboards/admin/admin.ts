@@ -11,6 +11,7 @@ import {
   AdminService, ClientUser, GuideUser, ArtisanUser, DmcUser,
   ReservationItem, AdminUser, PlatformStats
 } from '../../../services/admin.service';
+import { LandmarkService, LandmarkItem } from '../../../services/landmark.service';
 import { AuthService } from '../../../services/auth.service';
 import { PlatformUser, ToastType, UserRole, UserStatus } from './platform-user.model';
 
@@ -39,11 +40,15 @@ export class admin implements AfterViewInit, OnDestroy, OnInit {
 
   @ViewChild('growthChart')      private growthChartRef?:      ElementRef<HTMLCanvasElement>;
   @ViewChild('destinationChart') private destinationChartRef?: ElementRef<HTMLCanvasElement>;
+  @ViewChild('landmarkMap')      private landmarkMapRef?:      ElementRef<HTMLDivElement>;
   private growthChart?:      Chart;
   private destinationChart?: Chart;
   private toastTimeoutId?: ReturnType<typeof setTimeout>;
+  private leafletMap: any = null;
+  private leafletMarkers: any[] = [];
 
   private svc = inject(AdminService);
+  private landmarkSvc = inject(LandmarkService);
   private auth = inject(AuthService);
   private cdr = inject(ChangeDetectorRef);
 
@@ -53,6 +58,7 @@ export class admin implements AfterViewInit, OnDestroy, OnInit {
   loadingGuides = false;
   loadingArtisans = false;
   loadingReservations = false;
+  loadingLandmarks = false;
 
   // ── KPI stats from /admins/stats (fast single query) ─────────────────────
   stats: PlatformStats = {
@@ -74,9 +80,10 @@ export class admin implements AfterViewInit, OnDestroy, OnInit {
   reservations: ReservationItem[] = [];
   admins:       AdminUser[]       = [];
   users:        PlatformUser[]    = [];
+  landmarks:    LandmarkItem[]    = [];
 
   // ── Tab ───────────────────────────────────────────────────────────────────
-  activeTab: 'users' | 'guides' | 'artisans' | 'reservations' | 'analytics' = 'users';
+  activeTab: 'users' | 'guides' | 'artisans' | 'reservations' | 'analytics' | 'landmarks' = 'users';
 
   // ── Toast ─────────────────────────────────────────────────────────────────
   toastMessage = ''; toastType: ToastType = 'success'; toastVisible = false;
@@ -86,11 +93,43 @@ export class admin implements AfterViewInit, OnDestroy, OnInit {
   filterRole: UserRole | 'All' = 'All';
   roleOptions: (UserRole | 'All')[] = ['All', 'Client', 'Guide', 'Artisan', 'DMC', 'Administrator'];
 
+  // ── Landmark filters ──────────────────────────────────────────────────────
+  landmarkSearch = '';
+  landmarkFilterCategory: string = 'All';
+  landmarkFilterZone: string = 'All';
+  landmarkFilterPrice: string = 'All';
+  landmarkSortField: 'nom' | 'categorie' | 'zone' | 'categoriePrix' | 'prixEntree' = 'nom';
+  landmarkSortDir: 'asc' | 'desc' = 'asc';
+  landmarkPage = 1;
+  landmarkPageSize = 10;
+
   // ── Modal state ───────────────────────────────────────────────────────────
   showModal  = false;
   modalMode: 'add' | 'edit' = 'add';
   modalSaving = false;
   currentUser: PlatformUser | null = null;
+
+  // ── Landmark modal state ──────────────────────────────────────────────────
+  showLandmarkModal = false;
+  landmarkModalMode: 'add' | 'edit' = 'add';
+  landmarkModalSaving = false;
+  currentLandmark: LandmarkItem | null = null;
+  fLandmarkName = '';
+  fLandmarkCategory = '';
+  fLandmarkZone = '';
+  fLandmarkLatitude = 0;
+  fLandmarkLongitude = 0;
+  fLandmarkPriceCategory = 'Gratuit';
+  fLandmarkEntryPrice = 0;
+  fLandmarkHistoricalPeriod = '';
+  fLandmarkUnesco = false;
+  fLandmarkIntangibleHeritage = '';
+  fLandmarkArchitecturalNotes = '';
+  fLandmarkDescription = '';
+
+  // ── CSV import state ──────────────────────────────────────────────────────
+  csvImporting = false;
+  csvImportResult: { imported: number; message: string } | null = null;
 
   // ── Confirm dialog state ─────────────────────────────────────────────────
   showConfirm = false;
@@ -123,6 +162,7 @@ export class admin implements AfterViewInit, OnDestroy, OnInit {
     this.growthChart?.destroy();
     this.destinationChart?.destroy();
     if (this.toastTimeoutId) clearTimeout(this.toastTimeoutId);
+    this.destroyLeafletMap();
   }
 
   // ── Lazy tab loading ──────────────────────────────────────────────────────
@@ -134,6 +174,7 @@ export class admin implements AfterViewInit, OnDestroy, OnInit {
     if (tab === 'artisans'     && !this.artisans.length)     this.loadArtisanTab();
     if (tab === 'reservations' && !this.reservations.length) this.loadReservationTab();
     if (tab === 'analytics')   setTimeout(() => this.refreshCharts(), 60);
+    if (tab === 'landmarks')   { this.loadLandmarkTab(); setTimeout(() => this.initLeafletMap(), 100); }
   }
 
   private loadUserTab(): void {
@@ -166,6 +207,14 @@ export class admin implements AfterViewInit, OnDestroy, OnInit {
     });
     if (!this.clients.length)  this.svc.getClients().subscribe(r => { this.clients = r; this.cdr.markForCheck(); });
     if (!this.guides.length)   this.svc.getGuides().subscribe(r => { this.guides = r; this.cdr.markForCheck(); });
+  }
+
+  private loadLandmarkTab(): void {
+    this.loadingLandmarks = true;
+    this.landmarkSvc.getAll().subscribe({
+      next: r => { this.landmarks = r; this.loadingLandmarks = false; this.cdr.markForCheck(); },
+      error: () => { this.loadingLandmarks = false; this.cdr.markForCheck(); }
+    });
   }
 
   private rebuildUsers(): void {
@@ -235,20 +284,125 @@ export class admin implements AfterViewInit, OnDestroy, OnInit {
   get totalArtisans()  { return this.stats.totalArtisans; }
   get totalDmcs()      { return this.stats.totalDmcs; }
   get totalReservations() { return this.stats.totalReservations; }
+  get totalLandmarks() { return this.landmarks.length; }
+  get freeLandmarksCount() { return this.landmarks.filter(l => l.prixEntree === 0).length; }
   get certifiedGuides()   { return this.guides.filter(g => g.statutCertification === 'CERTIFIE'); }
   get availableGuides()   { return this.guides.filter(g => g.disponible); }
-  get confirmedRes()      { return this.reservations.filter(r => r.statut === 'CONFIRMEE'); }
+  get confirmedRes()      { return this.reservations.filter(r => r.statut === 'CONFIRMED'); }
   get confirmedReservations() { return this.confirmedRes; }
-  get pendingRes()        { return this.reservations.filter(r => r.statut === 'EN_ATTENTE'); }
+  get pendingRes()        { return this.reservations.filter(r => r.statut === 'PENDING'); }
   get pendingReservations() { return this.pendingRes; }
+
+  // ── Landmark computed ─────────────────────────────────────────────────────
+
+  get landmarkCategories(): string[] {
+    return [...new Set(this.landmarks.map(l => l.categorie))].sort();
+  }
+
+  get landmarkZones(): string[] {
+    return [...new Set(this.landmarks.map(l => l.zone))].sort();
+  }
+
+  get filteredLandmarks(): LandmarkItem[] {
+    const q = this.landmarkSearch.trim().toLowerCase();
+    let result = this.landmarks.filter(l =>
+      (!q || l.nom.toLowerCase().includes(q) || l.zone.toLowerCase().includes(q)) &&
+      (this.landmarkFilterCategory === 'All' || l.categorie === this.landmarkFilterCategory) &&
+      (this.landmarkFilterZone === 'All' || l.zone === this.landmarkFilterZone) &&
+      (this.landmarkFilterPrice === 'All' ||
+        (this.landmarkFilterPrice === 'Gratuit' && l.prixEntree === 0) ||
+        (this.landmarkFilterPrice === 'Payant' && l.prixEntree > 0))
+    );
+
+    result.sort((a, b) => {
+      const fieldA = a[this.landmarkSortField];
+      const fieldB = b[this.landmarkSortField];
+      const cmp = typeof fieldA === 'string' ? fieldA.localeCompare(fieldB as string) : (fieldA as number) - (fieldB as number);
+      return this.landmarkSortDir === 'asc' ? cmp : -cmp;
+    });
+
+    return result;
+  }
+
+  get paginatedLandmarks(): LandmarkItem[] {
+    const start = (this.landmarkPage - 1) * this.landmarkPageSize;
+    return this.filteredLandmarks.slice(start, start + this.landmarkPageSize);
+  }
+
+  get landmarkTotalPages(): number {
+    return Math.ceil(this.filteredLandmarks.length / this.landmarkPageSize) || 1;
+  }
+
+  get landmarkPageNumbers(): number[] {
+    const pages: number[] = [];
+    for (let i = 1; i <= this.landmarkTotalPages; i++) pages.push(i);
+    return pages;
+  }
 
   trackUser(_: number, u: PlatformUser): number   { return u.id; }
   trackGuide(_: number, g: GuideUser): number     { return +g.id; }
   trackArtisan(_: number, a: ArtisanUser): number { return +a.id; }
   trackRes(_: number, r: ReservationItem): number { return +r.id; }
+  trackLandmark(_: number, l: LandmarkItem): number { return l.id; }
 
   handleSearch(v: string): void    { this.searchQuery = v; }
   handleRoleFilter(v: UserRole | 'All'): void { this.filterRole = v; }
+
+  // ── Landmark filtering / sorting ──────────────────────────────────────────
+
+  handleLandmarkSearch(v: string): void {
+    this.landmarkSearch = v;
+    this.landmarkPage = 1;
+  }
+
+  handleLandmarkCategoryFilter(v: string): void {
+    this.landmarkFilterCategory = v;
+    this.landmarkPage = 1;
+  }
+
+  handleLandmarkZoneFilter(v: string): void {
+    this.landmarkFilterZone = v;
+    this.landmarkPage = 1;
+  }
+
+  handleLandmarkPriceFilter(v: string): void {
+    this.landmarkFilterPrice = v;
+    this.landmarkPage = 1;
+  }
+
+  sortLandmarks(field: typeof this.landmarkSortField): void {
+    if (this.landmarkSortField === field) {
+      this.landmarkSortDir = this.landmarkSortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.landmarkSortField = field;
+      this.landmarkSortDir = 'asc';
+    }
+  }
+
+  landmarkSortIcon(field: typeof this.landmarkSortField): string {
+    if (this.landmarkSortField !== field) return 'lucide:arrow-up-down';
+    return this.landmarkSortDir === 'asc' ? 'lucide:arrow-up' : 'lucide:arrow-down';
+  }
+
+  landmarkPageClass(page: number): Record<string, boolean> {
+    return {
+      'bg-primary text-primary-foreground': page === this.landmarkPage,
+      'bg-muted text-muted-foreground hover:bg-muted/80': page !== this.landmarkPage,
+    };
+  }
+
+  landmarkGoPage(page: number): void {
+    this.landmarkPage = Math.max(1, Math.min(page, this.landmarkTotalPages));
+  }
+
+  landmarkPriceCategoryClass(cat: string): Record<string, boolean> {
+    return {
+      'bg-emerald-100 text-emerald-800': cat === 'Gratuit',
+      'bg-amber-100 text-amber-800': cat === 'Moyen',
+      'bg-red-100 text-red-800': cat === 'Élevé',
+      'bg-blue-100 text-blue-800': cat === 'Gratuit pour les enfants',
+    };
+  }
 
   // ── Toast ─────────────────────────────────────────────────────────────────
 
@@ -276,14 +430,15 @@ export class admin implements AfterViewInit, OnDestroy, OnInit {
   }
   reservationStatusClass(s: string): Record<string, boolean> {
     return {
-      'bg-emerald-100 text-emerald-800': s === 'CONFIRMEE',
-      'bg-amber-100 text-amber-800':     s === 'EN_ATTENTE',
-      'bg-red-100 text-red-800':         s === 'ANNULEE',
-      'bg-muted text-muted-foreground':  !['CONFIRMEE','EN_ATTENTE','ANNULEE'].includes(s),
+      'bg-emerald-100 text-emerald-800': s === 'CONFIRMED',
+      'bg-amber-100 text-amber-800':     s === 'PENDING',
+      'bg-red-100 text-red-800':         s === 'CANCELLED',
+      'bg-blue-100 text-blue-800':       s === 'COMPLETED',
+      'bg-muted text-muted-foreground':  !['CONFIRMED','PENDING','CANCELLED','COMPLETED'].includes(s),
     };
   }
 
-  // ── Modal open/close ──────────────────────────────────────────────────────
+  // ── User Modal open/close ─────────────────────────────────────────────────
 
   openModal(mode: 'add' | 'edit', user?: PlatformUser): void {
     this.modalMode = mode;
@@ -300,7 +455,6 @@ export class admin implements AfterViewInit, OnDestroy, OnInit {
       this.fLangue = user.language !== '—' ? user.language : '';
       this.fRole = user.role;
       this.fStatus = user.status;
-      // role-specific
       this.fTier        = user.tierAbonnement ?? '';
       this.fLicence     = user.numeroLicence ?? '';
       this.fStatutCert  = user.statutCertification ?? 'EN_ATTENTE';
@@ -413,7 +567,6 @@ export class admin implements AfterViewInit, OnDestroy, OnInit {
         this.notify('User updated.');
         this.closeModal();
         this.modalSaving = false;
-        // Optimistic update: refresh the local user list in background
         this.refreshAfterCrud();
       },
       error: (e: any) => {
@@ -514,6 +667,125 @@ export class admin implements AfterViewInit, OnDestroy, OnInit {
     });
   }
 
+  // ── Landmark CRUD ─────────────────────────────────────────────────────────
+
+  openLandmarkModal(mode: 'add' | 'edit', landmark?: LandmarkItem): void {
+    this.landmarkModalMode = mode;
+    this.currentLandmark = landmark ?? null;
+    this.showLandmarkModal = true;
+    this.landmarkModalSaving = false;
+    if (mode === 'edit' && landmark) {
+      this.fLandmarkName = landmark.nom;
+      this.fLandmarkCategory = landmark.categorie;
+      this.fLandmarkZone = landmark.zone;
+      this.fLandmarkLatitude = landmark.latitude;
+      this.fLandmarkLongitude = landmark.longitude;
+      this.fLandmarkPriceCategory = landmark.categoriePrix;
+      this.fLandmarkEntryPrice = landmark.prixEntree;
+      this.fLandmarkHistoricalPeriod = landmark.historicalPeriod ?? '';
+      this.fLandmarkUnesco = landmark.unesco;
+      this.fLandmarkIntangibleHeritage = landmark.intangibleHeritage ?? '';
+      this.fLandmarkArchitecturalNotes = landmark.architecturalNotes ?? '';
+      this.fLandmarkDescription = landmark.description ?? '';
+    } else {
+      this.fLandmarkName = '';
+      this.fLandmarkCategory = '';
+      this.fLandmarkZone = '';
+      this.fLandmarkLatitude = 31.6295;
+      this.fLandmarkLongitude = -7.9811;
+      this.fLandmarkPriceCategory = 'Gratuit';
+      this.fLandmarkEntryPrice = 0;
+      this.fLandmarkHistoricalPeriod = '';
+      this.fLandmarkUnesco = false;
+      this.fLandmarkIntangibleHeritage = '';
+      this.fLandmarkArchitecturalNotes = '';
+      this.fLandmarkDescription = '';
+    }
+  }
+
+  closeLandmarkModal(): void {
+    this.showLandmarkModal = false;
+    this.currentLandmark = null;
+  }
+
+  get landmarkModalTitle(): string {
+    return this.landmarkModalMode === 'edit' ? 'Modifier le Landmark' : 'Ajouter un Landmark';
+  }
+
+  submitLandmarkModal(): void {
+    if (this.landmarkModalSaving) return;
+    this.landmarkModalSaving = true;
+    const payload = {
+      nom: this.fLandmarkName,
+      categorie: this.fLandmarkCategory,
+      zone: this.fLandmarkZone,
+      latitude: this.fLandmarkLatitude,
+      longitude: this.fLandmarkLongitude,
+      categoriePrix: this.fLandmarkPriceCategory,
+      prixEntree: this.fLandmarkEntryPrice,
+      historicalPeriod: this.fLandmarkHistoricalPeriod || null,
+      unesco: this.fLandmarkUnesco,
+      intangibleHeritage: this.fLandmarkIntangibleHeritage || null,
+      architecturalNotes: this.fLandmarkArchitecturalNotes || null,
+      description: this.fLandmarkDescription || null,
+    };
+
+    const call$ = this.landmarkModalMode === 'edit' && this.currentLandmark
+      ? this.landmarkSvc.update(this.currentLandmark.id, payload)
+      : this.landmarkSvc.create(payload);
+
+    call$.subscribe({
+      next: () => {
+        this.notify(this.landmarkModalMode === 'edit' ? 'Landmark mis à jour.' : 'Landmark créé avec succès.');
+        this.closeLandmarkModal();
+        this.loadLandmarkTab();
+        this.updateLeafletMarkers();
+      },
+      error: (e: any) => {
+        this.notify(e?.error?.message ?? 'Erreur lors de l\'enregistrement.', 'error');
+        this.landmarkModalSaving = false;
+      }
+    });
+  }
+
+  deleteLandmarkById(id: number): void {
+    this.requestConfirm('Supprimer ce landmark ?', () => {
+      this.landmarkSvc.delete(id).subscribe({
+        next: () => { this.notify('Landmark supprimé.'); this.loadLandmarkTab(); this.updateLeafletMarkers(); },
+        error: () => this.notify('Erreur lors de la suppression.', 'error')
+      });
+    });
+  }
+
+  // ── CSV Import ────────────────────────────────────────────────────────────
+
+  onCsvFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+    const file = input.files[0];
+    if (!file.name.endsWith('.csv')) {
+      this.notify('Veuillez sélectionner un fichier CSV.', 'error');
+      return;
+    }
+    this.csvImporting = true;
+    this.csvImportResult = null;
+    this.landmarkSvc.importCsv(file).subscribe({
+      next: (imported) => {
+        this.csvImportResult = { imported: imported.length, message: `${imported.length} landmark(s) importé(s) avec succès.` };
+        this.notify(this.csvImportResult.message);
+        this.csvImporting = false;
+        this.loadLandmarkTab();
+        this.updateLeafletMarkers();
+        input.value = '';
+      },
+      error: (e: any) => {
+        this.notify(e?.error?.message ?? 'Erreur lors de l\'import CSV.', 'error');
+        this.csvImporting = false;
+        input.value = '';
+      }
+    });
+  }
+
   // ── Refresh after a write operation ───────────────────────────────────────
 
   private refreshAfterCrud(): void {
@@ -522,6 +794,51 @@ export class admin implements AfterViewInit, OnDestroy, OnInit {
     if (this.activeTab === 'guides')       this.loadGuideTab();
     if (this.activeTab === 'artisans')     this.loadArtisanTab();
     if (this.activeTab === 'reservations') this.loadReservationTab();
+    if (this.activeTab === 'landmarks')    this.loadLandmarkTab();
+  }
+
+  // ── Leaflet Map ───────────────────────────────────────────────────────────
+
+  private async initLeafletMap(): Promise<void> {
+    if (!this.landmarkMapRef?.nativeElement) return;
+    if (this.leafletMap) {
+      this.leafletMap.invalidateSize();
+      this.updateLeafletMarkers();
+      return;
+    }
+    const L = await import('leaflet');
+    this.leafletMap = L.map(this.landmarkMapRef.nativeElement, {
+      center: [31.6295, -7.9811],
+      zoom: 11,
+      zoomControl: true,
+    });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap',
+      maxZoom: 18,
+    }).addTo(this.leafletMap);
+    this.updateLeafletMarkers();
+  }
+
+  private updateLeafletMarkers(): void {
+    if (!this.leafletMap) return;
+    import('leaflet').then(L => {
+      this.leafletMarkers.forEach(m => this.leafletMap.removeLayer(m));
+      this.leafletMarkers = [];
+      this.landmarks.forEach(l => {
+        const marker = L.marker([l.latitude, l.longitude])
+          .addTo(this.leafletMap)
+          .bindPopup(`<strong>${l.nom}</strong><br/>${l.categorie}<br/>${l.zone}`);
+        this.leafletMarkers.push(marker);
+      });
+    });
+  }
+
+  private destroyLeafletMap(): void {
+    if (this.leafletMap) {
+      this.leafletMap.remove();
+      this.leafletMap = null;
+      this.leafletMarkers = [];
+    }
   }
 
   // ── Charts ─────────────────────────────────────────────────────────────────
