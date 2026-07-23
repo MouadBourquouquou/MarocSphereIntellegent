@@ -36,6 +36,20 @@ export class DashboardClient implements OnInit, AfterViewChecked {
   chatInput = signal('');
   isSending = signal(false);
   private shouldScroll = false;
+  sidebarOpen = false;
+
+
+
+
+
+
+
+
+
+
+
+
+  
 
   displayName = computed(() => {
     const profile = this.client();

@@ -1,326 +1,382 @@
 <div class="min-h-screen w-full bg-background flex flex-col relative text-foreground font-sans">
-    @if (isLoading()) {
+  @if (isLoading()) {
     <div class="p-6 text-center text-muted-foreground">Chargement de votre espace client…</div>
-    }
-    @if (errorMessage()) {
-    <div class="mx-6 mt-4 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm" role="alert">
-        {{ errorMessage() }}
+  }
+  @if (errorMessage()) {
+    <div
+      class="mx-6 mt-4 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm"
+      role="alert"
+    >
+      {{ errorMessage() }}
     </div>
-    }
-    <!-- Header / Role Switcher -->
-    <header
-        class="border-b border-border bg-card px-6 py-4 flex items-center justify-between sticky top-0 z-50 shadow-sm">
-        <div class="flex items-center gap-3">
-            <!-- LOGO -->
-            <a class="navbar-brand" routerLink="/">
-                <img src="/pics/LOGOPRINCIPALE.png" alt="MarocSphere" class="logo" />
-            </a>
-            <div>
-                <h1 class="text-xl font-heading font-bold text-primary tracking-wide">MarocSphere</h1>
-                <p class="text-xs text-muted-foreground font-sans">1st AI-powered Moroccan travel planning platform</p>
-            </div>
+  }
+  <!-- Header / Role Switcher -->
+  <header
+    class="border-b border-border bg-card px-6 py-4 flex items-center justify-between sticky top-0 z-50 shadow-sm"
+  >
+    <div class="flex items-center gap-3">
+      <!-- LOGO -->
+      <a class="navbar-brand" routerLink="/">
+        <img src="/pics/LOGOPRINCIPALE.png" alt="MarocSphere" class="logo" />
+      </a>
+    </div>
+
+    <!-- Navigation Tabs (Role Switch Demo & Core Features) -->
+    <nav class="hidden lg:flex items-center gap-1 bg-muted p-1 rounded-xl">
+      <a
+        routerLink="/dashboard-client"
+        class="px-4 py-2 rounded-lg text-sm font-medium bg-primary text-primary-foreground shadow-sm flex items-center gap-2"
+      >
+        <iconify-icon icon="lucide:user" class="text-base"></iconify-icon>
+        My dashboard
+      </a>
+      <a
+        routerLink="/marketplace"
+        class="px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground flex items-center gap-2"
+      >
+        <iconify-icon icon="lucide:shopping-cart" class="text-primary text-lg"></iconify-icon>
+        Marketplace
+      </a>
+      <a
+        href="/favourites"
+        class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all"
+      >
+        <iconify-icon icon="lucide:heart" class="text-primary text-lg"></iconify-icon>
+        <span>My favourites </span>
+      </a>
+      <a
+        href="#"
+        class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all"
+      >
+        <iconify-icon icon="bi:save" class="text-primary text-lg"></iconify-icon>
+        <span>Saved trips</span>
+      </a>
+    </nav>
+
+    <!-- Right Actions: Wallet & Profile -->
+    <div class="flex items-center gap-4">
+      <!-- Wallet Quick Access -->
+      <div class="bg-muted px-3 py-1.5 rounded-lg flex items-center gap-2 border border-border">
+        <iconify-icon
+          icon="lucide:credit-card"
+          class="text-secondary-foreground text-lg"
+        ></iconify-icon>
+        <span class="text-sm font-bold text-foreground">0 MAD</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <a routerLink="/client-profile">
+          <img
+            [src]="avatar()"
+            [alt]="displayName()"
+            class="w-9 h-9 rounded-full border-2 border-primary object-cover"
+          />
+        </a>
+        <div class="hidden md:block text-left">
+          <p class="text-xs font-semibold">{{ displayName() }}</p>
+          <button
+            type="button"
+            (click)="logout()"
+            class="text-[10px] text-muted-foreground hover:text-primary"
+          >
+            Déconnexion
+          </button>
         </div>
+      </div>
+    </div>
+  </header>
 
-        <!-- Navigation Tabs (Role Switch Demo & Core Features) -->
-        <nav class="hidden lg:flex items-center gap-1 bg-muted p-1 rounded-xl">
-            <a routerLink="/dashboard-client"
-                class="px-4 py-2 rounded-lg text-sm font-medium bg-primary text-primary-foreground shadow-sm flex items-center gap-2">
-                <iconify-icon icon="lucide:user" class="text-base"></iconify-icon>
-                {{ displayName() }}
-            </a>
-            <a routerLink="/marketplace"
-                class="px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground flex items-center gap-2">
-                <iconify-icon icon="lucide:shopping-cart" class="text-base"></iconify-icon>
-                Marketplace
-            </a>
-        </nav>
+  <!-- Main Content Layout: Sidebar + Grid (AI Chat & Map/Trips) -->
+  <div class="flex-1 flex flex-col lg:flex-row ">
+    <!-- Main Layout -->
+    <div class="dashboard-layout py-4">
+      <!-- Sidebar -->
+      <aside class="history-sidebar" [class.expanded]="sidebarOpen">
+        <button class="toggle-btn" (click)="sidebarOpen = !sidebarOpen">
+          <iconify-icon icon="lucide:panel-left"></iconify-icon>
+        </button>
 
-        <!-- Right Actions: Wallet & Profile -->
-        <div class="flex items-center gap-4">
-            <!-- Wallet Quick Access -->
-            <div class="bg-muted px-3 py-1.5 rounded-lg flex items-center gap-2 border border-border">
-                <iconify-icon icon="lucide:credit-card" class="text-secondary-foreground text-lg"></iconify-icon>
-                <span class="text-xs text-muted-foreground font-medium">My Wallet:</span>
-                <span class="text-sm font-bold text-foreground">0 MAD</span>
-            </div>
-              <div class="flex items-center gap-2">
-                <a routerLink="/client-profile">
-                  <img [src]="avatar()" [alt]="displayName()"
-                      class="w-9 h-9 rounded-full border-2 border-primary object-cover" />
-                            </a>
-                  <div class="hidden md:block text-left">
-                      <p class="text-xs font-semibold">{{ displayName() }}</p>
-                      <button type="button" (click)="logout()" class="text-[10px] text-muted-foreground hover:text-primary">Déconnexion</button>
-                  </div>
-              </div>
+        <button class="new-chat">
+          <iconify-icon icon="lucide:plus"></iconify-icon>
+          <span class="sidebar-text">New Chat</span>
+        </button>
+
+        <div class="history-section">
+          <small class="sidebar-text section-title">Today</small>
+
+          <button class="history-item active">
+            <iconify-icon icon="lucide:map"></iconify-icon>
+            <span class="sidebar-text">Tangier itinerary</span>
+          </button>
+
+          <button class="history-item">
+            <iconify-icon icon="lucide:message-circle"></iconify-icon>
+            <span class="sidebar-text">Marrakech guide</span>
+          </button>
+
+          <button class="history-item">
+            <iconify-icon icon="lucide:utensils"></iconify-icon>
+            <span class="sidebar-text">Restaurants</span>
+          </button>
         </div>
-    </header>
+      </aside>
 
-    <!-- Main Content Layout: Sidebar + Grid (AI Chat & Map/Trips) -->
-    <div class="flex-1 flex flex-col lg:flex-row">
-
-        <!-- Left Navigation / Active Trips & Quick Links Sidebar -->
-        <aside class="w-full lg:w-72 bg-card border-r border-border p-5 flex flex-col gap-6">
-            <div>
-                <h3 class="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">My Trips</h3>
-                <div class="space-y-3">
-                    @if (itineraires().length === 0 && !isLoading()) {
-                    <p class="text-xs text-muted-foreground p-3 rounded-xl border border-border">
-                        Aucun voyage planifié. Utilisez l'assistant IA pour créer votre premier itinéraire.
-                    </p>
-                    }
-                    @for (itineraire of itineraires(); track itineraire.id; let first = $first) {
-                    <div
-                        class="p-3.5 rounded-xl border transition-all cursor-pointer"
-                        [class]="first ? 'bg-primary/5 border-primary/20 hover:border-primary' : 'border-border hover:bg-muted/50'">
-                        @if (first) {
-                        <div class="flex justify-between items-start mb-1">
-                            <span
-                                class="text-[10px] uppercase font-bold text-primary tracking-wider bg-primary/10 px-2 py-0.5 rounded-full">Active
-                                Trip</span>
-                            @if (itineraire.genereParIA) {
-                            <span class="text-[10px] font-semibold text-secondary-foreground">IA</span>
-                            }
-                        </div>
-                        }
-                        <h4 class="font-heading font-bold text-sm text-foreground">{{ getItineraireTitle(itineraire.jours) }}</h4>
-                        @if (getDaysCount(itineraire.jours) > 0) {
-                        <p class="text-xs text-muted-foreground mt-1">{{ getDaysCount(itineraire.jours) }} jour(s) planifié(s)</p>
-                        }
-                    </div>
-                    }
-                </div>
-            </div>
-
-            <!-- Quick Actions -->
-            <div>
-                <h3 class="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">Explore MarocSphere
-                </h3>
-                <ul class="space-y-1">
-                    <li>
-                        <a href="#"
-                            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold text-foreground bg-muted">
-                            <iconify-icon icon="lucide:layout-dashboard" class="text-primary text-lg"></iconify-icon>
-                            <span>AI Trip Planner</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a routerLink="/marketplace"
-                            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all">
-                            <iconify-icon icon="lucide:shopping-cart" class="text-secondary-foreground text-lg"></iconify-icon>
-                            <span>Artisan & Guides Marketplace</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#"
-                            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all">
-                            <iconify-icon icon="lucide:heart" class="text-primary text-lg"></iconify-icon>
-                            <span>My favourites </span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#"
-                            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all">
-                            <iconify-icon icon="lucide:credit-card" class="text-secondary-foreground text-lg"></iconify-icon>
-                            <span>My Wallet & Transactions</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
-            <!-- Quick Wallet Info -->
-            <div
-                class="mt-auto p-4 rounded-xl bg-gradient-to-br from-secondary-foreground to-primary/80 text-primary-foreground relative overflow-hidden shadow-md">
-                <div class="absolute -right-6 -bottom-6 opacity-10">
-                    <iconify-icon icon="lucide:credit-card" class="text-8xl"></iconify-icon>
-                </div>
-                <p class="text-xs opacity-80">MarocSphere</p>
-                <p class="text-xl font-bold font-heading mt-1">1st AI-powered Moroccan travel planning platform </p>
-                <div class="mt-4 flex items-center justify-between text-[11px] bg-primary/10 p-2 rounded-lg">
-                    <span>Bienvenue {{ client()?.prenom ?? 'Client' }}</span>
-                    <iconify-icon icon="lucide:shield" class="text-base"></iconify-icon>
-                </div>
-            </div>
-        </aside>
-
+      <!-- Everything else (chat + right column) -->
+      <div class="dashboard-content">
         <!-- Center & Right Workspace: AI Chat (Left) & Map/Details (Right) -->
         <main class="flex-1 p-6 flex flex-col lg:flex-row gap-6">
-
-            <!-- AI Itinerary Planner Chat Section -->
+          <!-- AI Itinerary Planner Chat Section -->
+          <div
+            class="flex-1 bg-card rounded-2xl border border-border shadow-sm flex flex-col h-[720px] overflow-hidden"
+          >
+            <!-- Chat Header -->
             <div
-                class="flex-1 bg-card rounded-2xl border border-border shadow-sm flex flex-col h-[720px] overflow-hidden">
-                <!-- Chat Header -->
-                <div class="px-5 py-4 border-b border-border flex items-center justify-between bg-muted/30">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                            <iconify-icon icon="lucide:zap" class="text-xl"></iconify-icon>
-                        </div>
-                        <div>
-                            <h2 class="font-heading font-bold text-base text-foreground flex items-center gap-2">
-                                MarocSphere AI Guide
-                                <span
-                                    class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-primary/10 text-primary">Online</span>
-                            </h2>
-                            <p class="text-xs text-muted-foreground">Ask me to build, customize, or book your Moroccan
-                                itinerary</p>
-                        </div>
-                    </div>
-                    <button class="text-muted-foreground hover:text-primary transition-all" (click)="resetChat()">
-                        <iconify-icon icon="lucide:refresh-cw" class="text-lg"></iconify-icon>
-                    </button>
+              class="px-5 py-4 border-b border-border flex items-center justify-between bg-muted/30"
+            >
+              <div class="flex items-center gap-3">
+                <div
+                  class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary"
+                >
+                  <iconify-icon icon="lucide:zap" class="text-xl"></iconify-icon>
                 </div>
-
-                <!-- Chat History -->
-                <div #chatContainer class="flex-1 overflow-y-auto p-5 space-y-4">
-                    @if (chatMessages().length === 0) {
-                    <div class="flex gap-3 max-w-[85%]">
-                        <div
-                            class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground shrink-0 text-sm font-heading font-bold">
-                            M</div>
-                        <div class="bg-muted p-3.5 rounded-2xl rounded-tl-none">
-                            <p class="text-sm text-foreground leading-relaxed">Salam Alaykum, {{ client()?.prenom ?? 'voyageur' }}! Je suis votre assistant MarocSphere. Demandez-moi de construire ou personnaliser votre itinéraire marocain.</p>
-                        </div>
-                    </div>
-                    }
-                    @for (msg of chatMessages(); track msg.id) {
-                        @if (msg.role === 'AI') {
-                        <div class="flex gap-3 max-w-[85%]">
-                            <div
-                                class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground shrink-0 text-sm font-heading font-bold">
-                                M</div>
-                            <div class="bg-muted p-3.5 rounded-2xl rounded-tl-none">
-                                <p class="text-sm text-foreground leading-relaxed whitespace-pre-line">{{ msg.contenu }}</p>
-                            </div>
-                        </div>
-                        } @else {
-                        <div class="flex gap-3 max-w-[85%] ml-auto justify-end">
-                            <div class="bg-primary text-primary-foreground p-3.5 rounded-2xl rounded-tr-none">
-                                <p class="text-sm leading-relaxed">{{ msg.contenu }}</p>
-                            </div>
-                            <img [src]="avatar()" [alt]="displayName()"
-                                class="w-8 h-8 rounded-full object-cover shrink-0" />
-                        </div>
-                        }
-                    }
-                    @if (isSending()) {
-                    <div class="flex gap-3 max-w-[85%]">
-                        <div
-                            class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground shrink-0 text-sm font-heading font-bold">
-                            M</div>
-                        <div class="bg-muted p-3.5 rounded-2xl rounded-tl-none">
-                            <p class="text-sm text-foreground animate-pulse">En train de répondre...</p>
-                        </div>
-                    </div>
-                    }
+                <div>
+                  <h2
+                    class="font-heading font-bold text-base text-foreground flex items-center gap-2"
+                  >
+                    MarocSphere AI Guide
+                    <span
+                      class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-primary/10 text-primary"
+                      >Online</span
+                    >
+                  </h2>
+                  <p class="text-xs text-muted-foreground">
+                    Ask me to build, customize, or book your Moroccan itinerary
+                  </p>
                 </div>
-
-                <!-- Chat Input Area -->
-                <div class="p-4 border-t border-border bg-card">
-                    <div class="flex items-center gap-2 bg-muted rounded-xl p-1.5 border border-border">
-                        <button class="p-2 text-muted-foreground hover:text-primary transition-all" (click)="resetChat()">
-                            <iconify-icon icon="lucide:refresh-cw" class="text-xl"></iconify-icon>
-                        </button>
-                        <input type="text" placeholder="Tell AI what you want to explore or add..."
-                            class="flex-1 bg-transparent text-sm border-0 focus:ring-0 outline-none px-2 text-foreground placeholder:text-muted-foreground"
-                            [value]="chatInput()"
-                            (input)="updateChatInput($event)"
-                            (keydown)="onChatKeydown($event)" />
-                        <button
-                            class="bg-primary text-primary-foreground p-2.5 rounded-lg flex items-center justify-center hover:opacity-90 transition-all"
-                            (click)="sendMessage()"
-                            [disabled]="isSending() || !chatInput().trim()">
-                            <iconify-icon icon="lucide:send" class="text-base"></iconify-icon>
-                        </button>
-                    </div>
-                    <div class="flex gap-2 mt-2">
-                        <span class="text-[10px] text-muted-foreground">Try asking:</span>
-                        <button class="text-[10px] text-primary hover:underline font-medium"
-                            (click)="sendSuggestion('Créez-moi un itinéraire de 3 jours à Marrakech')">
-                            "Créez-moi un itinéraire à Marrakech"
-                        </button>
-                        <span class="text-[10px] text-muted-foreground">•</span>
-                        <button class="text-[10px] text-primary hover:underline font-medium"
-                            (click)="sendSuggestion('Trouvez-moi un artisan tapis traditionnel')">
-                            "Trouvez-moi un artisan tapis"
-                        </button>
-                    </div>
-                </div>
+              </div>
+              <button
+                class="text-muted-foreground hover:text-primary transition-all"
+                (click)="resetChat()"
+              >
+                <iconify-icon icon="lucide:refresh-cw" class="text-lg"></iconify-icon>
+              </button>
             </div>
 
-            <!-- Right Column: Interactive Map & Live Itinerary Status -->
-            <div class="w-full lg:w-96 flex flex-col gap-6">
-                <!-- Live Map Card -->
-                <div class="bg-card rounded-2xl border border-border shadow-sm overflow-hidden flex flex-col">
-                    <div class="px-5 py-3 border-b border-border flex justify-between items-center bg-muted/20">
-                        <h3 class="font-heading font-bold text-sm text-foreground flex items-center gap-2">
-                            <iconify-icon icon="lucide:globe" class="text-primary text-base"></iconify-icon>
-                            Marrakech Interactive Map
-                        </h3>
-                        <span class="text-[10px] font-semibold text-secondary-foreground flex items-center gap-1">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> GPS Live
-                        </span>
-                    </div>
-                    <div class="relative h-64 bg-muted">
-                        <img src="https://uxmagic.blob.core.windows.net/public/agent-images/marrakech-map-1783419205165-oqz0a7geey.png"
-                            alt="Marrakech Map" class="w-full h-full object-cover" />
-
-                        <!-- Floating Map Controls -->
-                        <div class="absolute bottom-3 right-3 flex flex-col gap-1.5">
-                            <button
-                                class="w-8 h-8 rounded-lg bg-card text-foreground shadow-md flex items-center justify-center hover:bg-muted transition-all">
-                                <iconify-icon icon="lucide:plus" class="text-sm"></iconify-icon>
-                            </button>
-                            <button
-                                class="w-8 h-8 rounded-lg bg-card text-foreground shadow-md flex items-center justify-center hover:bg-muted transition-all">
-                                <iconify-icon icon="lucide:minimize" class="text-sm"></iconify-icon>
-                            </button>
-                        </div>
-
-                        <!-- Custom Pin Card Overlay -->
-                        <div
-                            class="absolute top-3 left-3 bg-card/95 backdrop-blur-sm border border-border rounded-lg p-2 shadow-lg max-w-[180px]">
-                            <p class="text-[10px] font-bold text-foreground">Next Stop: Bahia Palace</p>
-                            <p class="text-[9px] text-muted-foreground">Meeting guide Amin here at 10:00 AM</p>
-                        </div>
-                    </div>
-                    <div class="p-4 bg-muted/40 border-t border-border flex items-center justify-between text-xs">
-                        <span class="text-muted-foreground flex items-center gap-1">
-                            <iconify-icon icon="lucide:map-pin" class="text-primary"></iconify-icon> Medina, Marrakech
-                        </span>
-                        <a href="#" class="text-secondary font-bold hover:underline">Get Directions</a>
-                    </div>
+            <!-- Chat History -->
+            <div #chatContainer class="flex-1 overflow-y-auto p-5 space-y-4">
+              @if (chatMessages().length === 0) {
+                <div class="flex gap-3 max-w-[85%]">
+                  <div
+                    class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground shrink-0 text-sm font-heading font-bold"
+                  >
+                    M
+                  </div>
+                  <div class="bg-muted p-3.5 rounded-2xl rounded-tl-none">
+                    <p class="text-sm text-foreground leading-relaxed">
+                      Salam Alaykum, {{ client()?.prenom ?? 'voyageur' }}! Je suis votre assistant
+                      MarocSphere. Demandez-moi de construire ou personnaliser votre itinéraire
+                      marocain.
+                    </p>
+                  </div>
                 </div>
-
-                <!-- Escrow Wallet Protection Info -->
-                <div class="bg-card rounded-2xl border border-border shadow-sm p-5 space-y-4">
-                    <div class="flex items-center gap-3">
-                        <div
-                            class="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary-foreground">
-                            <iconify-icon icon="lucide:shield" class="text-xl"></iconify-icon>
-                        </div>
-                        <div>
-                            <h3 class="font-heading font-bold text-sm text-foreground">Escrow Wallet Protection</h3>
-                            <p class="text-xs text-muted-foreground">Funds are safely released only after booking
-                                completion</p>
-                        </div>
+              }
+              @for (msg of chatMessages(); track msg.id) {
+                @if (msg.role === 'AI') {
+                  <div class="flex gap-3 max-w-[85%]">
+                    <div
+                      class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground shrink-0 text-sm font-heading font-bold"
+                    >
+                      M
                     </div>
-                    <div class="border-t border-border pt-3 space-y-2">
-                        <div class="flex justify-between text-xs">
-                            <span class="text-muted-foreground">Total réservations :</span>
-                            <span class="font-bold">{{ reservations().length }}</span>
-                        </div>
-                        <div class="flex justify-between text-xs">
-                            <span class="text-muted-foreground">En attente :</span>
-                            <span class="font-bold text-primary">{{ pendingReservations() }}</span>
-                        </div>
-                        <div class="flex justify-between text-xs">
-                            <span class="text-muted-foreground">Confirmées / terminées :</span>
-                            <span class="font-bold text-emerald-600">{{ completedReservations() }}</span>
-                        </div>
+                    <div class="bg-muted p-3.5 rounded-2xl rounded-tl-none">
+                      <p class="text-sm text-foreground leading-relaxed whitespace-pre-line">
+                        {{ msg.contenu }}
+                      </p>
                     </div>
+                  </div>
+                } @else {
+                  <div class="flex gap-3 max-w-[85%] ml-auto justify-end">
+                    <div
+                      class="bg-primary text-primary-foreground p-3.5 rounded-2xl rounded-tr-none"
+                    >
+                      <p class="text-sm leading-relaxed">{{ msg.contenu }}</p>
+                    </div>
+                    <img
+                        [src]="avatar()"
+                        [alt]="displayName()"
+                        class="w-12 h-8 rounded-full object-cover shrink-0 border-2 border-white shadow-sm"
+                    />
+                  </div>
+                }
+              }
+              @if (isSending()) {
+                <div class="flex gap-3 max-w-[85%]">
+                  <div
+                    class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground shrink-0 text-sm font-heading font-bold"
+                  >
+                    M
+                  </div>
+                  <div class="bg-muted p-3.5 rounded-2xl rounded-tl-none">
+                    <p class="text-sm text-foreground animate-pulse">En train de répondre...</p>
+                  </div>
                 </div>
+              }
             </div>
+
+            <!-- Chat Input Area -->
+            <div class="p-4 border-t border-border bg-card">
+              <div class="flex items-center gap-2 bg-muted rounded-xl p-1.5 border border-border">
+                <button
+                  class="p-2 text-muted-foreground hover:text-primary transition-all"
+                  (click)="resetChat()"
+                >
+                  <iconify-icon icon="lucide:refresh-cw" class="text-xl"></iconify-icon>
+                </button>
+                <input
+                  type="text"
+                  placeholder="Tell AI what you want to explore or add..."
+                  class="flex-1 bg-transparent text-sm border-0 focus:ring-0 outline-none px-2 text-foreground placeholder:text-muted-foreground"
+                  [value]="chatInput()"
+                  (input)="updateChatInput($event)"
+                  (keydown)="onChatKeydown($event)"
+                />
+                <button
+                  class="bg-primary text-primary-foreground p-2.5 rounded-lg flex items-center justify-center hover:opacity-90 transition-all"
+                  (click)="sendMessage()"
+                  [disabled]="isSending() || !chatInput().trim()"
+                >
+                  <iconify-icon icon="lucide:send" class="text-base"></iconify-icon>
+                </button>
+              </div>
+              <div class="flex gap-2 mt-2">
+                <span class="text-[10px] text-muted-foreground">Try asking:</span>
+                <button
+                  class="text-[10px] text-primary hover:underline font-medium"
+                  (click)="sendSuggestion('Créez-moi un itinéraire de 3 jours à Marrakech')"
+                >
+                  "Créez-moi un itinéraire à Marrakech"
+                </button>
+                <span class="text-[10px] text-muted-foreground">•</span>
+                <button
+                  class="text-[10px] text-primary hover:underline font-medium"
+                  (click)="sendSuggestion('Trouvez-moi un artisan tapis traditionnel')"
+                >
+                  "Trouvez-moi un artisan tapis"
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Interactive Map & Live Itinerary Status -->
+          <div class="w-full lg:w-96 flex flex-col gap-6">
+            <!-- Live Map Card -->
+            <div
+              class="bg-card rounded-2xl border border-border shadow-sm overflow-hidden flex flex-col"
+            >
+              <div
+                class="px-5 py-3 border-b border-border flex justify-between items-center bg-muted/20"
+              >
+                <h3 class="font-heading font-bold text-sm text-foreground flex items-center gap-2">
+                  <iconify-icon icon="lucide:globe" class="text-primary text-base"></iconify-icon>
+                  Marrakech Interactive Map
+                </h3>
+                <span
+                  class="text-[10px] font-semibold text-secondary-foreground flex items-center gap-1"
+                >
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> GPS
+                  Live
+                </span>
+              </div>
+              <div class="relative h-64 bg-muted">
+                <img
+                  src="https://uxmagic.blob.core.windows.net/public/agent-images/marrakech-map-1783419205165-oqz0a7geey.png"
+                  alt="Marrakech Map"
+                  class="w-full h-full object-cover"
+                />
+
+                <!-- Floating Map Controls -->
+                <div class="absolute bottom-3 right-3 flex flex-col gap-1.5">
+                  <button
+                    class="w-8 h-8 rounded-lg bg-card text-foreground shadow-md flex items-center justify-center hover:bg-muted transition-all"
+                  >
+                    <iconify-icon icon="lucide:plus" class="text-sm"></iconify-icon>
+                  </button>
+                  <button
+                    class="w-8 h-8 rounded-lg bg-card text-foreground shadow-md flex items-center justify-center hover:bg-muted transition-all"
+                  >
+                    <iconify-icon icon="lucide:minimize" class="text-sm"></iconify-icon>
+                  </button>
+                </div>
+
+                <!-- Custom Pin Card Overlay -->
+                <div
+                  class="absolute top-3 left-3 bg-card/95 backdrop-blur-sm border border-border rounded-lg p-2 shadow-lg max-w-[180px]"
+                >
+                  <p class="text-[10px] font-bold text-foreground">Next Stop: Bahia Palace</p>
+                  <p class="text-[9px] text-muted-foreground">
+                    Meeting guide Amin here at 10:00 AM
+                  </p>
+                </div>
+              </div>
+              <div
+                class="p-4 bg-muted/40 border-t border-border flex items-center justify-between text-xs"
+              >
+                <span class="text-muted-foreground flex items-center gap-1">
+                  <iconify-icon icon="lucide:map-pin" class="text-primary"></iconify-icon> Medina,
+                  Marrakech
+                </span>
+                <a href="#" class="text-secondary font-bold hover:underline">Get Directions</a>
+              </div>
+            </div>
+
+            <!-- Escrow Wallet Protection Info -->
+            <div class="bg-card rounded-2xl border border-border shadow-sm p-5 space-y-4">
+              <div class="flex items-center gap-3">
+                <div
+                  class="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary-foreground"
+                >
+                  <iconify-icon icon="lucide:shield" class="text-xl"></iconify-icon>
+                </div>
+                <div>
+                  <h3 class="font-heading font-bold text-sm text-foreground">My reservations</h3>
+                </div>
+              </div>
+              <div class="border-t border-border pt-3 space-y-2">
+                <div class="flex justify-between text-xs">
+                  <span class="text-muted-foreground">Total réservations :</span>
+                  <span class="font-bold">{{ reservations().length }}</span>
+                </div>
+                <div class="flex justify-between text-xs">
+                  <span class="text-muted-foreground">En attente :</span>
+                  <span class="font-bold text-primary">{{ pendingReservations() }}</span>
+                </div>
+                <div class="flex justify-between text-xs">
+                  <span class="text-muted-foreground">Confirmées / terminées :</span>
+                  <span class="font-bold text-emerald-600">{{ completedReservations() }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Info -->
+            <div
+              class="mt-auto p-4 rounded-xl bg-gradient-to-br from-secondary-foreground to-primary/80 text-primary-foreground relative overflow-hidden shadow-md"
+            >
+              <div class="absolute -right-6 -bottom-6 opacity-10">
+                <iconify-icon icon="lucide:credit-card" class="text-8xl"></iconify-icon>
+              </div>
+              <p class="text-xs opacity-80">MarocSphere</p>
+              <p class="text-xl font-bold font-heading mt-1">
+                1st AI-powered Moroccan travel planning platform
+              </p>
+              <div
+                class="mt-4 flex items-center justify-between text-[11px] bg-primary/10 p-2 rounded-lg"
+              >
+                <span>Bienvenue {{ client()?.prenom ?? 'Client' }}</span>
+                <iconify-icon icon="lucide:shield" class="text-base"></iconify-icon>
+              </div>
+            </div>
+          </div>
         </main>
+      </div>
     </div>
+  </div>
 </div>
-

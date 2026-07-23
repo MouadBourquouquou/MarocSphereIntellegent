@@ -425,6 +425,11 @@
 }
 .pf-eco__chip iconify-icon { font-size: 0.72rem; }
 
+.logo {
+        height: 50px;
+        width: auto;
+        object-fit: contain;
+}
 /* ── Right Column ────────────────────────────────────────── */
 .pf-main {
   display: flex; flex-direction: column; gap: 16px;
