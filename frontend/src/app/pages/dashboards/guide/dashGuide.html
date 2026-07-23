@@ -190,6 +190,11 @@
                     <div class="gp-contact-row">
                       <iconify-icon icon="lucide:file-text"></iconify-icon>
                       <span>Licence: {{ numeroLicence() || 'Not provided' }}</span>
+                    <div class="hidden sm:block text-left">
+                        <p class="text-xs font-bold text-foreground leading-tight">{{ guidePrenom() }} {{ guideName() }}</p>
+                        <p class="text-[10px] text-muted-foreground">
+                            Certified Guide
+                        </p>
                     </div>
                   </div>
                 </div>

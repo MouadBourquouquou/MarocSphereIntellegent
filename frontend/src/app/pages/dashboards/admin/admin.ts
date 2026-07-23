@@ -11,6 +11,7 @@ import {
   AdminService, ClientUser, GuideUser, ArtisanUser, DmcUser,
   ReservationItem, AdminUser, PlatformStats
 } from '../../../services/admin.service';
+import { AuthService } from '../../../services/auth.service';
 import { PlatformUser, ToastType, UserRole, UserStatus } from './platform-user.model';
 
 import 'iconify-icon';
@@ -43,6 +44,7 @@ export class admin implements AfterViewInit, OnDestroy, OnInit {
   private toastTimeoutId?: ReturnType<typeof setTimeout>;
 
   private svc = inject(AdminService);
+  private auth = inject(AuthService);
   private cdr = inject(ChangeDetectorRef);
 
   // ── Loading flags (one per tab for instant paint) ─────────────────────────
@@ -321,7 +323,9 @@ export class admin implements AfterViewInit, OnDestroy, OnInit {
 
   closeModal(): void { this.showModal = false; this.currentUser = null; }
 
-  get modalTitle(): string { return this.modalMode === 'edit' ? 'Modifier l\'utilisateur' : 'Ajouter un utilisateur'; }
+  logout(): void { this.auth.logout(); }
+
+  get modalTitle(): string { return this.modalMode === 'edit' ? 'Edit User' : 'Add User'; }
 
   submitModal(): void {
     if (this.modalSaving) return;
@@ -359,17 +363,17 @@ export class admin implements AfterViewInit, OnDestroy, OnInit {
         call$ = this.svc.createAdmin({ ...base, role: this.fAdminRole });
         break;
       default:
-        this.notify('Rôle inconnu.', 'error'); this.modalSaving = false; return;
+        this.notify('Unknown role.', 'error'); this.modalSaving = false; return;
     }
 
     call$.subscribe({
       next: () => {
-        this.notify('Utilisateur créé avec succès.');
+        this.notify('User created successfully.');
         this.closeModal();
         this.refreshAfterCrud();
       },
       error: (e: any) => {
-        this.notify(e?.error?.message ?? 'Erreur lors de la création.', 'error');
+        this.notify(e?.error?.message ?? 'Error during creation.', 'error');
         this.modalSaving = false;
       }
     });
@@ -401,19 +405,19 @@ export class admin implements AfterViewInit, OnDestroy, OnInit {
         call$ = this.svc.updateAdmin(user.id, base);
         break;
       default:
-        this.notify('Rôle inconnu.', 'error'); this.modalSaving = false; return;
+        this.notify('Unknown role.', 'error'); this.modalSaving = false; return;
     }
 
     call$.subscribe({
       next: () => {
-        this.notify('Utilisateur mis à jour.');
+        this.notify('User updated.');
         this.closeModal();
         this.modalSaving = false;
         // Optimistic update: refresh the local user list in background
         this.refreshAfterCrud();
       },
       error: (e: any) => {
-        this.notify(e?.error?.message ?? 'Erreur lors de la mise à jour.', 'error');
+        this.notify(e?.error?.message ?? 'Error during update.', 'error');
         this.modalSaving = false;
       }
     });
@@ -441,7 +445,7 @@ export class admin implements AfterViewInit, OnDestroy, OnInit {
   // ── Delete ────────────────────────────────────────────────────────────────
 
   deleteUser(userId: number, role: UserRole): void {
-    this.requestConfirm('Supprimer définitivement cet utilisateur ?', () => {
+    this.requestConfirm('Permanently delete this user?', () => {
       const call$: any = {
         'Client': () => this.svc.deleteClient(userId),
         'Guide': () => this.svc.deleteGuide(userId),
@@ -449,37 +453,37 @@ export class admin implements AfterViewInit, OnDestroy, OnInit {
         'DMC': () => this.svc.deleteDmc(userId),
         'Administrator': () => this.svc.deleteAdmin(userId),
       }[role]?.();
-      if (!call$) { this.notify('Rôle inconnu.', 'error'); return; }
+      if (!call$) { this.notify('Unknown role.', 'error'); return; }
       call$.subscribe({
-        next: () => { this.notify('Utilisateur supprimé.', 'error'); this.refreshAfterCrud(); },
-        error: () => this.notify('Erreur de suppression.', 'error')
+        next: () => { this.notify('User deleted.', 'error'); this.refreshAfterCrud(); },
+        error: () => this.notify('Deletion error.', 'error')
       });
     });
   }
 
   deleteGuideById(id: number): void {
-    this.requestConfirm('Supprimer ce guide ?', () => {
+    this.requestConfirm('Delete this guide?', () => {
       this.svc.deleteGuide(id).subscribe({
-        next: () => { this.notify('Guide supprimé.', 'error'); this.loadGuideTab(); this.rebuildUsers(); },
-        error: () => this.notify('Erreur de suppression.', 'error')
+        next: () => { this.notify('Guide deleted.', 'error'); this.loadGuideTab(); this.rebuildUsers(); },
+        error: () => this.notify('Deletion error.', 'error')
       });
     });
   }
 
   deleteArtisanById(id: number): void {
-    this.requestConfirm('Supprimer cet artisan ?', () => {
+    this.requestConfirm('Delete this artisan?', () => {
       this.svc.deleteArtisan(id).subscribe({
-        next: () => { this.notify('Artisan supprimé.', 'error'); this.loadArtisanTab(); this.rebuildUsers(); },
-        error: () => this.notify('Erreur de suppression.', 'error')
+        next: () => { this.notify('Artisan deleted.', 'error'); this.loadArtisanTab(); this.rebuildUsers(); },
+        error: () => this.notify('Deletion error.', 'error')
       });
     });
   }
 
   deleteReservationById(id: number): void {
-    this.requestConfirm('Supprimer cette réservation ?', () => {
+    this.requestConfirm('Delete this reservation?', () => {
       this.svc.deleteReservation(id).subscribe({
-        next: () => { this.notify('Réservation supprimée.', 'error'); this.loadReservationTab(); },
-        error: () => this.notify('Erreur de suppression.', 'error')
+        next: () => { this.notify('Reservation deleted.', 'error'); this.loadReservationTab(); },
+        error: () => this.notify('Deletion error.', 'error')
       });
     });
   }
@@ -503,10 +507,10 @@ export class admin implements AfterViewInit, OnDestroy, OnInit {
     call$.subscribe({
       next: () => {
         u.status = newStatus;
-        this.notify(`Statut changé en ${newStatus}.`);
+        this.notify(`Status changed to ${newStatus}.`);
         this.cdr.markForCheck();
       },
-      error: () => this.notify('Erreur lors du changement de statut.', 'error')
+      error: () => this.notify('Error changing status.', 'error')
     });
   }
 
@@ -538,7 +542,7 @@ export class admin implements AfterViewInit, OnDestroy, OnInit {
         data: {
           labels: entityLabels,
           datasets: [{
-            label: 'Utilisateurs',
+            label: 'Users',
             data: entityValues,
             backgroundColor: ['#B34724', '#2C5234', '#D4AF37', '#6E655F', '#5B8DB8'],
           }]
@@ -559,14 +563,14 @@ export class admin implements AfterViewInit, OnDestroy, OnInit {
     const sValues = Object.values(statuts);
 
     if (this.destinationChart) {
-      this.destinationChart.data.labels = sLabels.length ? sLabels : ['Aucune réservation'];
+      this.destinationChart.data.labels = sLabels.length ? sLabels : ['No reservations'];
       this.destinationChart.data.datasets[0].data = sValues.length ? sValues : [0];
       this.destinationChart.update();
     } else {
       this.destinationChart = new Chart(this.destinationChartRef.nativeElement, {
         type: 'doughnut',
         data: {
-          labels: sLabels.length ? sLabels : ['Aucune réservation'],
+          labels: sLabels.length ? sLabels : ['No reservations'],
           datasets: [{ data: sValues.length ? sValues : [1],
             backgroundColor: ['#B34724', '#2C5234', '#D4AF37', '#6E655F', '#5B8DB8'] }]
         },
