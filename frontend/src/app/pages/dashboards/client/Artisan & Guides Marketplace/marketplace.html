@@ -223,16 +223,22 @@
         </p>
 
         <div class="flex flex-wrap items-center gap-4 mt-2">
-          <button id="orders-tab" (click)="switchDashboardTab('orders')"
-            class="px-6 py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold shadow-md hover:bg-primary/95 hover:-translate-y-0.5 transition-all duration-200">
+          <button (click)="setActiveTab('experiences')"
+            [class]="activeTab() === 'experiences'
+              ? 'px-6 py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold shadow-md hover:bg-primary/95 hover:-translate-y-0.5 transition-all duration-200'
+              : 'px-6 py-3.5 rounded-xl bg-card border border-border text-foreground font-semibold hover:bg-muted hover:-translate-y-0.5 transition-all duration-200'">
             Experiences
           </button>
-          <button id="overview-tab" (click)="switchDashboardTab('overview')"
-            class="px-6 py-3.5 rounded-xl bg-secondary text-secondary-foreground font-semibold shadow-md hover:bg-secondary/95 hover:-translate-y-0.5 transition-all duration-200">
+          <button (click)="setActiveTab('guides')"
+            [class]="activeTab() === 'guides'
+              ? 'px-6 py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold shadow-md hover:bg-primary/95 hover:-translate-y-0.5 transition-all duration-200'
+              : 'px-6 py-3.5 rounded-xl bg-card border border-border text-foreground font-semibold hover:bg-muted hover:-translate-y-0.5 transition-all duration-200'">
             Guides
           </button>
-          <button id="products-tab" (click)="switchDashboardTab('products')"
-            class="px-6 py-3.5 rounded-xl bg-card border border-border text-foreground font-semibold hover:bg-muted hover:-translate-y-0.5 transition-all duration-200">
+          <button (click)="setActiveTab('products')"
+            [class]="activeTab() === 'products'
+              ? 'px-6 py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold shadow-md hover:bg-primary/95 hover:-translate-y-0.5 transition-all duration-200'
+              : 'px-6 py-3.5 rounded-xl bg-card border border-border text-foreground font-semibold hover:bg-muted hover:-translate-y-0.5 transition-all duration-200'">
             Products
           </button>
         </div>
@@ -241,7 +247,8 @@
 
     <!-- MARKETPLACE MAIN INTERACTIVE GRID -->
     <main class="w-full px-4 lg:px-8 max-w-7xl mx-auto flex flex-col gap-10">
-      <!-- SECTION HEADER WITH TOGGLEABLE LIVE MAP OVERLAY -->
+      <!-- DYNAMIC SECTION HEADER -->
+      @if (activeTab() === 'experiences') {
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
         <div>
           <h2 class="text-2xl font-heading font-bold text-foreground">Curated Experiences</h2>
@@ -250,6 +257,27 @@
           </p>
         </div>
       </div>
+      }
+      @if (activeTab() === 'guides') {
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
+        <div>
+          <h2 class="text-2xl font-heading font-bold text-foreground">Certified Local Guides</h2>
+          <p class="text-sm text-muted-foreground">
+            Highly-vetted cultural and adventure guides with official national certification.
+          </p>
+        </div>
+      </div>
+      }
+      @if (activeTab() === 'products') {
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
+        <div>
+          <h2 class="text-2xl font-heading font-bold text-foreground">Premium Artisan Products</h2>
+          <p class="text-sm text-muted-foreground">
+            Sourced directly from certified master artisans in the souks of Marrakech and Fez.
+          </p>
+        </div>
+      </div>
+      }
 
       <!-- LIVE INTERACTIVE MAP OVERLAY (Visible when toggle checked) -->
       <div id="interactive-map-overlay"
@@ -339,22 +367,12 @@
         </div>
       </div>
 
-      <!-- SCRIPT TO HANDLE TOGGLE -->
-      <script>
-        document.getElementById('map-toggle-checkbox')?.addEventListener('change', function (e) {
-          const overlay = document.getElementById('interactive-map-overlay');
-          if (overlay) {
-            if (e.target.checked) {
-              overlay.classList.remove('hidden');
-            } else {
-              overlay.classList.add('hidden');
-            }
-          }
-        });
-      </script>
+      <!-- TAB CONTENT PANELS -->
+      <div class="tab-content-container">
 
-      <!-- EXPERIENCES GRID (Airbnb style) -->
-      <section id="experiences-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <!-- EXPERIENCES PANEL -->
+      @if (activeTab() === 'experiences') {
+      <section class="tab-panel grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <!-- Experience Card 1 -->
         <div
           class="bg-card rounded-3xl overflow-hidden border border-border shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col group relative">
@@ -590,16 +608,11 @@
           </div>
         </div>
       </section>
+      }
 
-      <!-- CERTIFIED LOCAL GUIDES SECTION -->
-      <section id="guides-grid" class="flex flex-col gap-6 mt-6">
-        <div class="border-b border-border pb-4">
-          <h2 class="text-2xl font-heading font-bold text-foreground">Certified Local Guides</h2>
-          <p class="text-sm text-muted-foreground">
-            Highly-vetted cultural and adventure guides with official national certification.
-          </p>
-        </div>
-
+      <!-- GUIDES PANEL -->
+      @if (activeTab() === 'guides') {
+      <section class="tab-panel flex flex-col gap-6 mt-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- Guide 1 Card -->
           <div
@@ -711,16 +724,11 @@
           </div>
         </div>
       </section>
+      }
 
-      <!-- PREMIUM ARTISAN PRODUCTS SECTION -->
-      <section id="products-grid" class="flex flex-col gap-6 mt-6">
-        <div class="border-b border-border pb-4">
-          <h2 class="text-2xl font-heading font-bold text-foreground">Premium Artisan Products</h2>
-          <p class="text-sm text-muted-foreground">
-            Sourced directly from certified master artisans in the souks of Marrakech and Fez.
-          </p>
-        </div>
-
+      <!-- PRODUCTS PANEL -->
+      @if (activeTab() === 'products') {
+      <section class="tab-panel flex flex-col gap-6 mt-6">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           <!-- Product 1 -->
           <div
@@ -861,6 +869,9 @@
           </div>
         </div>
       </section>
+      }
+
+      </div><!-- /tab-content-container -->
     </main>
 
     <!-- INTERACTIVE EXPERIENCE DETAILS & BOOKING MODAL (Native CSS/Anchor target toggle) -->

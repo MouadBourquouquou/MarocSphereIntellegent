@@ -9,8 +9,6 @@ import {
   Inject,
   PLATFORM_ID,
   AfterViewInit,
-  Renderer2,
-  OnDestroy
 } from '@angular/core';
 
 import { RouterLink } from '@angular/router';
@@ -22,7 +20,10 @@ import { AuthService } from '../../../../services/auth.service';
 import { Artisan, ClientProfile, Guide } from '../../../../models/api.models';
 import { avatarUrl, fullName } from '../../../../utils/display.utils';
 
-import { isPlatformBrowser, CommonModule } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
+
+type MarketplaceTab = 'experiences' | 'guides' | 'products';
+
 @Component({
   selector: 'app-marketplace',
   imports: [RouterLink],
@@ -53,7 +54,7 @@ export class marketplace implements OnInit {
     });
   }
 
-    private setupFormPreventDefault(): void {
+  private setupFormPreventDefault(): void {
     const forms = this.elRef.nativeElement.querySelectorAll<HTMLFormElement>('form');
     forms.forEach((form) => {
       const onSubmit = (event: Event): void => { event.preventDefault(); };
@@ -61,6 +62,8 @@ export class marketplace implements OnInit {
       this.cleanupFns.push(() => form.removeEventListener('submit', onSubmit));
     });
   }
+
+  activeTab = signal<MarketplaceTab>('experiences');
 
   isLoading = signal(true);
   errorMessage = signal('');
@@ -72,12 +75,14 @@ export class marketplace implements OnInit {
   guides = signal<Guide[]>([]);
 
   constructor(
-    private renderer: Renderer2,
     private elRef: ElementRef<HTMLElement>,
     @Inject(PLATFORM_ID) platformId: object,
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
-    
+  }
+
+  setActiveTab(tab: MarketplaceTab): void {
+    this.activeTab.set(tab);
   }
 
   displayName = computed(() => {
@@ -194,41 +199,6 @@ export class marketplace implements OnInit {
 
   logout(): void {
     this.authService.logout();
-  }
-
-  switchDashboardTab(tabId: string): void {
-    if (!this.isBrowser) return;
-    const root = this.elRef.nativeElement;
-    root.querySelectorAll<HTMLElement>('.dash-tab-btn').forEach((btn) => {
-      btn.classList.remove('bg-secondary', 'text-secondary-foreground', 'shadow-sm');
-      btn.classList.add('text-muted-foreground', 'hover:text-foreground');
-    });
-    const activeBtn = root.querySelector<HTMLElement>(`#${tabId}-tab`);
-    activeBtn?.classList.remove('text-muted-foreground', 'hover:text-foreground');
-    activeBtn?.classList.add('bg-secondary', 'text-secondary-foreground', 'shadow-sm');
-    root
-      .querySelectorAll<HTMLElement>('.dash-tab-pane')
-      .forEach((pane) => pane.classList.add('hidden'));
-    root.querySelector<HTMLElement>(`#${tabId}-content`)?.classList.remove('hidden');
-  }
-
-  /* marketplace ts */
-
-  onFormSubmit(event: Event): void {
-    event.preventDefault();
-  }
-
-  scrollToSection(targetId: string, event?: Event): void {
-    event?.preventDefault();
-    const target = document.getElementById(targetId);
-    target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-
-  toggleElementById(elementId: string): void {
-    const el = document.getElementById(elementId);
-    if (!el) return;
-    const isHidden = el.style.display === 'none';
-    this.renderer.setStyle(el, 'display', isHidden ? '' : 'none');
   }
 
 }
