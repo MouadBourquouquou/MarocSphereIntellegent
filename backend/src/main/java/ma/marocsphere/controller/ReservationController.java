@@ -1,13 +1,16 @@
 package ma.marocsphere.controller;
 
+import jakarta.validation.Valid;
 import ma.marocsphere.dto.ReservationCreationDTO;
 import ma.marocsphere.dto.ReservationResponseDTO;
+import ma.marocsphere.dto.ReservationStatusDTO;
 import ma.marocsphere.service.ReservationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/reservations")
@@ -29,9 +32,26 @@ public class ReservationController {
         return ResponseEntity.ok(reservationService.getById(id));
     }
 
+    @GetMapping("/guide/{guideId}")
+    public ResponseEntity<List<ReservationResponseDTO>> getByGuideId(@PathVariable Long guideId) {
+        return ResponseEntity.ok(reservationService.getByGuideId(guideId));
+    }
+
+    @GetMapping("/client/{clientId}")
+    public ResponseEntity<List<ReservationResponseDTO>> getByClientId(@PathVariable Long clientId) {
+        return ResponseEntity.ok(reservationService.getByClientId(clientId));
+    }
+
     @PostMapping
-    public ResponseEntity<ReservationResponseDTO> create(@RequestBody ReservationCreationDTO dto) {
+    public ResponseEntity<ReservationResponseDTO> create(@Valid @RequestBody ReservationCreationDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(reservationService.create(dto));
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<ReservationResponseDTO> updateStatus(
+            @PathVariable Long id,
+            @Valid @RequestBody ReservationStatusDTO dto) {
+        return ResponseEntity.ok(reservationService.updateStatus(id, dto));
     }
 
     @DeleteMapping("/{id}")

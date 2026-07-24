@@ -1,7 +1,7 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { tap } from 'rxjs';
+import { tap, catchError, of } from 'rxjs';
 
 export interface LoginRequest {
   email: string;
@@ -78,6 +78,17 @@ export class AuthService {
   }
 
   logout() {
+    const token = this.getToken();
+    if (token) {
+      this.http.post(`${this.apiUrl}/logout`, {}).pipe(
+        catchError(() => of(null))
+      ).subscribe({ next: () => this.clearLocalLogout(), error: () => this.clearLocalLogout() });
+    } else {
+      this.clearLocalLogout();
+    }
+  }
+
+  private clearLocalLogout() {
     this.currentUser.set(null);
     localStorage.removeItem('auth_user');
     this.router.navigate(['/login']);

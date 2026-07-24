@@ -7,6 +7,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import ma.marocsphere.service.TokenBlacklistService;
 import ma.marocsphere.util.JwtUtil;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,6 +25,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     private final UserDetailsService userDetailsService;
     private final JwtUtil jwtUtil;
+    private final TokenBlacklistService tokenBlacklistService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -32,7 +34,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String jwt = extractToken(request);
         String username = null;
 
-        if (jwt != null) {
+        if (jwt != null && !tokenBlacklistService.isBlacklisted(jwt)) {
             try {
                 username = jwtUtil.extractUsername(jwt);
             } catch (Exception ignored) {

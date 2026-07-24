@@ -1,0 +1,323 @@
+import { Injectable } from '@angular/core';
+import { MapLocation } from '../models/api.models';
+
+@Injectable({ providedIn: 'root' })
+export class LocationService {
+  private readonly locations: MapLocation[] = [
+    // Hotels
+    {
+      id: 1,
+      name: 'La Mamounia',
+      category: 'Hotel',
+      lat: 31.6258,
+      lng: -7.9891,
+      address: 'Avenue Bab Jdid, Marrakech',
+      rating: 4.8,
+      imageUrl: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=400',
+      description: 'Legendary 5-star palace hotel set within 8 hectares of gardens.',
+    },
+    {
+      id: 2,
+      name: 'Royal Mansour',
+      category: 'Hotel',
+      lat: 31.6215,
+      lng: -7.9883,
+      address: 'Derb Sidi Ahmed, Marrakech',
+      rating: 4.9,
+      imageUrl: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400',
+      description: 'Ultra-luxury hotel with private riads and a stunning medina setting.',
+    },
+    {
+      id: 3,
+      name: 'Four Seasons Resort Agadir',
+      category: 'Hotel',
+      lat: 30.4278,
+      lng: -9.6347,
+      address: 'Baie des Roses, Agadir',
+      rating: 4.7,
+      imageUrl: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400',
+      description: 'Beachfront resort with Andalusian-inspired architecture.',
+    },
+    {
+      id: 4,
+      name: 'Riad Fès',
+      category: 'Hotel',
+      lat: 34.0610,
+      lng: -4.9746,
+      address: 'Derb El Miter, Fès',
+      rating: 4.6,
+      imageUrl: 'https://images.unsplash.com/photo-1590490360182-c33d57733427?w=400',
+      description: 'Historic riad hotel in the heart of Fès el-Bali medina.',
+    },
+
+    // Riads
+    {
+      id: 5,
+      name: 'Riad Yasmine',
+      category: 'Riad',
+      lat: 31.6295,
+      lng: -7.9912,
+      address: 'Derb El Hammam, Marrakech',
+      rating: 4.5,
+      imageUrl: 'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=400',
+      description: 'Iconic riad with its famous turquoise pool and rooftop terrace.',
+    },
+    {
+      id: 6,
+      name: 'Riad Kniza',
+      category: 'Riad',
+      lat: 31.6322,
+      lng: -7.9878,
+      address: "Derb l'Hôtel, Marrakech",
+      rating: 4.7,
+      imageUrl: 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=400',
+      description: 'Boutique riad blending traditional craftsmanship with modern luxury.',
+    },
+    {
+      id: 7,
+      name: 'Riad Laaroussa',
+      category: 'Riad',
+      lat: 34.0630,
+      lng: -4.9720,
+      address: 'Derb Sidi Bouamar, Fès',
+      rating: 4.6,
+      imageUrl: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=400',
+      description: '17th-century palace turned luxury riad with a rooftop pool.',
+    },
+
+    // Restaurants
+    {
+      id: 8,
+      name: 'Nomad',
+      category: 'Restaurant',
+      lat: 31.6278,
+      lng: -7.9917,
+      address: 'Derb Aarjane, Marrakech',
+      rating: 4.4,
+      imageUrl: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400',
+      description: 'Modern Moroccan cuisine with panoramic medina views.',
+    },
+    {
+      id: 9,
+      name: 'Al Fassia Aguedal',
+      category: 'Restaurant',
+      lat: 31.6450,
+      lng: -7.9980,
+      address: 'Avenue Mohammed V, Marrakech',
+      rating: 4.5,
+      imageUrl: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400',
+      description: 'Award-winning restaurant run entirely by women chefs.',
+    },
+    {
+      id: 10,
+      name: 'Café Clock',
+      category: 'Restaurant',
+      lat: 34.0620,
+      lng: -4.9738,
+      address: 'Derb El Guébbas, Fès',
+      rating: 4.3,
+      imageUrl: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400',
+      description: 'Cultural hub serving fusion Moroccan-Western dishes.',
+    },
+    {
+      id: 11,
+      name: 'La Sqala',
+      category: 'Restaurant',
+      lat: 33.5731,
+      lng: -7.5898,
+      address: 'Boulevard Mohammed V, Casablanca',
+      rating: 4.2,
+      imageUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400',
+      description: 'Traditional Moroccan restaurant in a historic fort.',
+    },
+
+    // Tourist Attractions
+    {
+      id: 12,
+      name: 'Jardin Majorelle',
+      category: 'Attraction',
+      lat: 31.6419,
+      lng: -8.0033,
+      address: 'Avenue Yves Saint Laurent, Marrakech',
+      rating: 4.6,
+      imageUrl: 'https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?w=400',
+      description: 'Vibrant botanical garden created by Jacques Majorelle.',
+    },
+    {
+      id: 13,
+      name: 'Bahia Palace',
+      category: 'Attraction',
+      lat: 31.6227,
+      lng: -7.9910,
+      address: 'Rue Riad Zitoun El Jdid, Marrakech',
+      rating: 4.5,
+      imageUrl: 'https://images.unsplash.com/photo-1548018560-c7196e4f220b?w=400',
+      description: '19th-century palace with stunning zellige tilework and painted ceilings.',
+    },
+    {
+      id: 14,
+      name: 'Koutoubia Mosque',
+      category: 'Attraction',
+      lat: 31.6195,
+      lng: -7.9890,
+      address: 'Derb Moulay Abdellah, Marrakech',
+      rating: 4.4,
+      imageUrl: 'https://images.unsplash.com/photo-1545128387-86b6cbe21f44?w=400',
+      description: 'Iconic 12th-century mosque with the tallest minaret in Marrakech.',
+    },
+    {
+      id: 15,
+      name: 'Blue Gate (Bab Bou Jeloud)',
+      category: 'Attraction',
+      lat: 34.0637,
+      lng: -4.9725,
+      address: 'Avenue Mohammed V, Fès',
+      rating: 4.3,
+      imageUrl: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400',
+      description: 'Ornate blue-tiled gateway to Fès el-Bali.',
+    },
+    {
+      id: 16,
+      name: 'Hassan II Mosque',
+      category: 'Attraction',
+      lat: 33.6084,
+      lng: -7.6326,
+      address: 'Boulevard Sidi Mohammed Ben Abdallah, Casablanca',
+      rating: 4.7,
+      imageUrl: 'https://images.unsplash.com/photo-1565552652080-cd1ac0e97d84?w=400',
+      description: 'Africa\'s largest mosque with a stunning oceanfront minaret.',
+    },
+    {
+      id: 17,
+      name: 'Chefchaouen Medina',
+      category: 'Attraction',
+      lat: 35.1688,
+      lng: -5.2636,
+      address: 'Chefchaouen',
+      rating: 4.6,
+      imageUrl: 'https://images.unsplash.com/photo-1553521796-ed15c72dcf3d?w=400',
+      description: 'Famous blue-washed medina in the Rif Mountains.',
+    },
+
+    // Guides
+    {
+      id: 18,
+      name: 'Amine - Marrakech Heritage Guide',
+      category: 'Guide',
+      lat: 31.6265,
+      lng: -7.9895,
+      address: 'Jemaa el-Fnaa, Marrakech',
+      rating: 4.8,
+      imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
+      description: 'Certified guide specializing in Marrakech medina and cultural tours.',
+    },
+    {
+      id: 19,
+      name: 'Fatima - Imperial Cities Expert',
+      category: 'Guide',
+      lat: 34.0580,
+      lng: -4.9715,
+      address: 'Riad District, Fès',
+      rating: 4.7,
+      imageUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
+      description: 'Expert in Fès history and traditional Moroccan crafts.',
+    },
+
+    // Artisans
+    {
+      id: 20,
+      name: 'Youssef - Master Ceramicist',
+      category: 'Artisan',
+      lat: 31.6310,
+      lng: -7.9920,
+      address: 'Kissaria, Marrakech',
+      rating: 4.9,
+      imageUrl: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=400',
+      description: 'Third-generation potter known for traditional Fès blue ceramics.',
+    },
+    {
+      id: 21,
+      name: 'Khadija - Textile Artisan',
+      category: 'Artisan',
+      lat: 34.0645,
+      lng: -4.9710,
+      address: 'Tanneries, Fès',
+      rating: 4.6,
+      imageUrl: 'https://images.unsplash.com/photo-1558171813-4c088753af8f?w=400',
+      description: 'Specializes in handwoven Berber carpets and textiles.',
+    },
+    {
+      id: 22,
+      name: 'Hassan - Leather Craftsman',
+      category: 'Artisan',
+      lat: 31.6280,
+      lng: -7.9865,
+      address: 'Souk des Teinturiers, Marrakech',
+      rating: 4.5,
+      imageUrl: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400',
+      description: 'Leather artisan creating bags, belts, and babouches since 1985.',
+    },
+
+    // Events
+    {
+      id: 23,
+      name: 'Marrakech International Film Festival',
+      category: 'Event',
+      lat: 31.6250,
+      lng: -7.9950,
+      address: 'Bab Doukkala, Marrakech',
+      rating: 4.4,
+      imageUrl: 'https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=400',
+      description: 'Annual international film festival attracting global cinema talent.',
+    },
+    {
+      id: 24,
+      name: 'Fès Festival of World Sacred Music',
+      category: 'Event',
+      lat: 34.0615,
+      lng: -4.9730,
+      address: 'Bab Al Makina, Fès',
+      rating: 4.5,
+      imageUrl: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400',
+      description: 'Renowned festival celebrating spiritual music from around the world.',
+    },
+
+    // DMCs
+    {
+      id: 25,
+      name: 'Morocco Travel DMC',
+      category: 'DMC',
+      lat: 33.5731,
+      lng: -7.5898,
+      address: 'Avenue des FAR, Casablanca',
+      rating: 4.3,
+      imageUrl: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400',
+      description: 'Full-service destination management company across Morocco.',
+    },
+    {
+      id: 26,
+      name: 'Atlas & Sahara DMC',
+      category: 'DMC',
+      lat: 31.6295,
+      lng: -8.0010,
+      address: 'Guéliz, Marrakech',
+      rating: 4.4,
+      imageUrl: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=400',
+      description: 'Specialized in Sahara desert tours and Atlas Mountain treks.',
+    },
+  ];
+
+  getLocations(): MapLocation[] {
+    return this.locations;
+  }
+
+  getLocationsByCategory(category: MapLocationCategory): MapLocation[] {
+    return this.locations.filter((l) => l.category === category);
+  }
+
+  getCategories(): MapLocationCategory[] {
+    return [...new Set(this.locations.map((l) => l.category))];
+  }
+}
+
+type MapLocationCategory = import('../models/api.models').MapLocationCategory;

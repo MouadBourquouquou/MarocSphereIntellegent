@@ -1,836 +1,1013 @@
-﻿<div data-page="artisan-dashboard">
-  <div class="min-h-screen w-full bg-background flex flex-col relative font-sans text-foreground pb-12">
-    <header
-      class="sticky top-0 z-50 bg-card/90 backdrop-blur-md border-b border-border/60 px-6 py-4 flex items-center justify-between shadow-sm">
-      <div class="flex items-center gap-3">
-        <a class="navbar-brand" routerLink="/">
-          <img src="/pics/LOGOPRINCIPALE.png" alt="MarocSphere" class="logo" />
-        </a>
-        <div>
-          <span class="font-heading font-bold text-lg tracking-wider text-primary">MarocSphere</span>
-          <p class="text-xs text-muted-foreground font-sans">Artisan Workspace &amp; Business Hub</p>
-        </div>
-      </div>
+<div data-page="artisan-dashboard" class="ga-root">
 
-      <nav class="hidden md:flex items-center gap-1 bg-muted p-1 rounded-full border border-border/50">
-        <button
-          class="px-4 py-1.5 rounded-full text-sm font-medium bg-card text-foreground shadow-sm transition-all">Artisan
-          Dashboard</button>
-      </nav>
+  <!-- ══════════════════════════════════════════════════
+       TOAST NOTIFICATION
+  ══════════════════════════════════════════════════ -->
+  @if (showNotification()) {
+    <div class="ga-toast" [class.ga-toast--error]="notificationType() === 'error'">
+      <iconify-icon [icon]="notificationType() === 'success' ? 'lucide:check-circle-2' : 'lucide:alert-circle'"></iconify-icon>
+      {{ notificationMessage() }}
+    </div>
+  }
 
-      <div class="flex items-center gap-4">
-        <div class="flex items-center gap-2 bg-muted px-3 py-1.5 rounded-lg border border-border/50">
-          <span class="w-2.5 h-2.5 rounded-full bg-secondary-foreground animate-pulse"></span>
-          <span class="text-xs font-semibold text-foreground">Workshop Live</span>
-        </div>
-        <div class="relative">
-          <button
-            class="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-foreground hover:bg-border/30 transition-all">
-            <iconify-icon icon="lucide:bell" class="text-lg"></iconify-icon>
-            <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-primary rounded-full border-2 border-card"></span>
+  <!-- ══════════════════════════════════════════════════
+       HEADER
+  ══════════════════════════════════════════════════ -->
+  <header class="ga-header">
+    <a routerLink="/" class="ga-header__logo">
+      <img src="/pics/LOGOPRINCIPALE.png" alt="MarocSphere" />
+    </a>
+
+    <nav class="ga-nav">
+      <button class="ga-nav__item" [class.ga-nav__item--active]="activePage() === 'profile'" (click)="navigate('profile')">
+        <iconify-icon icon="lucide:user-circle-2"></iconify-icon>
+        <span>Profile</span>
+        @if (activePage() === 'profile') { <span class="ga-nav__indicator"></span> }
+      </button>
+      <button class="ga-nav__item" [class.ga-nav__item--active]="activePage() === 'products'" (click)="navigate('products')">
+        <iconify-icon icon="lucide:package"></iconify-icon>
+        <span>Products</span>
+        @if (activePage() === 'products') { <span class="ga-nav__indicator"></span> }
+      </button>
+      <button class="ga-nav__item" [class.ga-nav__item--active]="activePage() === 'orders'" (click)="navigate('orders')">
+        <iconify-icon icon="lucide:shopping-bag"></iconify-icon>
+        <span>Orders</span>
+        @if (pendingOrderCount() > 0) { <span class="ga-nav__badge">{{ pendingOrderCount() }}</span> }
+        @if (activePage() === 'orders') { <span class="ga-nav__indicator"></span> }
+      </button>
+      <button class="ga-nav__item" [class.ga-nav__item--active]="activePage() === 'analytics'" (click)="navigate('analytics')">
+        <iconify-icon icon="lucide:bar-chart-3"></iconify-icon>
+        <span>Analytics</span>
+        @if (activePage() === 'analytics') { <span class="ga-nav__indicator"></span> }
+      </button>
+    </nav>
+
+    <div class="ga-header__right">
+      <button class="ga-header__icon-btn" aria-label="Notifications">
+        <iconify-icon icon="lucide:bell"></iconify-icon>
+        @if (pendingOrderCount() > 0) { <span class="ga-badge">{{ pendingOrderCount() }}</span> }
+      </button>
+      <div class="ga-header__avatar-wrap">
+        <button class="ga-header__avatar" aria-label="Account menu">
+          {{ artisanInitials() }}
+          @if (isActive()) { <span class="ga-avatar-dot"></span> }
+        </button>
+        <div class="ga-header__dropdown">
+          <div class="ga-dropdown__info">
+            <span class="ga-dropdown__name">{{ artisanPrenom() }} {{ artisanNom() }}</span>
+            <span class="ga-dropdown__role">{{ artisanCraft() }}</span>
+          </div>
+          <hr class="ga-dropdown__sep" />
+          <button class="ga-dropdown__item" (click)="navigate('profile')">
+            <iconify-icon icon="lucide:user"></iconify-icon> Profile
+          </button>
+          <button class="ga-dropdown__item" (click)="toggleAvailability()">
+            <iconify-icon [icon]="isActive() ? 'lucide:toggle-right' : 'lucide:toggle-left'"></iconify-icon>
+            {{ isActive() ? 'Go Unavailable' : 'Go Available' }}
+          </button>
+          <hr class="ga-dropdown__sep" />
+          <button class="ga-dropdown__item ga-dropdown__item--danger" (click)="logout()">
+            <iconify-icon icon="lucide:log-out"></iconify-icon> Log out
           </button>
         </div>
-        <img [src]="avatar()" [alt]="displayName()"
-          class="w-10 h-10 rounded-full border-2 border-secondary shadow-sm">
-        <button type="button" (click)="logout()"
-          class="text-xs text-muted-foreground hover:text-primary">Déconnexion</button>
       </div>
-    </header>
-
-    @if (isLoading()) {
-    <div class="p-6 text-center text-muted-foreground">Chargement de votre espace artisan…</div>
-    }
-    @if (errorMessage()) {
-    <div class="mx-6 mt-4 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm" role="alert">
-      {{ errorMessage() }}
     </div>
-    }
+  </header>
 
-    @if (!isLoading()) {
-    <main class="max-w-7xl mx-auto px-4 md:px-6 py-8 w-full flex-grow grid grid-cols-1 lg:grid-cols-12 gap-8">
-      <aside class="col-span-1 lg:col-span-4 flex flex-col gap-6">
-        <div class="bg-card rounded-2xl border border-border/80 shadow-md overflow-hidden relative">
-          <div class="h-32 w-full bg-gradient-to-r from-secondary/80 to-accent/80 relative">
-            <div class="absolute inset-0 bg-gradient-to-t from-primary/50 to-transparent"></div>
+  <!-- ══════════════════════════════════════════════════
+       MAIN CONTENT
+  ══════════════════════════════════════════════════ -->
+  <main class="ga-main">
+
+    <!-- ════════════════════════════════════════════
+         PROFILE PAGE
+    ════════════════════════════════════════════ -->
+    @if (activePage() === 'profile') {
+      <div class="ga-page ga-page--profile">
+        <div class="pf">
+
+          <!-- ── LEFT SIDEBAR ── -->
+          <aside class="pf-sidebar ga-animate-in">
+
+            <!-- Identity Card -->
+            <div class="pf-card">
+              <div class="pf-card__banner">
+                <img src="/images/artisan_hero.jpg" alt="Workshop" />
+              </div>
+              <div class="pf-card__avatar-wrap">
+                <div class="pf-card__avatar">
+                  {{ artisanInitials() }}
+                  @if (isVerified()) {
+                    <span class="pf-card__verified" title="Verified Artisan">
+                      <iconify-icon icon="lucide:shield-check"></iconify-icon>
+                    </span>
+                  }
+                </div>
+              </div>
+
+              <div class="pf-card__body">
+                <h1 class="pf-card__name">{{ artisanPrenom() }} {{ artisanNom() }}</h1>
+                <p class="pf-card__craft">{{ artisanCraft() || 'Master Artisan' }}</p>
+
+                <div class="pf-card__rating">
+                  <span class="pf-card__stars">★★★★★</span>
+                  <span class="pf-card__rating-val">{{ averageRating() }}</span>
+                  <span class="pf-card__rating-count">({{ totalReviews() }} reviews)</span>
+                </div>
+
+                <div class="pf-card__badges">
+                  @if (isVerified()) {
+                    <span class="pf-badge pf-badge--sage">
+                      <iconify-icon icon="lucide:shield-check"></iconify-icon> Verified Artisan
+                    </span>
+                  }
+                  <span class="pf-badge pf-badge--green">
+                    <iconify-icon icon="lucide:leaf"></iconify-icon> Eco-Friendly
+                  </span>
+                  <span class="pf-badge pf-badge--gold">
+                    <iconify-icon icon="lucide:hand-heart"></iconify-icon> Fair Trade
+                  </span>
+                  <span class="pf-badge pf-badge--terra">
+                    <iconify-icon icon="lucide:users"></iconify-icon> Community Impact
+                  </span>
+                </div>
+
+                <div class="pf-card__meta">
+                  <div class="pf-card__meta-row">
+                    <iconify-icon icon="lucide:map-pin"></iconify-icon>
+                    <span>{{ artisanLocation() || 'Morocco' }}</span>
+                  </div>
+                  <div class="pf-card__meta-row">
+                    <iconify-icon icon="lucide:calendar"></iconify-icon>
+                    <span>Member since 2023</span>
+                  </div>
+                </div>
+
+                <button class="pf-avail" [class.pf-avail--on]="isActive()" (click)="toggleAvailability()">
+                  <span class="pf-avail__dot"></span>
+                  {{ isActive() ? 'Accepting orders' : 'Not accepting orders' }}
+                </button>
+              </div>
+
+              <div class="pf-card__stats">
+                <div class="pf-card__stat">
+                  <span class="pf-card__stat-val">{{ totalProducts() }}</span>
+                  <span class="pf-card__stat-lbl">Products</span>
+                </div>
+                <div class="pf-card__stat">
+                  <span class="pf-card__stat-val">{{ completedOrderCount() }}</span>
+                  <span class="pf-card__stat-lbl">Deliveries</span>
+                </div>
+                <div class="pf-card__stat">
+                  <span class="pf-card__stat-val">{{ totalRevenue() }}</span>
+                  <span class="pf-card__stat-lbl">Revenue</span>
+                </div>
+              </div>
+
+              <div class="pf-card__foot">
+                <button class="ga-btn ga-btn--primary ga-btn--full" (click)="toggleEditMode(true)">
+                  <iconify-icon icon="lucide:pencil"></iconify-icon> Edit Profile
+                </button>
+              </div>
+            </div>
+
+            <!-- Eco Score Card -->
+            <div class="pf-eco ga-animate-in ga-animate-in--delay-1">
+              <div class="pf-eco__top">
+                <div class="pf-eco__ring-wrap">
+                  <svg viewBox="0 0 36 36" class="pf-eco__svg">
+                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#E8E1D9" stroke-width="2.5" />
+                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#2F6B59" stroke-width="2.5" stroke-dasharray="85, 100" stroke-linecap="round" />
+                  </svg>
+                  <span class="pf-eco__score">85</span>
+                </div>
+                <div class="pf-eco__info">
+                  <span class="pf-eco__title">Eco Score</span>
+                  <span class="pf-eco__status">Excellent</span>
+                </div>
+              </div>
+              <span class="pf-eco__trend">+5 this month</span>
+              <hr class="pf-eco__sep" />
+              <span class="pf-eco__section">Sustainable Practices</span>
+              <div class="pf-eco__chips">
+                <span class="pf-eco__chip"><iconify-icon icon="lucide:recycle"></iconify-icon> Recycled Materials</span>
+                <span class="pf-eco__chip"><iconify-icon icon="lucide:droplets"></iconify-icon> Water Efficient</span>
+                <span class="pf-eco__chip"><iconify-icon icon="lucide:sun"></iconify-icon> Solar Powered</span>
+                <span class="pf-eco__chip"><iconify-icon icon="lucide:palette"></iconify-icon> Natural Dyes</span>
+              </div>
+            </div>
+
+          </aside>
+
+          <!-- ── RIGHT COLUMN ── -->
+          <div class="pf-main">
+
+            <!-- This Week -->
+            <div class="pf-week ga-animate-in">
+              <div class="pf-week__head">
+                <iconify-icon icon="lucide:sparkles" class="pf-week__icon"></iconify-icon>
+                <h2 class="pf-week__title">This Week</h2>
+              </div>
+              <div class="pf-pills">
+                <span class="pf-pill pf-pill--terra">
+                  <iconify-icon icon="lucide:hammer"></iconify-icon>
+                  6 handmade pieces completed
+                </span>
+                <span class="pf-pill pf-pill--gold">
+                  <iconify-icon icon="lucide:trending-up"></iconify-icon>
+                  Ceramics collection trending
+                </span>
+                <span class="pf-pill pf-pill--sage">
+                  <iconify-icon icon="lucide:message-circle"></iconify-icon>
+                  3 new reviews received
+                </span>
+              </div>
+            </div>
+
+            <!-- Today's Activity -->
+            <div class="pf-card-section ga-animate-in ga-animate-in--delay-1">
+              <div class="pf-card-section__head">
+                <iconify-icon icon="lucide:clock"></iconify-icon>
+                <h3>Today's Activity</h3>
+              </div>
+              <div class="pf-timeline">
+                @for (item of todayActivity(); track $index) {
+                  <div class="pf-tl-item">
+                    <div class="pf-tl-icon pf-tl-icon--{{ item.color }}">
+                      <iconify-icon [icon]="item.icon"></iconify-icon>
+                    </div>
+                    <div class="pf-tl-body">
+                      <span class="pf-tl-text">{{ item.text }}</span>
+                      <span class="pf-tl-time">{{ item.time }}</span>
+                    </div>
+                  </div>
+                }
+                @for (item of yesterdayActivity(); track $index) {
+                  <div class="pf-tl-item">
+                    <div class="pf-tl-icon pf-tl-icon--muted">
+                      <iconify-icon [icon]="item.icon"></iconify-icon>
+                    </div>
+                    <div class="pf-tl-body">
+                      <span class="pf-tl-text">{{ item.text }}</span>
+                      <span class="pf-tl-time">{{ item.time }}</span>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Community Impact -->
+            <div class="pf-card-section ga-animate-in ga-animate-in--delay-2">
+              <div class="pf-card-section__head">
+                <h3>Community Impact</h3>
+                <span class="pf-impact-badge">Making a difference</span>
+              </div>
+              <div class="pf-impact-grid">
+                <div class="pf-impact-card">
+                  <div class="pf-impact-card__icon pf-impact-card__icon--terra">
+                    <iconify-icon icon="lucide:users"></iconify-icon>
+                  </div>
+                  <span class="pf-impact-card__val">12</span>
+                  <span class="pf-impact-card__lbl">Artisans Supported</span>
+                  <span class="pf-impact-card__cap">+3 this year</span>
+                </div>
+                <div class="pf-impact-card">
+                  <div class="pf-impact-card__icon pf-impact-card__icon--green">
+                    <iconify-icon icon="lucide:trees"></iconify-icon>
+                  </div>
+                  <span class="pf-impact-card__val">2.4t</span>
+                  <span class="pf-impact-card__lbl">CO₂ Saved</span>
+                  <span class="pf-impact-card__cap">vs traditional shipping</span>
+                </div>
+                <div class="pf-impact-card">
+                  <div class="pf-impact-card__icon pf-impact-card__icon--gold">
+                    <iconify-icon icon="lucide:banknote"></iconify-icon>
+                  </div>
+                  <span class="pf-impact-card__val">34K MAD</span>
+                  <span class="pf-impact-card__lbl">Fair Wages Paid</span>
+                  <span class="pf-impact-card__cap">+18% above market</span>
+                </div>
+                <div class="pf-impact-card">
+                  <div class="pf-impact-card__icon pf-impact-card__icon--teal">
+                    <iconify-icon icon="lucide:globe"></iconify-icon>
+                  </div>
+                  <span class="pf-impact-card__val">24</span>
+                  <span class="pf-impact-card__lbl">Countries Reached</span>
+                  <span class="pf-impact-card__cap">Worldwide impact</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Customer Reviews -->
+            <div class="pf-card-section ga-animate-in ga-animate-in--delay-3">
+              <div class="pf-card-section__head">
+                <div class="pf-card-section__head-left">
+                  <iconify-icon icon="lucide:message-square-text"></iconify-icon>
+                  <h3>Customer Reviews</h3>
+                </div>
+                <span class="pf-reviews-count">{{ totalReviews() }} total</span>
+              </div>
+              @if (reviews().length > 0) {
+                <div class="pf-reviews-list">
+                  @for (review of reviews(); track $index) {
+                    <div class="pf-review">
+                      <div class="pf-review__top">
+                        <img [src]="review.avatar" class="pf-review__avatar" [alt]="review.author" />
+                        <div class="pf-review__info">
+                          <span class="pf-review__author">{{ review.author }}</span>
+                          <span class="pf-review__location">{{ review.country }}</span>
+                        </div>
+                        <div class="pf-review__stars">
+                          @for (s of [1,2,3,4,5]; track s) {
+                            <span [class.pf-star--filled]="s <= review.stars">★</span>
+                          }
+                        </div>
+                      </div>
+                      <p class="pf-review__text">"{{ review.text }}"</p>
+                      @if (review.product) {
+                        <span class="pf-review__product">for {{ review.product }}</span>
+                      }
+                    </div>
+                  }
+                </div>
+              } @else {
+                <div class="pf-reviews-empty">
+                  <iconify-icon icon="lucide:message-square-text"></iconify-icon>
+                  <span class="pf-reviews-empty__title">No reviews yet</span>
+                  <span class="pf-reviews-empty__desc">Your customer feedback will appear here.</span>
+                </div>
+              }
+            </div>
+
           </div>
 
-          <div class="px-6 pb-6 relative -mt-12 flex flex-col items-center text-center">
-            <img [src]="avatar()" [alt]="displayName()"
-              class="w-24 h-24 rounded-full border-4 border-card shadow-lg object-cover">
+        </div>
 
-            <h2 class="text-xl font-heading font-bold text-foreground mt-3">{{ displayName() }}</h2>
-            <p class="text-xs text-secondary font-semibold">{{ profile()?.category ?? 'Artisan' }}</p>
-
-            <div class="flex flex-wrap gap-2 justify-center mt-4">
-              @if (profile()?.qrTraceId) {
-              <span
-                class="inline-flex items-center gap-1 bg-secondary/10 text-secondary text-[10px] font-bold px-2.5 py-1 rounded-full border border-secondary/20 uppercase tracking-wider">
-                <iconify-icon icon="lucide:shield" class="text-xs"></iconify-icon> QR Authenticated
-              </span>
-              }
-              @if (profile()?.eligibleExport) {
-              <span
-                class="inline-flex items-center gap-1 bg-accent/10 text-accent text-[10px] font-bold px-2.5 py-1 rounded-full border border-accent/20 uppercase tracking-wider">
-                <iconify-icon icon="lucide:globe" class="text-xs"></iconify-icon> Export Eligible
-              </span>
-              }
-            </div>
-
-            <div class="w-full mt-6 pt-6 border-t border-border/40 flex flex-col gap-3 text-left text-xs">
-              <div class="flex justify-between items-center">
-                <span class="text-muted-foreground">Type</span>
-                <span class="font-semibold text-foreground">{{ profile()?.independant ? 'Independent' : 'Cooperative Member' }}</span>
-              </div>
-              <div class="flex justify-between items-center">
-                <span class="text-muted-foreground">Nationality</span>
-                <span class="font-semibold text-foreground">{{ profile()?.nationalite ?? '—' }}</span>
-              </div>
-              <div class="flex justify-between items-center">
-                <span class="text-muted-foreground">Language</span>
-                <span class="font-semibold text-foreground">{{ profile()?.languePreferee ?? '—' }}</span>
-              </div>
-              <div class="flex justify-between items-center">
-                <span class="text-muted-foreground">Member Since</span>
-                <span class="font-semibold text-foreground">{{ memberSince() }}</span>
-              </div>
-            </div>
-
-            <div class="w-full mt-6 grid grid-cols-1 gap-2">
-              @if (!profileEdit()) {
-              <button type="button" (click)="enableProfileEdit()"
-                class="py-2.5 bg-secondary text-secondary-foreground rounded-xl font-semibold text-xs shadow-md shadow-secondary/10 hover:bg-secondary/95 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-1.5">
-                <iconify-icon icon="lucide:pencil" class="text-sm"></iconify-icon> Edit Profile
-              </button>
-              }
-            </div>
-          </div>
-
-          @if (profileEdit()) {
-          <div class="bg-background/80 border-t border-border/40 p-6">
-            <h3 class="font-heading text-sm font-bold text-foreground mb-4">Edit Artisan Profile</h3>
-            <form (ngSubmit)="saveProfile()" class="space-y-4">
-              <div class="grid gap-4">
-                <div>
-                  <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Workshop Name</label>
-                  <input type="text" name="workshop" [(ngModel)]="profileForm.workshop"
-                    class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
+        <!-- ── Edit Form ── -->
+        @if (isEditing()) {
+          <div class="pe ga-animate-in" style="max-width: 800px; margin: 2rem auto 0;">
+            <h2 class="pe__title">Edit Profile</h2>
+            <form class="ga-form" (submit)="saveProfile($event)">
+              <div class="ga-form__row">
+                <div class="ga-form__field">
+                  <label>First name</label>
+                  <input type="text" [value]="artisanPrenom()" (input)="artisanPrenom.set($any($event.target).value)" />
                 </div>
-
-                <div class="grid gap-4 md:grid-cols-2">
-                  <div>
-                    <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Category</label>
-                    <input type="text" name="category" [(ngModel)]="profileForm.category"
-                      class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
-                  </div>
-                  <div>
-                    <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Role</label>
-                    <input type="text" name="role" [(ngModel)]="profileForm.role"
-                      class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
-                  </div>
-                </div>
-
-                <div>
-                  <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Biography</label>
-                  <textarea name="biography" rows="4" [(ngModel)]="profileForm.biography"
-                    class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"></textarea>
-                </div>
-
-                <div class="grid gap-4 md:grid-cols-2">
-                  <div>
-                    <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Contact Email</label>
-                    <input type="email" name="contact" [(ngModel)]="profileForm.contact"
-                      class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
-                  </div>
-                  <div>
-                    <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Phone</label>
-                    <input type="text" name="phone" [(ngModel)]="profileForm.phone"
-                      class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
-                  </div>
-                </div>
-
-                <div>
-                  <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Workshop Location</label>
-                  <input type="text" name="location" [(ngModel)]="profileForm.location"
-                    class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
+                <div class="ga-form__field">
+                  <label>Last name</label>
+                  <input type="text" [value]="artisanNom()" (input)="artisanNom.set($any($event.target).value)" />
                 </div>
               </div>
-
-              <div class="flex flex-wrap gap-3 justify-end pt-2 border-t border-border/40">
-                <button type="button" (click)="cancelProfileEdit()"
-                  class="px-4 py-2.5 rounded-xl border border-border text-xs font-semibold text-foreground hover:bg-muted transition-all">Cancel</button>
-                <button type="submit"
-                  class="px-5 py-2.5 rounded-xl bg-secondary text-secondary-foreground text-xs font-semibold shadow-md shadow-secondary/15 hover:bg-secondary/95 transition-all">Save Changes</button>
+              <div class="ga-form__row">
+                <div class="ga-form__field">
+                  <label>Craft specialty</label>
+                  <input type="text" [value]="artisanCraft()" (input)="artisanCraft.set($any($event.target).value)" />
+                </div>
+                <div class="ga-form__field">
+                  <label>Workshop location</label>
+                  <input type="text" [value]="artisanLocation()" (input)="artisanLocation.set($any($event.target).value)" />
+                </div>
+              </div>
+              <div class="ga-form__field">
+                <label>Languages</label>
+                <input type="text" [value]="artisanLanguages()" (input)="artisanLanguages.set($any($event.target).value)" />
+              </div>
+              <div class="ga-form__field">
+                <label>Bio</label>
+                <textarea rows="4" [value]="artisanBio()" (input)="artisanBio.set($any($event.target).value)"></textarea>
+              </div>
+              <div class="ga-form__actions">
+                <button type="button" class="ga-btn ga-btn--ghost" (click)="toggleEditMode(false)">Cancel</button>
+                <button type="submit" class="ga-btn ga-btn--primary" [disabled]="isSaving()">
+                  {{ isSaving() ? 'Saving...' : 'Save Changes' }}
+                </button>
               </div>
             </form>
           </div>
-          }
-        </div>
+        }
 
-        <div class="bg-card rounded-2xl border border-border/80 p-5 shadow-sm">
-          <h3
-            class="font-heading font-bold text-sm text-foreground tracking-wide border-b border-border/40 pb-3 mb-4 flex items-center gap-2">
-            <iconify-icon icon="lucide:bell" class="text-primary"></iconify-icon>
-            Stock &amp; Process Alerts
-          </h3>
-          <div class="flex flex-col gap-3">
-            @for (product of products(); track product.id) {
-              @if (product.stock > 0 && product.stock <= 5) {
-              <div class="p-3 rounded-xl bg-primary/5 border border-primary/10 flex items-center gap-3">
-                <span class="p-1.5 rounded-lg bg-primary/10 text-primary"><iconify-icon icon="lucide:circle-alert"
-                    class="text-base"></iconify-icon></span>
-                <div>
-                  <h4 class="text-xs font-bold text-foreground">Low Stock Alert</h4>
-                  <p class="text-[10px] text-muted-foreground mt-0.5">{{ product.name }} ({{ product.stock }} units left)</p>
-                </div>
-              </div>
-              }
-            }
-            @for (order of orders(); track order.id) {
-              @if (order.status === 'Pending') {
-              <div class="p-3 rounded-xl bg-secondary/5 border border-secondary/10 flex items-center gap-3">
-                <span class="p-1.5 rounded-lg text-secondary" style="background-color:#d9e8e1;"><iconify-icon icon="lucide:clock"
-                    class="text-base" style="color: #006233;"></iconify-icon></span>
-                <div>
-                  <h4 class="text-xs font-bold text-foreground">Pending Confirmation</h4>
-                  <p class="text-[10px] text-muted-foreground mt-0.5">Order #{{ order.id }} requires confirmation.</p>
-                </div>
-              </div>
-              }
-            }
-            @if (products().length === 0 && orders().length === 0) {
-            <p class="text-xs text-muted-foreground">No alerts at the moment.</p>
-            }
+      </div>
+    }
+
+    <!-- ════════════════════════════════════════════
+         PRODUCTS PAGE
+    ════════════════════════════════════════════ -->
+    @if (activePage() === 'products') {
+      <div class="ga-page ga-page--products">
+
+        <div class="ga-page-header ga-animate-in">
+          <div>
+            <h1 class="ga-page-header__title">Your Collection</h1>
+            <p class="ga-page-header__subtitle">Handcrafted pieces that tell a story</p>
           </div>
-        </div>
-      </aside>
-
-      <section class="col-span-1 lg:col-span-8 flex flex-col gap-6">
-        <div class="bg-card rounded-2xl border border-border/80 p-1.5 shadow-sm flex overflow-x-auto gap-1">
-          <button id="overview-tab" (click)="switchDashboardTab('overview')"
-            class="dash-tab-btn flex-1 px-4 py-3 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2 whitespace-nowrap bg-secondary text-secondary-foreground shadow-sm">
-            <iconify-icon icon="lucide:layout-dashboard" class="text-lg"></iconify-icon>
-            Business Stats
-          </button>
-          <button id="products-tab" (click)="switchDashboardTab('products')"
-            class="dash-tab-btn flex-1 px-4 py-3 rounded-xl text-sm font-semibold text-muted-foreground hover:text-foreground transition-all flex items-center justify-center gap-2 whitespace-nowrap">
-            <iconify-icon icon="lucide:grid-3x3" class="text-lg"></iconify-icon>
-            Products
-          </button>
-          <button id="orders-tab" (click)="switchDashboardTab('orders')"
-            class="dash-tab-btn flex-1 px-4 py-3 rounded-xl text-sm font-semibold text-muted-foreground hover:text-foreground transition-all flex items-center justify-center gap-2 whitespace-nowrap">
-            <iconify-icon icon="lucide:shopping-cart" class="text-lg"></iconify-icon>
-            Orders
+          <button class="ga-btn ga-btn--primary" (click)="openProductModal()">
+            <iconify-icon icon="lucide:plus"></iconify-icon> Add Product
           </button>
         </div>
 
-        <!-- OVERVIEW TAB -->
-        <div id="overview-content" class="dash-tab-pane flex flex-col gap-6">
-          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-            <div class="bg-card rounded-2xl border border-border/60 p-4 shadow-sm hover:shadow-md transition-all">
-              <div class="flex justify-between items-start">
-                <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Category</span>
-                <span class="p-1.5 rounded-lg bg-secondary/10 text-secondary"><iconify-icon icon="lucide:layers"
-                    class="text-base"></iconify-icon></span>
-              </div>
-              <p class="text-lg font-bold text-foreground mt-2">{{ profile()?.category ?? '—' }}</p>
-              <p class="text-[10px] text-secondary font-medium mt-1">Your craft specialty</p>
-              <p class="text-2xl font-bold text-foreground mt-2">{{ totalProducts() }}</p>
-              <p class="text-[10px] text-secondary-foreground font-medium mt-1">Live product listings</p>
+        <!-- ── Featured product (hero) ── -->
+        @if (featuredProduct(); as fp) {
+          <div class="ga-product-hero ga-animate-in">
+            <div class="ga-product-hero__image">
+              <img [src]="fp.image" [alt]="fp.name" />
+              <span class="ga-product-hero__badge">Best Seller</span>
             </div>
-
-            <div class="bg-card rounded-2xl border border-border/60 p-4 shadow-sm hover:shadow-md transition-all">
-              <div class="flex justify-between items-start">
-                <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Pending Orders</span>
-                <span class="p-1.5 rounded-lg bg-accent/10 text-accent"><iconify-icon icon="lucide:clock"
-                    class="text-base"></iconify-icon></span>
+            <div class="ga-product-hero__content">
+              <span class="ga-product-hero__eyebrow">{{ fp.category }}</span>
+              <h2 class="ga-product-hero__title">{{ fp.name }}</h2>
+              <p class="ga-product-hero__desc">{{ fp.description }}</p>
+              <div class="ga-product-hero__stats">
+                <div class="ga-product-hero__stat">
+                  <iconify-icon icon="lucide:star"></iconify-icon>
+                  <span>{{ fp.rating }}</span>
+                </div>
+                <div class="ga-product-hero__stat">
+                  <iconify-icon icon="lucide:shopping-bag"></iconify-icon>
+                  <span>{{ fp.orders }} orders</span>
+                </div>
+                <div class="ga-product-hero__stat">
+                  <iconify-icon icon="lucide:eye"></iconify-icon>
+                  <span>{{ fp.views }} views</span>
+                </div>
+                <div class="ga-product-hero__stat">
+                  <iconify-icon icon="lucide:heart"></iconify-icon>
+                  <span>{{ fp.favorites }} saves</span>
+                </div>
               </div>
-              <p class="text-2xl font-bold text-foreground mt-2">{{ pendingOrders() }}</p>
-              <p class="text-[10px] text-muted-foreground font-medium mt-1">Awaiting confirmation</p>
-            </div>
-
-            <div class="bg-card rounded-2xl border border-border/60 p-4 shadow-sm hover:shadow-md transition-all">
-              <div class="flex justify-between items-start">
-                <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Confirmed Orders</span>
-                <span class="p-1.5 rounded-lg bg-primary/10 text-primary"><iconify-icon icon="lucide:check-circle"
-                    class="text-base"></iconify-icon></span>
-              </div>
-              <p class="text-2xl font-bold text-foreground mt-2">{{ confirmedOrders() }}</p>
-              <p class="text-[10px] text-muted-foreground font-medium mt-1">Ready for dispatch</p>
-            </div>
-
-            <div class="bg-card rounded-2xl border border-border/60 p-4 shadow-sm hover:shadow-md transition-all">
-              <div class="flex justify-between items-start">
-                <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Completed Orders</span>
-                <span class="p-1.5 rounded-lg bg-secondary/10 text-secondary"><iconify-icon icon="lucide:package"
-                    class="text-base"></iconify-icon></span>
-              </div>
-              <p class="text-2xl font-bold text-foreground mt-2">{{ completedOrders() }}</p>
-              <p class="text-[10px] text-muted-foreground font-medium mt-1">Fulfilled successfully</p>
-            </div>
-
-            <div class="bg-card rounded-2xl border border-border/60 p-4 shadow-sm hover:shadow-md transition-all">
-              <div class="flex justify-between items-start">
-                <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Revenue</span>
-                <span class="p-1.5 rounded-lg bg-accent/10 text-accent"><iconify-icon icon="lucide:credit-card"
-                    class="text-base"></iconify-icon></span>
-              </div>
-              <p class="text-2xl font-bold text-foreground mt-2">{{ revenue() | currency:'MAD':'symbol':'1.0-0' }}</p>
-              <p class="text-[10px] text-accent font-medium mt-1" style="color:#C19344">Full marketplace sales</p>
-            </div>
-
-            <div class="bg-card rounded-2xl border border-border/60 p-4 shadow-sm hover:shadow-md transition-all">
-              <div class="flex justify-between items-start">
-                <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Phone</span>
-                <span class="p-1.5 rounded-lg bg-primary/10 text-primary"><iconify-icon icon="lucide:phone"
-                    class="text-base"></iconify-icon></span>
-              </div>
-              <p class="text-lg font-bold text-foreground mt-2">{{ profile()?.phone ?? '—' }}</p>
-              <p class="text-[10px] text-muted-foreground mt-1">Contact number</p>
-            </div>
-
-            <div class="bg-card rounded-2xl border border-border/60 p-4 shadow-sm hover:shadow-md transition-all">
-              <div class="flex justify-between items-start">
-                <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">QR Trace</span>
-                <span class="p-1.5 rounded-lg bg-yellow-500/10 text-yellow-500"><iconify-icon icon="lucide:qr-code"
-                    class="text-base"></iconify-icon></span>
-              </div>
-              <p class="text-sm font-bold text-foreground mt-2 truncate">{{ profile()?.qrTraceId ?? '—' }}</p>
-              <p class="text-[10px] text-muted-foreground mt-1">Traceability ID</p>
+              <div class="ga-product-hero__price">{{ fp.price }}<small>MAD</small></div>
             </div>
           </div>
-          <div class="bg-card rounded-2xl border border-border/60 p-4 shadow-sm hover:shadow-md transition-all">
-            <div class="flex justify-between items-start">
-              <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Average Rating</span>
-              <span class="p-1.5 rounded-lg bg-yellow-500/10 text-yellow-500"><iconify-icon icon="lucide:star"
-                  class="text-base"></iconify-icon></span>
-            </div>
-            <p class="text-2xl font-bold text-foreground mt-2">{{ averageRating() }}</p>
-            <p class="text-[10px] text-muted-foreground font-medium mt-1">Across all listed products</p>
+        }
+
+        <!-- ── Filters ── -->
+        <div class="ga-toolbar ga-animate-in ga-animate-in--delay-1">
+          <div class="ga-filter-pills">
+            <button class="ga-filter-pill" [class.ga-filter-pill--active]="productFilter() === 'all'" (click)="productFilter.set('all')">All</button>
+            <button class="ga-filter-pill" [class.ga-filter-pill--active]="productFilter() === 'published'" (click)="productFilter.set('published')">Published</button>
+            <button class="ga-filter-pill" [class.ga-filter-pill--active]="productFilter() === 'draft'" (click)="productFilter.set('draft')">
+              Draft
+              @if (draftProducts().length > 0) { <span class="ga-inline-badge">{{ draftProducts().length }}</span> }
+            </button>
+            <button class="ga-filter-pill" [class.ga-filter-pill--active]="productFilter() === 'outofstock'" (click)="productFilter.set('outofstock')">
+              Out of Stock
+              @if (outOfStockProducts().length > 0) { <span class="ga-inline-badge">{{ outOfStockProducts().length }}</span> }
+            </button>
           </div>
-
-          <div class="bg-card rounded-2xl border border-border/80 p-6 shadow-sm">
-            <div class="flex items-center justify-between border-b border-border/40 pb-4 mb-6">
-              <div class="flex items-center gap-2">
-                <iconify-icon icon="lucide:chart-bar" class="text-secondary"></iconify-icon>
-                <h3 class="font-heading font-bold text-base text-foreground tracking-wide">Sales Analytics &amp; Growth</h3>
-              </div>
-              <div class="flex gap-2">
-                <button
-                  class="px-3 py-1 bg-muted border border-border/50 text-[11px] font-semibold rounded-lg hover:bg-border/20 transition-all">Weekly</button>
-                <button
-                  class="px-3 py-1 bg-secondary text-secondary-foreground text-[11px] font-semibold rounded-lg transition-all shadow-sm">Monthly</button>
-              </div>
-            </div>
-
-            <div class="h-64 overflow-hidden relative">
-              <canvas id="artisanSalesChart" height="180"></canvas>
-            </div>
+          <div class="ga-search">
+            <iconify-icon icon="lucide:search"></iconify-icon>
+            <input type="text" placeholder="Search products..." [value]="productSearch()" (input)="productSearch.set($any($event.target).value)" />
           </div>
         </div>
 
-        <!-- PRODUCTS TAB -->
-        <div id="products-content" class="dash-tab-pane hidden flex flex-col gap-6">
-          <div class="bg-card rounded-2xl border border-border/80 p-6 shadow-sm">
-            <div
-              class="flex flex-col gap-4 md:flex-row md:items-center justify-between border-b border-border/40 pb-4 mb-6">
-              <div>
-                <h3 class="font-heading font-bold text-base text-foreground tracking-wide">Product Catalog</h3>
-                <p class="text-xs text-muted-foreground mt-0.5">Manage, add, and update your handcrafted marketplace
-                  products.</p>
-              </div>
-              <div class="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto] md:grid-cols-[1.5fr_auto] w-full md:w-auto">
-                <div class="flex items-center gap-2">
-                  <input type="text" placeholder="Search products or categories..."
-                    [ngModel]="productSearch()"
-                    (ngModelChange)="productSearch.set($event)"
-                    class="w-full rounded-2xl border border-border bg-background px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
-                </div>
-                <div class="flex items-center gap-2">
-                  <select [ngModel]="productFilter()" (ngModelChange)="productFilter.set($event)"
-                    class="rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent">
-                    <option value="all">All products</option>
-                    <option value="available">In Stock</option>
-                    <option value="low-stock">Low Stock</option>
-                    <option value="out-of-stock">Out of Stock</option>
-                  </select>
-                </div>
-                <div class="flex items-center gap-2">
-                  <select [ngModel]="productSort()" (ngModelChange)="productSort.set($event)"
-                    class="rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent">
-                    <option value="newest">Most Popular</option>
-                    <option value="price-asc">Price: Low to High</option>
-                    <option value="price-desc">Price: High to Low</option>
-                  </select>
-                </div>
-              </div>
-              <button type="button" (click)="openProductModal('add')"
-                class="inline-flex items-center gap-1.5 rounded-xl bg-secondary text-secondary-foreground px-4 py-2 text-xs font-semibold shadow-md shadow-secondary/10 hover:bg-secondary/95 transition-all">
-                <iconify-icon icon="lucide:plus" class="text-xs"></iconify-icon>
-                Add Product
-              </button>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              @for (product of paginatedProducts(); track product.id) {
-              <div
-                class="border border-border/60 rounded-xl overflow-hidden bg-muted/20 group hover:shadow-md transition-all">
-                <div class="h-40 bg-muted relative overflow-hidden">
-                  <img [src]="product.image" [alt]="product.name"
-                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                  <span
-                    class="absolute top-3 left-3 rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.18em]"
-                    [class]="product.availability === 'In Stock' ? 'bg-secondary/90 text-secondary-foreground' : product.availability === 'Low Stock' ? 'bg-accent/90 text-card' : 'bg-destructive/90 text-card'">
-                    {{ product.availability }}
-                  </span>
-                </div>
-                <div class="p-4">
-                  <span class="text-[10px] uppercase font-bold tracking-wider text-accent">{{ product.category }}</span>
-                  <h4 class="font-heading font-bold text-sm text-foreground mt-1">{{ product.name }}</h4>
-                  <p class="text-[11px] text-muted-foreground mt-2 line-clamp-3">{{ product.description }}</p>
-                  <div class="grid grid-cols-2 gap-2 mt-4 text-[11px] text-muted-foreground">
-                    <span class="font-semibold text-foreground">{{ product.price | currency:'MAD':'symbol':'1.0-0' }}</span>
-                    <span class="font-semibold text-foreground">{{ product.stock }} pcs</span>
-                    <span class="col-span-2 text-[10px]">Rating {{ product.rating }} · {{ product.orders }} orders</span>
-                  </div>
-                  <div class="grid grid-cols-3 gap-2 mt-4">
-                    <button type="button" (click)="openProductModal('view', product)"
-                      class="rounded-full border border-border bg-card text-foreground px-2 py-2 text-[11px] font-semibold hover:bg-muted transition-all">View</button>
-                    <button type="button" (click)="openProductModal('edit', product)"
-                      class="rounded-full border border-border bg-card text-foreground px-2 py-2 text-[11px] font-semibold hover:bg-muted transition-all">Edit</button>
-                    <button type="button" (click)="confirmDeleteProduct(product.id)"
-                      class="rounded-full border border-destructive text-destructive bg-card px-2 py-2 text-[11px] font-semibold hover:bg-destructive/10 transition-all">Delete</button>
-                  </div>
-                </div>
-              </div>
-              }
-            </div>
-
-            @if (paginatedProducts().length === 0) {
-            <div
-              class="rounded-3xl border border-border bg-muted/50 p-6 text-center text-sm text-muted-foreground">
-              No products match your current search or filter.
-            </div>
-            }
-
-            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mt-5">
-              <span class="text-xs text-muted-foreground">Showing {{ paginatedProducts().length }} of {{ filteredProducts().length }} products</span>
-              <div class="flex items-center gap-2">
-                <button type="button" (click)="prevProductPage()"
-                  [disabled]="currentProductPage() === 1"
-                  class="rounded-full border border-border bg-card px-3 py-2 text-[11px] font-semibold text-foreground hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-all">Previous</button>
-                <span class="text-xs text-muted-foreground">Page {{ currentProductPage() }} / {{ productPageCount() }}</span>
-                <button type="button" (click)="nextProductPage()"
-                  [disabled]="currentProductPage() === productPageCount()"
-                  class="rounded-full border border-border bg-card px-3 py-2 text-[11px] font-semibold text-foreground hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-all">Next</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ORDERS TAB -->
-        <div id="orders-content" class="dash-tab-pane hidden flex flex-col gap-6">
-          <div class="bg-card rounded-2xl border border-border/80 p-6 shadow-sm">
-            <div class="border-b border-border/40 pb-4 mb-6">
-              <h3 class="font-heading font-bold text-base text-foreground tracking-wide">Orders &amp; Confirmations</h3>
-              <p class="text-xs text-muted-foreground mt-0.5">Track payments, confirm requests, and keep customers informed.</p>
-            </div>
-
-            <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-4">
-              <input type="text" placeholder="Search orders, customers, or IDs..."
-                [ngModel]="orderSearch()"
-                (ngModelChange)="orderSearch.set($event)"
-                class="w-full md:w-2/3 rounded-2xl border border-border bg-background px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
-              <select [ngModel]="orderFilter()" (ngModelChange)="orderFilter.set($event)"
-                class="w-full md:w-1/3 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent">
-                <option value="all">All statuses</option>
-                <option value="pending">Pending</option>
-                <option value="confirmed">Confirmed</option>
-                <option value="completed">Completed</option>
-                <option value="rejected">Rejected</option>
-              </select>
-            </div>
-
-            <div class="overflow-x-auto">
-              <table class="w-full text-left border-collapse">
-                <thead>
-                  <tr
-                    class="border-b border-border/60 text-xs font-bold text-muted-foreground uppercase tracking-wider bg-muted/40">
-                    <th class="py-3 px-4">Order ID</th>
-                    <th class="py-3 px-4">Customer</th>
-                    <th class="py-3 px-4">Products</th>
-                    <th class="py-3 px-4">Total</th>
-                    <th class="py-3 px-4">Status</th>
-                    <th class="py-3 px-4">Payment</th>
-                    <th class="py-3 px-4 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody class="text-xs divide-y divide-border/30">
-                  @for (order of filteredOrders(); track order.id) {
-                  <tr>
-                    <td class="py-4 px-4 font-semibold text-foreground">#{{ order.id }}</td>
-                    <td class="py-4 px-4">
-                      <div class="font-semibold">{{ order.customer }}</div>
-                      <div class="text-[10px] text-muted-foreground">{{ order.contact }}</div>
-                    </td>
-                    <td class="py-4 px-4">
-                      <div class="max-w-[220px] text-[11px] text-muted-foreground">
-                        @for (item of order.products; track $index) {
-                          {{ item.qty }}× {{ item.name }}@if (!$last) {, }
-                        }
-                      </div>
-                    </td>
-                    <td class="py-4 px-4 font-semibold text-foreground">{{ order.total | currency:'MAD':'symbol':'1.0-0' }}</td>
-                    <td class="py-4 px-4">
-                      <span
-                        class="px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase"
-                        [class]="order.status === 'Pending' ? 'bg-yellow-500/10 text-yellow-600' : order.status === 'Confirmed' ? 'bg-primary/10 text-primary' : order.status === 'Completed' ? 'bg-secondary/10 text-secondary' : 'bg-destructive/10 text-destructive'">
-                        {{ order.status }}
-                      </span>
-                    </td>
-                    <td class="py-4 px-4 font-semibold text-secondary-foreground">{{ order.paymentStatus }}</td>
-                    <td class="py-4 px-4 text-right">
-                      <div class="flex flex-wrap justify-end gap-2">
-                        @if (order.status === 'Pending') {
-                        <button type="button" (click)="confirmOrder(order.id)"
-                          class="rounded-full bg-secondary text-secondary-foreground px-3 py-1.5 text-[11px] font-semibold hover:bg-secondary/95 transition-all">Confirm Order</button>
-                        <button type="button" (click)="rejectOrder(order.id)"
-                          class="rounded-full border border-border bg-card text-foreground px-3 py-1.5 text-[11px] font-semibold hover:bg-destructive/10 hover:text-destructive transition-all">Reject</button>
-                        }
-                        <button type="button" (click)="openOrderDetails(order)"
-                          class="rounded-full border border-border bg-card text-foreground px-3 py-1.5 text-[11px] font-semibold hover:bg-muted transition-all">Details</button>
-                      </div>
-                    </td>
-                  </tr>
-                  }
-                </tbody>
-              </table>
-              @if (filteredOrders().length === 0) {
-              <div class="py-8 text-center text-sm text-muted-foreground">
-                No orders match the selected filter.
-              </div>
-              }
-            </div>
-          </div>
-        </div>
-
-        <!-- MESSAGES TAB -->
-        <div id="messages-content" class="dash-tab-pane hidden flex flex-col gap-6">
-          <div
-            class="bg-card rounded-2xl border border-border/80 shadow-sm overflow-hidden flex flex-col md:flex-row h-[420px]">
-            <div class="w-full md:w-1/3 border-r border-border/60 flex flex-col bg-muted/10">
-              <div class="p-4 border-b border-border/60">
-                <input type="text" placeholder="Search clients..."
-                  class="w-full px-3 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-1 focus:ring-accent text-xs">
-              </div>
-              <div class="flex-grow overflow-y-auto">
-                <div class="p-3 bg-secondary/10 border-l-4 border-secondary flex gap-3 cursor-pointer">
-                  <img src="https://randomuser.me/api/portraits/men/12.jpg" alt="Client Youssef"
-                    class="w-10 h-10 rounded-full object-cover">
-                  <div class="flex-grow min-w-0">
-                    <div class="flex justify-between items-baseline">
-                      <h4 class="text-xs font-bold text-foreground truncate">Youssef Alami</h4>
-                      <span class="text-[9px] text-muted-foreground">12:30 PM</span>
+        <!-- ── Product grid (mixed layout) ── -->
+        <div class="ga-prod-grid ga-animate-in ga-animate-in--delay-2">
+          @for (prod of filteredProducts(); track prod.id; let i = $index) {
+            <article class="ga-prod-card" [class.ga-prod-card--featured]="i === 0 && productFilter() === 'all' && !productSearch()">
+              <div class="ga-prod-card__img-wrap">
+                <img [src]="prod.image" [alt]="prod.name" class="ga-prod-card__img" />
+                <span class="ga-prod-card__status"
+                  [class.ga-prod-card__status--draft]="prod.status === 'draft'"
+                  [class.ga-prod-card__status--outofstock]="prod.stock === 0">
+                  {{ prod.stock === 0 ? 'Out of Stock' : prod.status === 'published' ? 'Published' : 'Draft' }}
+                </span>
+                <span class="ga-prod-card__category">{{ prod.category }}</span>
+                <div class="ga-prod-card__menu-wrap">
+                  <button class="ga-prod-card__menu-btn" (click)="toggleDropdown(prod.id)">
+                    <iconify-icon icon="lucide:more-horizontal"></iconify-icon>
+                  </button>
+                  @if (showDropdownId() === prod.id) {
+                    <div class="ga-prod-card__dropdown">
+                      <button (click)="toggleDropdown(prod.id)"><iconify-icon icon="lucide:pencil"></iconify-icon> Edit</button>
+                      <button (click)="toggleProductStatus(prod.id); toggleDropdown(prod.id)">
+                        <iconify-icon [icon]="prod.status === 'published' ? 'lucide:eye-off' : 'lucide:eye'"></iconify-icon>
+                        {{ prod.status === 'published' ? 'Unpublish' : 'Publish' }}
+                      </button>
+                      <button (click)="duplicateProduct(prod.id)"><iconify-icon icon="lucide:copy"></iconify-icon> Duplicate</button>
+                      <button class="ga-prod-card__dropdown-danger" (click)="deleteProduct(prod.id)">
+                        <iconify-icon icon="lucide:archive"></iconify-icon> Archive
+                      </button>
                     </div>
-                    <p class="text-[11px] text-muted-foreground truncate mt-0.5">Can we customize the brass lantern with a gold finish?</p>
+                  }
+                </div>
+              </div>
+              <div class="ga-prod-card__body">
+                <h3 class="ga-prod-card__title">{{ prod.name }}</h3>
+                <p class="ga-prod-card__desc">{{ prod.description }}</p>
+                <div class="ga-prod-card__meta">
+                  <span><iconify-icon icon="lucide:package"></iconify-icon> Stock: {{ prod.stock }}</span>
+                  <span><iconify-icon icon="lucide:shopping-bag"></iconify-icon> {{ prod.orders }} orders</span>
+                  <span><iconify-icon icon="lucide:eye"></iconify-icon> {{ prod.views }}</span>
+                  <span><iconify-icon icon="lucide:heart"></iconify-icon> {{ prod.favorites }}</span>
+                </div>
+                <div class="ga-prod-card__footer">
+                  <span class="ga-prod-card__price">{{ prod.price }}<small>MAD</small></span>
+                  <div class="ga-prod-card__kpis">
+                    <span><iconify-icon icon="lucide:star"></iconify-icon> {{ prod.rating }}</span>
                   </div>
                 </div>
               </div>
+            </article>
+          } @empty {
+            <div class="ga-empty-state">
+              <iconify-icon icon="lucide:package"></iconify-icon>
+              <p>No products found.</p>
+              <button class="ga-btn ga-btn--primary" (click)="openProductModal()">Create your first product</button>
             </div>
+          }
+        </div>
 
-            <div class="flex-grow flex flex-col h-full">
-              <div class="p-4 border-b border-border/60 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                  <img src="https://randomuser.me/api/portraits/men/12.jpg" alt="Client Youssef"
-                    class="w-9 h-9 rounded-full object-cover">
-                  <div>
-                    <h4 class="text-xs font-bold text-foreground">Youssef Alami</h4>
-                    <span class="text-[10px] text-secondary font-medium">Online</span>
+        <!-- ── Stock warning ── -->
+        @if (outOfStockProducts().length > 0 && productFilter() !== 'outofstock') {
+          <div class="ga-stock-warning ga-animate-in">
+            <iconify-icon icon="lucide:alert-triangle"></iconify-icon>
+            <div class="ga-stock-warning__text">
+              <strong>{{ outOfStockProducts().length }} product{{ outOfStockProducts().length > 1 ? 's' : '' }} out of stock</strong>
+              <span>Restock to keep selling</span>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- ════════════════════════════════════════════
+         ORDERS PAGE
+    ════════════════════════════════════════════ -->
+    @if (activePage() === 'orders') {
+      <div class="ga-page ga-page--orders">
+
+        <div class="ga-page-header ga-animate-in">
+          <div>
+            <h1 class="ga-page-header__title">Orders</h1>
+            <p class="ga-page-header__subtitle">Organized by where they are in your workflow</p>
+          </div>
+        </div>
+
+        <div class="ga-filter-tabs ga-animate-in" style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--ga-border); padding-bottom: 0.75rem;">
+          <button class="ga-btn ga-btn--sm" [class.ga-btn--primary]="orderFilter() === 'all'" [class.ga-btn--ghost]="orderFilter() !== 'all'" (click)="orderFilter.set('all')">All Orders</button>
+          <button class="ga-btn ga-btn--sm" [class.ga-btn--primary]="orderFilter() === 'pending'" [class.ga-btn--ghost]="orderFilter() !== 'pending'" (click)="orderFilter.set('pending')">Needs Attention</button>
+          <button class="ga-btn ga-btn--sm" [class.ga-btn--primary]="orderFilter() === 'accepted' || orderFilter() === 'preparing'" [class.ga-btn--ghost]="orderFilter() !== 'accepted' && orderFilter() !== 'preparing'" (click)="orderFilter.set('preparing')">In Production</button>
+          <button class="ga-btn ga-btn--sm" [class.ga-btn--primary]="orderFilter() === 'shipped'" [class.ga-btn--ghost]="orderFilter() !== 'shipped'" (click)="orderFilter.set('shipped')">Shipped</button>
+          <button class="ga-btn ga-btn--sm" [class.ga-btn--primary]="orderFilter() === 'completed'" [class.ga-btn--ghost]="orderFilter() !== 'completed'" (click)="orderFilter.set('completed')">Completed</button>
+        </div>
+
+        @if ((orderFilter() === 'all' || orderFilter() === 'pending') && ordersNeedingAttention().length > 0) {
+          <section class="ga-order-group ga-animate-in">
+            <div class="ga-order-group__header">
+              <div class="ga-order-group__dot ga-order-group__dot--terra"></div>
+              <h2 class="ga-order-group__title">Needs Attention</h2>
+              <span class="ga-order-group__count">{{ ordersNeedingAttention().length }}</span>
+            </div>
+            <div class="ga-order-group__list">
+              @for (order of ordersNeedingAttention(); track order.id) {
+                <div class="ga-production-card ga-production-card--urgent">
+                  <div class="ga-production-card__header">
+                    <div class="ga-production-card__customer">
+                      <img [src]="order.customerAvatar" [alt]="order.customerName" class="ga-production-card__avatar" />
+                      <div>
+                        <span class="ga-production-card__name">{{ order.customerName }}</span>
+                        <span class="ga-production-card__country">
+                          <iconify-icon icon="lucide:globe-2"></iconify-icon> {{ order.customerCountry }}
+                        </span>
+                      </div>
+                    </div>
+                    <div class="ga-production-card__badges">
+                      <span class="ga-status-badge ga-status-badge--{{ order.status }}">{{ order.status }}</span>
+                      <span class="ga-payment-badge" [class.ga-payment-badge--paid]="order.paymentStatus === 'paid'" [class.ga-payment-badge--pending]="order.paymentStatus === 'pending'">
+                        {{ order.paymentStatus }}
+                      </span>
+                    </div>
+                  </div>
+                  <div class="ga-production-card__body">
+                    <div class="ga-production-card__product">
+                      <iconify-icon icon="lucide:package"></iconify-icon>
+                      <strong>{{ order.products }}</strong> × {{ order.quantity }}
+                    </div>
+                    <div class="ga-production-card__meta">
+                      <span><iconify-icon icon="lucide:calendar"></iconify-icon> Ordered {{ order.date }}</span>
+                      <span><iconify-icon icon="lucide:clock"></iconify-icon> Deadline {{ order.deadline }}</span>
+                      <span><iconify-icon icon="lucide:map-pin"></iconify-icon> {{ order.shippingAddress }}</span>
+                    </div>
+                    @if (order.specialNote) {
+                      <p class="ga-production-card__note">
+                        <iconify-icon icon="lucide:message-square-quote"></iconify-icon>
+                        {{ order.specialNote }}
+                      </p>
+                    }
+                    <div class="ga-production-card__total">{{ order.totalPrice }}</div>
+                  </div>
+                  <div class="ga-production-card__actions">
+                    <button class="ga-btn ga-btn--primary ga-btn--sm" (click)="acceptOrder(order.id)">
+                      <iconify-icon icon="lucide:check"></iconify-icon> Accept
+                    </button>
+                    <button class="ga-btn ga-btn--ghost ga-btn--sm" (click)="rejectOrder(order.id)">
+                      <iconify-icon icon="lucide:x"></iconify-icon> Reject
+                    </button>
                   </div>
                 </div>
-              </div>
-
-              <div class="flex-grow p-4 overflow-y-auto flex flex-col gap-3 bg-muted/5">
-                <div class="self-start max-w-[80%] bg-muted/60 p-3 rounded-2xl text-xs text-foreground">
-                  Salam Alaykum Youssef! Yes, we can certainly apply a Sahara Gold premium finish to the brass lantern.
-                  It takes about 2 additional days for the artisan coating.
-                </div>
-                <div class="self-end max-w-[80%] bg-secondary text-secondary-foreground p-3 rounded-2xl text-xs">
-                  That sounds perfect! Please proceed with the gold finish. I will confirm the escrow payment now.
-                </div>
-              </div>
-
-              <div class="p-3 border-t border-border/60 flex gap-2">
-                <input type="text" placeholder="Type your message..."
-                  class="flex-grow px-4 py-2.5 rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-accent text-xs">
-                <button
-                  class="px-4 py-2.5 bg-secondary text-secondary-foreground rounded-xl font-semibold text-xs shadow-md shadow-secondary/10 hover:bg-secondary/95 transition-all">Send</button>
-              </div>
+              }
             </div>
-          </div>
-        </div>
-      </section>
-    </main>
-    }
+          </section>
+        }
 
-    <!-- TOAST -->
-    @if (showToast()) {
-    <div
-      class="fixed right-4 top-24 z-50 max-w-sm rounded-3xl px-5 py-4 shadow-xl transition-all duration-300"
-      [class]="toastType() === 'success' ? 'bg-secondary text-secondary-foreground' : 'bg-destructive text-card'">
-      <div class="flex items-center justify-between gap-4">
-        <div class="text-sm font-semibold">{{ toastMessage() }}</div>
-        <button type="button" (click)="showToast.set(false)"
-          class="text-[11px] uppercase tracking-[0.2em] opacity-80 hover:opacity-100">Close</button>
+        @if ((orderFilter() === 'all' || orderFilter() === 'accepted' || orderFilter() === 'preparing') && ordersInProduction().length > 0) {
+          <section class="ga-order-group ga-animate-in ga-animate-in--delay-1">
+            <div class="ga-order-group__header">
+              <div class="ga-order-group__dot ga-order-group__dot--gold"></div>
+              <h2 class="ga-order-group__title">In Production</h2>
+              <span class="ga-order-group__count">{{ ordersInProduction().length }}</span>
+            </div>
+            <div class="ga-order-group__list">
+              @for (order of ordersInProduction(); track order.id) {
+                <div class="ga-production-card">
+                  <div class="ga-production-card__header">
+                    <div class="ga-production-card__customer">
+                      <img [src]="order.customerAvatar" [alt]="order.customerName" class="ga-production-card__avatar" />
+                      <div>
+                        <span class="ga-production-card__name">{{ order.customerName }}</span>
+                        <span class="ga-production-card__country">
+                          <iconify-icon icon="lucide:globe-2"></iconify-icon> {{ order.customerCountry }}
+                        </span>
+                      </div>
+                    </div>
+                    <div class="ga-production-card__badges">
+                      <span class="ga-status-badge ga-status-badge--{{ order.status }}">{{ order.status }}</span>
+                      <span class="ga-payment-badge" [class.ga-payment-badge--paid]="order.paymentStatus === 'paid'" [class.ga-payment-badge--pending]="order.paymentStatus === 'pending'">
+                        {{ order.paymentStatus }}
+                      </span>
+                    </div>
+                  </div>
+                  <div class="ga-production-card__body">
+                    <div class="ga-production-card__product">
+                      <iconify-icon icon="lucide:package"></iconify-icon>
+                      <strong>{{ order.products }}</strong> × {{ order.quantity }}
+                    </div>
+                    <div class="ga-production-card__meta">
+                      <span><iconify-icon icon="lucide:calendar"></iconify-icon> Ordered {{ order.date }}</span>
+                      <span><iconify-icon icon="lucide:clock"></iconify-icon> Deadline {{ order.deadline }}</span>
+                    </div>
+                    @if (order.specialNote) {
+                      <p class="ga-production-card__note">
+                        <iconify-icon icon="lucide:message-square-quote"></iconify-icon>
+                        {{ order.specialNote }}
+                      </p>
+                    }
+                  </div>
+                  <div class="ga-production-card__actions">
+                    @if (order.status === 'accepted') {
+                      <button class="ga-btn ga-btn--secondary ga-btn--sm" (click)="prepareOrder(order.id)">
+                        <iconify-icon icon="lucide:package"></iconify-icon> Start Production
+                      </button>
+                    }
+                    @if (order.status === 'preparing') {
+                      <button class="ga-btn ga-btn--primary ga-btn--sm" (click)="shipOrder(order.id)">
+                        <iconify-icon icon="lucide:truck"></iconify-icon> Ready for Shipping
+                      </button>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </section>
+        }
+
+        @if ((orderFilter() === 'all' || orderFilter() === 'shipped') && ordersReadyToShip().length > 0) {
+          <section class="ga-order-group ga-animate-in ga-animate-in--delay-2">
+            <div class="ga-order-group__header">
+              <div class="ga-order-group__dot ga-order-group__dot--blue"></div>
+              <h2 class="ga-order-group__title">Shipped</h2>
+              <span class="ga-order-group__count">{{ ordersReadyToShip().length }}</span>
+            </div>
+            <div class="ga-order-group__list">
+              @for (order of ordersReadyToShip(); track order.id) {
+                <div class="ga-production-card ga-production-card--muted">
+                  <div class="ga-production-card__header">
+                    <div class="ga-production-card__customer">
+                      <img [src]="order.customerAvatar" [alt]="order.customerName" class="ga-production-card__avatar" />
+                      <div>
+                        <span class="ga-production-card__name">{{ order.customerName }}</span>
+                        <span class="ga-production-card__country">
+                          <iconify-icon icon="lucide:globe-2"></iconify-icon> {{ order.customerCountry }}
+                        </span>
+                      </div>
+                    </div>
+                    <span class="ga-status-badge ga-status-badge--shipped">shipped</span>
+                  </div>
+                  <div class="ga-production-card__body">
+                    <div class="ga-production-card__product">
+                      <iconify-icon icon="lucide:package"></iconify-icon>
+                      <strong>{{ order.products }}</strong> × {{ order.quantity }}
+                    </div>
+                    <div class="ga-production-card__meta">
+                      <span><iconify-icon icon="lucide:map-pin"></iconify-icon> {{ order.shippingAddress }}</span>
+                      <span><iconify-icon icon="lucide:clock"></iconify-icon> Deadline {{ order.deadline }}</span>
+                    </div>
+                  </div>
+                  <div class="ga-production-card__actions">
+                    <button class="ga-btn ga-btn--secondary ga-btn--sm" (click)="deliverOrder(order.id)">
+                      <iconify-icon icon="lucide:check-circle-2"></iconify-icon> Delivered
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          </section>
+        }
+
+        @if ((orderFilter() === 'all' || orderFilter() === 'completed') && ordersCompleted().length > 0) {
+          <section class="ga-order-group ga-order-group--completed ga-animate-in ga-animate-in--delay-3">
+            <div class="ga-order-group__header">
+              <div class="ga-order-group__dot ga-order-group__dot--green"></div>
+              <h2 class="ga-order-group__title">Completed</h2>
+              <span class="ga-order-group__count">{{ ordersCompleted().length }}</span>
+            </div>
+            <div class="ga-order-group__list">
+              @for (order of ordersCompleted(); track order.id) {
+                <div class="ga-production-card ga-production-card--muted">
+                  <div class="ga-production-card__header">
+                    <div class="ga-production-card__customer">
+                      <img [src]="order.customerAvatar" [alt]="order.customerName" class="ga-production-card__avatar" />
+                      <div>
+                        <span class="ga-production-card__name">{{ order.customerName }}</span>
+                        <span class="ga-production-card__country">
+                          <iconify-icon icon="lucide:globe-2"></iconify-icon> {{ order.customerCountry }}
+                        </span>
+                      </div>
+                    </div>
+                    <span class="ga-status-badge ga-status-badge--{{ order.status }}">{{ order.status }}</span>
+                  </div>
+                  <div class="ga-production-card__body">
+                    <div class="ga-production-card__product">
+                      <iconify-icon icon="lucide:package"></iconify-icon>
+                      <strong>{{ order.products }}</strong> × {{ order.quantity }}
+                    </div>
+                    @if (order.specialNote) {
+                      <p class="ga-production-card__note ga-production-card__note--muted">
+                        "{{ order.specialNote }}"
+                      </p>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </section>
+        }
+
+        @if (
+          (orderFilter() === 'all' && orders().length === 0) ||
+          (orderFilter() === 'pending' && ordersNeedingAttention().length === 0) ||
+          ((orderFilter() === 'accepted' || orderFilter() === 'preparing') && ordersInProduction().length === 0) ||
+          (orderFilter() === 'shipped' && ordersReadyToShip().length === 0) ||
+          (orderFilter() === 'completed' && ordersCompleted().length === 0)
+        ) {
+          <div class="ga-empty-state">
+            <iconify-icon icon="lucide:shopping-bag"></iconify-icon>
+            <p>No orders found in this workflow stage.</p>
+          </div>
+        }
       </div>
-    </div>
     }
 
-    <!-- PRODUCT MODAL -->
-    @if (productModalOpen()) {
-    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div class="relative w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-3xl bg-card shadow-2xl flex flex-col">
-        <div class="flex items-center justify-between p-5 border-b border-border/80">
+    <!-- ════════════════════════════════════════════
+         ANALYTICS PAGE
+    ════════════════════════════════════════════ -->
+    @if (activePage() === 'analytics') {
+      <div class="ga-page ga-page--analytics">
+
+        <div class="ga-page-header ga-animate-in">
           <div>
-            <p class="text-[10px] text-muted-foreground uppercase tracking-[0.3em] mb-1">
-              {{ productModalMode() === 'add' ? 'Add Product' : productModalMode() === 'edit' ? 'Edit Product' : 'Product Details' }}
-            </p>
-            <h3 class="font-heading text-lg font-bold text-foreground">
-              {{ productModalMode() === 'view' ? selectedProduct()?.name : (productModalMode() === 'edit' ? 'Edit product details' : 'Create a new product') }}
-            </h3>
+            <h1 class="ga-page-header__title">Analytics</h1>
+            <p class="ga-page-header__subtitle">Answers to the questions that matter for your workshop</p>
           </div>
-          <button type="button" (click)="closeProductModal()"
-            class="rounded-full border border-border p-2 text-foreground hover:bg-muted transition-all">
-            <iconify-icon icon="lucide:x" class="text-lg"></iconify-icon>
-          </button>
+          <div class="ga-period-filter">
+            <iconify-icon icon="lucide:calendar"></iconify-icon>
+            This month
+          </div>
         </div>
 
-        <div class="flex-1 overflow-y-auto p-6">
-          @if (productModalMode() !== 'view') {
-          <form (ngSubmit)="saveProduct()" class="max-w-xl mx-auto space-y-4">
-            <div class="grid gap-4 md:grid-cols-2">
-              <div>
-                <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Product Name</label>
-                <input type="text" name="name" [(ngModel)]="productForm.name"
-                  class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
-              </div>
-              <div>
-                <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Category</label>
-                <input type="text" name="category" [(ngModel)]="productForm.category"
-                  class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
-              </div>
+        <div class="ga-analytics-kpis ga-animate-in ga-animate-in--delay-1">
+          <div class="ga-kpi-card">
+            <div class="ga-kpi-card__icon ga-kpi-card__icon--terra">
+              <iconify-icon icon="lucide:trending-up"></iconify-icon>
             </div>
-
-            <div class="grid gap-4 md:grid-cols-2">
-              <div>
-                <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Price (MAD)</label>
-                <input type="number" name="price" [(ngModel)]="productForm.price"
-                  class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
-              </div>
-              <div>
-                <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Stock</label>
-                <input type="number" name="stock" [(ngModel)]="productForm.stock"
-                  class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
-              </div>
-            </div>
-
-            <div class="grid gap-4 md:grid-cols-2">
-              <div>
-                <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Availability</label>
-                <select name="availability" [(ngModel)]="productForm.availability"
-                  class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent">
-                  <option value="In Stock">In Stock</option>
-                  <option value="Low Stock">Low Stock</option>
-                  <option value="Out of Stock">Out of Stock</option>
-                </select>
-              </div>
-              <div>
-                <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Rating</label>
-                <input type="number" step="0.1" min="0" max="5" name="rating" [(ngModel)]="productForm.rating"
-                  class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
-              </div>
-            </div>
-
-            <div>
-              <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Image URL</label>
-              <input type="text" name="image" [(ngModel)]="productForm.image"
-                placeholder="Paste image URL or upload below"
-                class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
-            </div>
-
-            <div>
-              <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Upload Image</label>
-              <input type="file" accept="image/*" (change)="onProductImageChange($event)"
-                class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
-            </div>
-
-            <div>
-              <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Materials</label>
-              <input type="text" name="materials" [(ngModel)]="productForm.materials"
-                class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent" />
-            </div>
-
-            <div>
-              <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Process</label>
-              <textarea name="process" rows="3" [(ngModel)]="productForm.process"
-                class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"></textarea>
-            </div>
-
-            <div>
-              <label class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Description</label>
-              <textarea name="description" rows="4" [(ngModel)]="productForm.description"
-                class="w-full mt-2 rounded-2xl border border-border bg-card px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"></textarea>
-            </div>
-
-            <div class="flex flex-wrap gap-3 justify-end pt-4 border-t border-border/40">
-              <button type="button" (click)="closeProductModal()"
-                class="px-4 py-2.5 rounded-xl border border-border text-xs font-semibold text-foreground hover:bg-muted transition-all">Cancel</button>
-              <button type="submit"
-                class="px-5 py-2.5 rounded-xl bg-secondary text-secondary-foreground text-xs font-semibold shadow-md shadow-secondary/15 hover:bg-secondary/95 transition-all">
-                {{ productModalMode() === 'edit' ? 'Save Changes' : 'Add Product' }}
-              </button>
-            </div>
-          </form>
-          }
-
-          @if (productModalMode() === 'view' && selectedProduct()) {
-          <div class="space-y-5">
-            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div>
-                <span class="text-[11px] text-muted-foreground uppercase tracking-[0.3em]">Product Overview</span>
-                <h4 class="mt-2 font-heading text-lg font-bold text-foreground">{{ selectedProduct()?.name }}</h4>
-                <p class="text-[12px] text-muted-foreground mt-2">{{ selectedProduct()?.description }}</p>
-              </div>
-              <div class="rounded-3xl bg-muted/50 p-4 border border-border">
-                <div class="flex items-center justify-between text-[11px] text-muted-foreground uppercase tracking-[0.25em] mb-3">
-                  <span>Price</span>
-                  <span>{{ selectedProduct()?.price | currency:'MAD':'symbol':'1.0-0' }}</span>
-                </div>
-                <div class="flex items-center justify-between text-[11px] text-muted-foreground uppercase tracking-[0.25em] mb-3">
-                  <span>Stock</span>
-                  <span>{{ selectedProduct()?.stock }} pcs</span>
-                </div>
-                <div class="flex items-center justify-between text-[11px] text-muted-foreground uppercase tracking-[0.25em] mb-3">
-                  <span>Rating</span>
-                  <span>{{ selectedProduct()?.rating }}</span>
-                </div>
-                <div class="flex items-center justify-between text-[11px] text-muted-foreground uppercase tracking-[0.25em]">
-                  <span>Orders</span>
-                  <span>{{ selectedProduct()?.orders }}</span>
-                </div>
-              </div>
-            </div>
-            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div class="rounded-3xl bg-muted/50 p-4 border border-border">
-                <h5 class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-2">Materials</h5>
-                <p class="text-sm text-foreground">{{ selectedProduct()?.materials }}</p>
-              </div>
-              <div class="rounded-3xl bg-muted/50 p-4 border border-border">
-                <h5 class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-2">Process</h5>
-                <p class="text-sm text-foreground">{{ selectedProduct()?.process }}</p>
-              </div>
-            </div>
-            <div class="flex justify-end">
-              <button type="button" (click)="closeProductModal()"
-                class="px-5 py-2.5 rounded-xl bg-secondary text-secondary-foreground text-xs font-semibold shadow-md shadow-secondary/15 hover:bg-secondary/95 transition-all">Close</button>
-            </div>
-          </div>
-          }
-        </div>
-      </div>
-    </div>
-    }
-
-    <!-- ORDER DETAIL MODAL -->
-    @if (orderDetailOpen() && selectedOrder()) {
-    <div class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-      <div class="w-full max-w-3xl rounded-3xl bg-card shadow-xl overflow-hidden">
-        <div class="flex items-center justify-between p-5 border-b border-border/80">
-          <div>
-            <p class="text-[10px] text-muted-foreground uppercase tracking-[0.3em]">Order Details</p>
-            <h3 class="font-heading font-bold text-lg text-foreground">#{{ selectedOrder()?.id }}</h3>
-            <p class="text-[11px] text-muted-foreground mt-1">{{ selectedOrder()?.date }} · {{ selectedOrder()?.paymentMethod }}</p>
-          </div>
-          <button type="button" (click)="closeOrderDetails()"
-            class="rounded-full border border-border p-2 text-foreground hover:bg-muted transition-all">
-            <iconify-icon icon="lucide:x" class="text-lg"></iconify-icon>
-          </button>
-        </div>
-        <div class="p-6 grid gap-6 md:grid-cols-2">
-          <div class="space-y-4">
-            <div>
-              <p class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-2">Customer</p>
-              <p class="font-semibold text-foreground">{{ selectedOrder()?.customer }}</p>
-              <p class="text-[11px] text-muted-foreground mt-1">{{ selectedOrder()?.contact }}</p>
-            </div>
-            <div>
-              <p class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-2">Shipping Address</p>
-              <p class="text-sm text-foreground">{{ selectedOrder()?.address }}</p>
-            </div>
-            <div>
-              <p class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-2">Payment status</p>
-              <p class="font-semibold text-secondary-foreground">{{ selectedOrder()?.paymentStatus }}</p>
-            </div>
-          </div>
-          <div class="space-y-4">
-            <div>
-              <p class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-2">Order status</p>
-              <span
-                class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[10px] font-semibold uppercase"
-                [class]="selectedOrder()?.status === 'Pending' ? 'bg-yellow-500/10 text-yellow-600' : selectedOrder()?.status === 'Confirmed' ? 'bg-primary/10 text-primary' : selectedOrder()?.status === 'Completed' ? 'bg-secondary/10 text-secondary' : 'bg-destructive/10 text-destructive'">
-                {{ selectedOrder()?.status }}
+            <div class="ga-kpi-card__body">
+              <span class="ga-kpi-card__value">{{ monthlyRevenue() }} MAD</span>
+              <span class="ga-kpi-card__label">Revenue this month</span>
+              <span class="ga-kpi-card__trend">
+                <iconify-icon icon="lucide:arrow-up-right"></iconify-icon> +18%
               </span>
             </div>
-            <div>
-              <p class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-2">Order timeline</p>
-              <ul class="text-sm text-foreground space-y-2">
-                @for (step of selectedOrder()?.timeline; track $index) {
-                <li>• {{ step }}</li>
-                }
-              </ul>
+          </div>
+          <div class="ga-kpi-card">
+            <div class="ga-kpi-card__icon ga-kpi-card__icon--green">
+              <iconify-icon icon="lucide:package"></iconify-icon>
+            </div>
+            <div class="ga-kpi-card__body">
+              <span class="ga-kpi-card__value">{{ orders().length }}</span>
+              <span class="ga-kpi-card__label">Total orders</span>
+              <span class="ga-kpi-card__trend">
+                <iconify-icon icon="lucide:arrow-up-right"></iconify-icon> +12%
+              </span>
+            </div>
+          </div>
+          <div class="ga-kpi-card">
+            <div class="ga-kpi-card__icon ga-kpi-card__icon--gold">
+              <iconify-icon icon="lucide:users"></iconify-icon>
+            </div>
+            <div class="ga-kpi-card__body">
+              <span class="ga-kpi-card__value">{{ returningCustomers() }}%</span>
+              <span class="ga-kpi-card__label">Returning customers</span>
+              <span class="ga-kpi-card__trend">
+                <iconify-icon icon="lucide:arrow-up-right"></iconify-icon> +5%
+              </span>
+            </div>
+          </div>
+          <div class="ga-kpi-card">
+            <div class="ga-kpi-card__icon ga-kpi-card__icon--sage">
+              <iconify-icon icon="lucide:clock"></iconify-icon>
+            </div>
+            <div class="ga-kpi-card__body">
+              <span class="ga-kpi-card__value">{{ avgProductionDays() }} days</span>
+              <span class="ga-kpi-card__label">Avg. production time</span>
+              <span class="ga-kpi-card__trend">
+                <iconify-icon icon="lucide:arrow-up-right"></iconify-icon> -0.5
+              </span>
             </div>
           </div>
         </div>
-        <div class="p-6 border-t border-border/80">
-          <div class="grid gap-4">
-            <div class="rounded-3xl bg-muted/50 p-4 border border-border">
-              <h4 class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-3">Ordered items</h4>
-              <div class="grid gap-3">
-                @for (item of selectedOrder()?.products; track $index) {
-                <div class="flex justify-between items-center text-sm text-foreground">
-                  <span>{{ item.name }} × {{ item.qty }}</span>
-                  <span>{{ item.price * item.qty | currency:'MAD':'symbol':'1.0-0' }}</span>
-                </div>
-                }
+
+        <section class="ga-sustainability ga-animate-in ga-animate-in--delay-2">
+          <div class="ga-sustainability__header">
+            <div class="ga-sustainability__title">
+              <iconify-icon icon="lucide:leaf"></iconify-icon>
+              Sustainability Impact
+            </div>
+            <span class="ga-sustainability__badge">
+              <iconify-icon icon="lucide:sparkles"></iconify-icon>
+              Making a difference
+            </span>
+          </div>
+          <div class="ga-sustainability__grid">
+            <div class="ga-sustain-card">
+              <div class="ga-sustain-card__icon ga-sustain-card__icon--green">
+                <iconify-icon icon="lucide:trees"></iconify-icon>
+              </div>
+              <span class="ga-sustain-card__value">2.4 tonnes</span>
+              <span class="ga-sustain-card__label">Carbon Footprint Saved — vs. industrial production</span>
+            </div>
+            <div class="ga-sustain-card">
+              <div class="ga-sustain-card__icon ga-sustain-card__icon--teal">
+                <iconify-icon icon="lucide:droplets"></iconify-icon>
+              </div>
+              <span class="ga-sustain-card__value">12,000 L</span>
+              <span class="ga-sustain-card__label">Water Conserved — Natural dye processes</span>
+            </div>
+            <div class="ga-sustain-card">
+              <div class="ga-sustain-card__icon ga-sustain-card__icon--gold">
+                <iconify-icon icon="lucide:recycle"></iconify-icon>
+              </div>
+              <span class="ga-sustain-card__value">78%</span>
+              <span class="ga-sustain-card__label">Recycled Materials — Of all raw materials</span>
+            </div>
+            <div class="ga-sustain-card">
+              <div class="ga-sustain-card__icon ga-sustain-card__icon--terra">
+                <iconify-icon icon="lucide:heart"></iconify-icon>
+              </div>
+              <span class="ga-sustain-card__value">34K MAD</span>
+              <span class="ga-sustain-card__label">Community Support — Fair wages above market</span>
+            </div>
+          </div>
+        </section>
+
+        <div class="ga-chart-grid ga-animate-in ga-animate-in--delay-3">
+          <div class="ga-chart-card">
+            <div class="ga-chart-card__header">
+              <div>
+                <h3 class="ga-chart-card__title">How is revenue trending?</h3>
+                <p class="ga-chart-card__subtitle">Monthly Revenue (MAD)</p>
               </div>
             </div>
-            <div class="rounded-3xl bg-muted/50 p-4 border border-border flex items-center justify-between text-sm font-semibold text-foreground">
-              <span>Total Amount</span>
-              <span>{{ selectedOrder()?.total | currency:'MAD':'symbol':'1.0-0' }}</span>
+            <canvas #revenueChart></canvas>
+          </div>
+          <div class="ga-chart-card">
+            <div class="ga-chart-card__header">
+              <div>
+                <h3 class="ga-chart-card__title">Revenue by Craft</h3>
+                <p class="ga-chart-card__subtitle">Breakdown by category</p>
+              </div>
             </div>
-            <div>
-              <p class="text-[11px] text-muted-foreground uppercase tracking-[0.3em] mb-2">Customer notes</p>
-              <p class="text-sm text-foreground">{{ selectedOrder()?.notes }}</p>
-            </div>
+            <canvas #categoryChart></canvas>
           </div>
         </div>
+
+        <div class="ga-chart-grid ga-animate-in ga-animate-in--delay-4">
+          <section class="ga-chart-card">
+            <h3 class="ga-chart-card__title">Which collection sells best?</h3>
+            <div class="ga-best-list">
+              @for (item of bestSellingProducts(); track item.name; let i = $index) {
+                <div class="ga-best-item">
+                  <span class="ga-best-item__rank">{{ i + 1 }}</span>
+                  <div class="ga-best-item__info">
+                    <span class="ga-best-item__name">{{ item.name }}</span>
+                    <span class="ga-best-item__sales">{{ item.orders }} orders sold</span>
+                  </div>
+                  <div class="ga-best-item__right">
+                    <span class="ga-best-item__revenue">{{ item.revenue }} MAD</span>
+                    <span class="ga-best-item__trend" [class]="'ga-best-item__trend--' + item.trend">
+                      <iconify-icon [icon]="item.trend === 'up' ? 'lucide:trending-up' : 'lucide:trending-down'"></iconify-icon>
+                    </span>
+                  </div>
+                </div>
+              }
+            </div>
+          </section>
+
+          <section class="ga-chart-card">
+            <div class="ga-chart-card__header">
+              <div>
+                <h3 class="ga-chart-card__title">When do orders come in?</h3>
+                <p class="ga-chart-card__subtitle">Orders by Status</p>
+              </div>
+            </div>
+            <canvas #ordersChart></canvas>
+          </section>
+        </div>
+
+        <section class="ga-chart-card ga-animate-in" style="margin-top: 1.25rem;">
+          <h3 class="ga-chart-card__title">Where do our customers come from?</h3>
+          <div class="ga-countries ga-countries--wide">
+            @for (country of customerCountries(); track country.name; let i = $index) {
+              <div class="ga-country-card ga-country-card--horizontal">
+                <span class="ga-country-card__flag ga-country-card__flag--lg">{{ country.flag }}</span>
+                <div class="ga-country-card__info">
+                  <span class="ga-country-card__name">{{ country.name }}</span>
+                  <div class="ga-country-card__bar">
+                    <div class="ga-country-card__bar-fill" [style.width]="(country.orders / 34 * 100) + '%'"></div>
+                  </div>
+                </div>
+                <div class="ga-country-card__stats">
+                  <span class="ga-country-card__orders">{{ country.orders }} orders</span>
+                  <span class="ga-country-card__revenue">{{ country.revenue }} MAD</span>
+                </div>
+              </div>
+            }
+          </div>
+        </section>
+
       </div>
-    </div>
     }
 
-    <!-- DELETE CONFIRM MODAL -->
-    @if (confirmDeleteModal()) {
-    <div class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-      <div class="w-full max-w-lg rounded-3xl bg-card p-6 shadow-xl border border-border">
-        <h3 class="text-lg font-heading font-bold text-foreground">Confirm deletion</h3>
-        <p class="text-sm text-muted-foreground mt-2">This product will be removed from your catalog permanently. Are you sure?</p>
-        <div class="mt-6 flex flex-wrap gap-3 justify-end">
-          <button type="button" (click)="cancelDeleteProduct()"
-            class="px-4 py-2.5 rounded-xl border border-border text-xs font-semibold text-foreground hover:bg-muted transition-all">Cancel</button>
-          <button type="button" (click)="deleteProduct()"
-            class="px-4 py-2.5 rounded-xl bg-destructive text-card text-xs font-semibold hover:bg-destructive/90 transition-all">Delete product</button>
+  </main>
+
+  <!-- ══════════════════════════════════════════════════
+       PRODUCT MODAL
+  ══════════════════════════════════════════════════ -->
+  @if (showProductModal()) {
+    <div class="ga-modal-backdrop" (click)="closeProductModal()">
+      <div class="ga-modal" (click)="$event.stopPropagation()">
+        <div class="ga-modal__header">
+          <h2 class="ga-modal__title">{{ editingProductId() ? 'Edit Product' : 'New Product' }}</h2>
+          <button class="ga-modal__close" (click)="closeProductModal()">
+            <iconify-icon icon="lucide:x"></iconify-icon>
+          </button>
         </div>
+        <form class="ga-form" (submit)="saveProduct($event)">
+          <div class="ga-form__field">
+            <label>Product name</label>
+            <input type="text" [value]="productFormName()" (input)="productFormName.set($any($event.target).value)" required />
+          </div>
+          <div class="ga-form__field">
+            <label>Description</label>
+            <textarea rows="3" [value]="productFormDesc()" (input)="productFormDesc.set($any($event.target).value)"></textarea>
+          </div>
+          <div class="ga-form__row">
+            <div class="ga-form__field">
+              <label>Category</label>
+              <input type="text" [value]="productFormCategory()" (input)="productFormCategory.set($any($event.target).value)" />
+            </div>
+            <div class="ga-form__field">
+              <label>Price (MAD)</label>
+              <input type="number" [value]="productFormPrice()" (input)="productFormPrice.set($any($event.target).value)" />
+            </div>
+          </div>
+          <div class="ga-form__row">
+            <div class="ga-form__field">
+              <label>Stock</label>
+              <input type="number" [value]="productFormStock()" (input)="productFormStock.set($any($event.target).value)" />
+            </div>
+            <div class="ga-form__field">
+              <label>Image URL</label>
+              <input type="text" [value]="productFormImage()" (input)="productFormImage.set($any($event.target).value)" />
+            </div>
+          </div>
+          <div class="ga-form__actions">
+            <button type="button" class="ga-btn ga-btn--ghost" (click)="closeProductModal()">Cancel</button>
+            <button type="submit" class="ga-btn ga-btn--primary" [disabled]="isSaving()">
+              {{ isSaving() ? 'Saving...' : 'Save Product' }}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
-    }
-  </div>
+  }
+
 </div>

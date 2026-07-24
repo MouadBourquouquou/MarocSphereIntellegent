@@ -67,7 +67,10 @@ export interface DmcDTO {
 export interface ReservationDTO {
   id: number;
   clientId: number;
-  guideId: number | null;
+  clientName: string;
+  resourceType: string;
+  resourceId: number;
+  resourceName: string;
   statut: string;
   date: string;
 }
@@ -180,7 +183,7 @@ export class AdminDataService {
       map(guides => {
         const counts: Record<string, number> = {};
         guides.forEach(g => {
-          const lang = g.languePreferee || 'Non spécifié';
+          const lang = g.languePreferee || 'Unspecified';
           counts[lang] = (counts[lang] ?? 0) + 1;
         });
         const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 6);
@@ -197,7 +200,7 @@ export class AdminDataService {
       map(artisans => {
         const counts: Record<string, number> = {};
         artisans.forEach(a => {
-          const cat = a.categorieArtisanat || 'Autre';
+          const cat = a.categorieArtisanat || 'Other';
           counts[cat] = (counts[cat] ?? 0) + 1;
         });
         const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 6);
@@ -231,7 +234,7 @@ export class AdminDataService {
       map(clients => {
         const counts: Record<string, number> = {};
         clients.forEach(c => {
-          const n = c.nationalite || 'Non spécifié';
+          const n = c.nationalite || 'Unspecified';
           counts[n] = (counts[n] ?? 0) + 1;
         });
         const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 6);

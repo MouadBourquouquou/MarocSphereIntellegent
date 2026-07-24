@@ -83,7 +83,10 @@ export interface DmcUser {
 export interface ReservationItem {
   id: number;
   clientId: number;
-  guideId: number | null;
+  clientName: string;
+  resourceType: string;
+  resourceId: number;
+  resourceName: string;
   statut: string;
   date: string;
 }
