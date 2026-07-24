@@ -163,6 +163,8 @@ export interface MapLocation {
   rating: number;
   imageUrl: string;
   description: string;
+}
+
 export interface Experience {
   id: number;
   guideId: number;

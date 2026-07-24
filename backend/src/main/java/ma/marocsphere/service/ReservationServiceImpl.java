@@ -58,6 +58,14 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<ReservationResponseDTO> getByGuideId(Long guideId) {
+        return reservationRepo.findByResourceTypeAndResourceIdWithClient(ReservationType.GUIDE, guideId).stream()
+                .map(this::toResponseDTO)
+                .toList();
+    }
+
+    @Override
     @Transactional
     public ReservationResponseDTO create(ReservationCreationDTO dto) {
         Client client = clientRepo.findById(dto.getClientId())

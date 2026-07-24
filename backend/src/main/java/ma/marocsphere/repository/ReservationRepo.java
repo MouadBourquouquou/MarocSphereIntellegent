@@ -23,6 +23,11 @@ public interface ReservationRepo extends JpaRepository<Reservation, Long> {
 
     long countByResourceType(ReservationType resourceType);
 
+    List<Reservation> findByResourceTypeAndResourceId(ReservationType resourceType, Long resourceId);
+
+    @Query("SELECT r FROM Reservation r LEFT JOIN FETCH r.client WHERE r.resourceType = :resourceType AND r.resourceId = :resourceId")
+    List<Reservation> findByResourceTypeAndResourceIdWithClient(@Param("resourceType") ReservationType resourceType, @Param("resourceId") Long resourceId);
+
     @Query("SELECT r FROM Reservation r LEFT JOIN FETCH r.client")
     List<Reservation> findAllWithClient();
 }

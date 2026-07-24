@@ -1,3 +1,4 @@
+@import "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
 @import "tailwindcss";
       @theme inline {
         --color-background: var(--background);
@@ -151,8 +152,6 @@ img {
           calc(var(--shadow-blur, 30) * 1px) calc(var(--shadow-spread, -8) * 1px)
           var(--shadow-color, rgba(15, 23, 42, 0.12));
       }
-
-@import "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
 
 .logo {
         height: 50px;
