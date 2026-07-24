@@ -90,12 +90,12 @@ export interface ChatMessageRequest {
 
 export interface Experience {
   id: number;
+  guideId: number;
   title: string;
   summary: string;
   description: string;
   location: string;
   category: string;
-  guideId: number;
   duration: string;
   difficulty: string;
   price: number;
@@ -107,6 +107,11 @@ export interface Experience {
   meetingPoint: string;
   mapImageUrl: string;
   reviewHighlights: string[];
+  image: string;
+  note: number;
+  reservationsNumber: number;
+  statut: 'PUBLISHED' | 'DRAFT';
+  creationDate: string;
 }
 
 export interface GuideBookingRequest {
@@ -277,6 +282,7 @@ export interface Notification {
   message: string;
   date: string;
   read: boolean;
+}
 export type MapLocationCategory =
   | 'Hotel'
   | 'Riad'
@@ -297,22 +303,6 @@ export interface MapLocation {
   rating: number;
   imageUrl: string;
   description: string;
-}
-
-export interface Experience {
-  id: number;
-  guideId: number;
-  titre: string;
-  description: string;
-  localisation: string;
-  duree: string;
-  prix: string;
-  categorie: string;
-  image: string;
-  note: number;
-  nombreReservations: number;
-  statut: 'PUBLISHED' | 'DRAFT';
-  dateCreation: string;
 }
 
 export interface ExperienceCreationRequest {

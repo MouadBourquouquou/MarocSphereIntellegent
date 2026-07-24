@@ -384,15 +384,15 @@ export class dashGuide implements AfterViewInit, OnDestroy {
   private mapExperience(e: ApiExperience): Experience {
     return {
       id: e.id.toString(),
-      title: e.titre ?? '',
+      title: e.title ?? '',
       description: e.description ?? '',
-      location: e.localisation ?? '',
-      duration: e.duree ?? '',
-      price: e.prix ?? '',
-      category: e.categorie ?? '',
+      location: e.location ?? '',
+      duration: e.duration ?? '',
+      price: e.price.toString() ?? '',
+      category: e.category ?? '',
       image: e.image ?? '/images/Unique Marrakech Itinerary_ Hidden Gems & Highlights.jpg',
       rating: e.note ?? 0,
-      bookings: e.nombreReservations ?? 0,
+      bookings: e.reservationsNumber ?? 0,
       status: e.statut === 'PUBLISHED' ? 'published' : 'draft',
     };
   }

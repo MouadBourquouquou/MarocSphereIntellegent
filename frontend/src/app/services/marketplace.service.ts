@@ -29,6 +29,11 @@ export class MarketplaceService {
       mapImageUrl:
         'https://uxmagic.blob.core.windows.net/public/project-documents/6a5f6e376789929bcca63504/el.hayouni.fatiha_gmail.com/1784639721014-135f69dd-image.png',
       reviewHighlights: ['Amazing cultural immersion', 'Excellent guide knowledge', 'Perfect pace for families'],
+      image: 'https://uxmagic.blob.core.windows.net/public/project-documents/6a5f6e376789929bcca63504/el.hayouni.fatiha_gmail.com/1784639701553-a7d2cd36-esperiences.jpeg',
+      note: 4.9,
+      reservationsNumber: 124,
+      statut: 'PUBLISHED',
+      creationDate: '2026-01-05',
     },
     {
       id: 2,
@@ -55,6 +60,11 @@ export class MarketplaceService {
       mapImageUrl:
         'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=150&q=80',
       reviewHighlights: ['Perfect desert evening', 'Memorable stars and campfire', 'Comfortable luxury experience'],
+      image: 'https://uxmagic.blob.core.windows.net/public/project-documents/6a5f6e376789929bcca63504/el.hayouni.fatiha_gmail.com/1784639701553-a7d2cd36-esperiences.jpeg',
+      note: 4.9,
+      reservationsNumber: 124,
+      statut: 'PUBLISHED',
+      creationDate: '2026-01-05',
     },
     {
       id: 3,
@@ -81,6 +91,11 @@ export class MarketplaceService {
       mapImageUrl:
         'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=150&q=80',
       reviewHighlights: ['Delicious local cooking class', 'Beautiful rooftop setting', 'Great for groups and couples'],
+      image: 'https://uxmagic.blob.core.windows.net/public/project-documents/6a5f6e376789929bcca63504/el.hayouni.fatiha_gmail.com/1784639701553-a7d2cd36-esperiences.jpeg',
+      note: 4.9,
+      reservationsNumber: 124,
+      statut: 'PUBLISHED',
+      creationDate: '2026-01-05',
     },
   ];
 
