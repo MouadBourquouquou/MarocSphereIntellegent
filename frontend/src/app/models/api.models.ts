@@ -76,14 +76,78 @@ export interface ChatMessage {
   id: number;
   clientId: number;
   contenu: string;
-  role: 'USER' | 'AI';
+  role: 'USER' | 'AI' | 'GUIDE' | 'ARTISAN';
   dateEnvoi: string;
+  guideId?: number;
+  artisanId?: number;
+  read?: boolean;
 }
 
 export interface ChatMessageRequest {
   clientId: number;
   contenu: string;
 }
+
+export interface Experience {
+  id: number;
+  title: string;
+  summary: string;
+  description: string;
+  location: string;
+  category: string;
+  guideId: number;
+  duration: string;
+  difficulty: string;
+  price: number;
+  rating: number;
+  reviewsCount: number;
+  gallery: string[];
+  includedServices: string[];
+  availableDates: string[];
+  meetingPoint: string;
+  mapImageUrl: string;
+  reviewHighlights: string[];
+}
+
+export interface GuideBookingRequest {
+  id: string;
+  clientId: number;
+  guideId: number;
+  itineraryId?: number;
+  itineraryTitle?: string;
+  date: string;
+  startTime: string;
+  duration: string;
+  travelers: number;
+  notes: string;
+  status: 'PENDING' | 'ACCEPTED' | 'DENIED';
+  type: 'AI' | 'EXPERIENCE';
+  createdAt: string;
+}
+
+export interface ProductBookingRequest {
+  id: string;
+  clientId: number;
+  artisanId: number;
+  productId: number;
+  pickupDate: string;
+  pickupTime: string;
+  quantity: number;
+  notes: string;
+  status: 'PENDING' | 'ACCEPTED' | 'DENIED';
+  createdAt: string;
+}
+
+export interface Review {
+  id: string;
+  artisanId?: number;
+  guideId?: number;
+  clientId: number;
+  rating: number;
+  comment: string;
+  date: string;
+}
+
 
 export interface Produit {
   id: number;
@@ -143,6 +207,76 @@ export interface CommandeUpdateRequest {
   statut: string;
 }
 
+export type BookingType = 'ai-itinerary' | 'experience' | 'product';
+
+export type BookingStatus = 'pending' | 'accepted' | 'denied';
+
+export interface Booking {
+  id: string;
+  clientId: number;
+  type: BookingType;
+  status: BookingStatus;
+  guideId?: number;
+  itineraryId?: number;
+  date?: string;
+  startTime?: string;
+  duration?: string;
+  travelers?: number;
+  artisanId?: number;
+  productId?: number;
+  pickupDate?: string;
+  pickupTime?: string;
+  quantity?: number;
+  notes: string;
+  createdAt: string;
+}
+
+export interface ItineraryDay {
+  dayNumber: number;
+  title: string;
+  activities: ItineraryActivity[];
+}
+
+export interface ItineraryActivity {
+  time: string;
+  description: string;
+  location?: string;
+}
+
+export interface AIItinerary {
+  id: number;
+  clientId: number;
+  title: string;
+  days: ItineraryDay[];
+  createdAt: string;
+}
+
+export interface Conversation {
+  id: string;
+  clientId: number;
+  guideId: number;
+  lastMessage: string;
+  lastMessageAt: string;
+  unreadCount: number;
+}
+
+export interface Message {
+  id: string;
+  conversationId: string;
+  senderId: number;
+  senderRole: 'client' | 'guide' | 'artisan';
+  content: string;
+  timestamp: string;
+  read: boolean;
+}
+
+export interface Notification {
+  id: string;
+  role: 'CLIENT' | 'GUIDE' | 'ARTISAN';
+  title: string;
+  message: string;
+  date: string;
+  read: boolean;
 export type MapLocationCategory =
   | 'Hotel'
   | 'Riad'
